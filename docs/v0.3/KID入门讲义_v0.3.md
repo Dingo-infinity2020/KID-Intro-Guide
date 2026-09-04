@@ -1380,7 +1380,7 @@ $$
 2. S. Doyle, *Lumped Element Kinetic Inductance Detectors*, PhD thesis, Cardiff University (2008).
 3. J. Zmuidzinas, “Superconducting Microresonators: Physics and Applications,” *Annual Review of Condensed Matter Physics*, 3, 169–214 (2012).
 4. J. Gao, *The Physics of Superconducting Microwave Resonators*, PhD thesis, California Institute of Technology (2008).
-5. M. Tinkham, *Introduction to Superconductivity*, 2nd ed., Dover Publications.
+5. M. Tinkham, *Introduction to Superconductivity*, 2nd ed., McGraw–Hill (1996).
 6. S. B. Kaplan et al., “Quasiparticle and phonon lifetimes in superconductors,” *Physical Review B*, 14, 4854–4873 (1976).
 7. A. Rothwarf and B. N. Taylor, “Measurement of Recombination Lifetimes in Superconductors,” *Physical Review Letters*, 19, 27–30 (1967).
-8. P. J. de Visser et al., generation–recombination / sparse quasiparticle fluctuation studies in superconducting resonators.
+8. P. J. de Visser et al., “Generation-Recombination Noise: The Fundamental Sensitivity Limit for Kinetic Inductance Detectors,” *Journal of Low Temperature Physics*, 167, 335–340 (2012).
