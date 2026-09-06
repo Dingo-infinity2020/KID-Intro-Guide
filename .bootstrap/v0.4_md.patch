@@ -1,0 +1,271 @@
+--- "/mnt/data/kid_intro_v0_3/KID\345\205\245\351\227\250\350\256\262\344\271\211_v0.3.md"	2026-09-06 05:32:20.217723661 +0000
++++ "/mnt/data/kid_intro_v0_4/KID\345\205\245\351\227\250\350\256\262\344\271\211_v0.4.md"	2026-09-06 05:36:39.509958194 +0000
+@@ -1,7 +1,7 @@
+-# KID 入门讲义 v0.3
++# KID 入门讲义 v0.4
+ 
+ **副标题：从“一个光子”到可读出的微波信号**  
+-**版本：v0.3 · 2026-09-04**
++**版本：v0.4 · 2026-09-06**
+ 
+ > 这不是一本“先学完凝聚态物理再碰器件”的教材。它采用器件设计者视角：**先建立可运行的物理图景，再逐层补上微观理论、公式、仿真与实验。**
+ 
+@@ -1368,6 +1368,258 @@
+ $$
+ 
+ 
++
++---
++
++# 第 5 章：复电导与 Mattis–Bardeen —— 把准粒子真正连接到 $L_k$ 与 $Q_i$
++
++## 学习目标
++
++这一章要打开前几章一直保留的“黑箱”：
++
++$$
++\boxed{
++N_{qp}\rightarrow f(E),\Delta\rightarrow \sigma_1,\sigma_2\rightarrow R_s,X_s\rightarrow L_k,Q_i\rightarrow f_0,S_{21}
++}
++$$
++
++学完后，你应能解释为什么同一批准粒子会同时让谐振频率下降、内部品质因数下降，以及为什么 PEC 模型无法描述完整 KID 响应。
++
++## 1. 为什么需要复电导？
++
++交流超导体的电流既有与电场同相的耗散分量，也有与电场正交的感性分量，因此写成
++
++$$
++\boxed{\sigma(\omega,T)=\sigma_1(\omega,T)-i\sigma_2(\omega,T)}.
++$$
++
++这里采用 $e^{+i\omega t}$ 约定；换用另一时间约定时虚部符号会改变，但物理不变。
++
++- $\sigma_1$：耗散响应，平均功率密度 $\langle p\rangle=\tfrac12\sigma_1|E_0|^2$；
++- $\sigma_2$：感性/超流响应，对应 kinetic inductance。
++
++因此通常：
++
++$$
++N_{qp}\uparrow\Rightarrow \sigma_1\uparrow,\quad \sigma_2\downarrow.
++$$
++
++## 2. Mattis–Bardeen 在做什么？
++
++BCS 给出超导能隙、准粒子能谱和态密度；Mattis–Bardeen 则把
++
++$$
++(\Delta,f(E),\omega,T)
++$$
++
++翻译成
++
++$$
++(\sigma_1,\sigma_2).
++$$
++
++对 $\hbar\omega<2\Delta$，其标准积分形式可写为
++
++$$
++\frac{\sigma_1}{\sigma_n}
++=\frac{2}{\hbar\omega}\int_\Delta^\infty
++\frac{E^2+\Delta^2+\hbar\omega E}{\sqrt{E^2-\Delta^2}\sqrt{(E+\hbar\omega)^2-\Delta^2}}
++[f(E)-f(E+\hbar\omega)]\,dE,
++$$
++
++以及
++
++$$
++\frac{\sigma_2}{\sigma_n}
++=\frac{1}{\hbar\omega}\int_\Delta^{\Delta+\hbar\omega}
++\frac{E^2+\Delta^2-\hbar\omega E}{\sqrt{E^2-\Delta^2}\sqrt{\Delta^2-(E-\hbar\omega)^2}}
++[1-2f(E)]\,dE.
++$$
++
++第一次学习不用背积分。只需看懂：$\Delta$ 定阈值、$f(E)$ 定占据、$\hbar\omega$ 定跃迁能量、BCS 态密度和 coherence factor 定跃迁权重。
++
++## 3. 低温 GHz 读出下的重要趋势
++
++若
++
++$$
++\hbar\omega\ll\Delta_0,\qquad k_BT\ll\Delta_0,
++$$
++
++则
++
++$$
++\frac{\sigma_1}{\sigma_n}\approx
++\frac{4\Delta_0}{\hbar\omega}e^{-\Delta_0/k_BT}
++\sinh\!\left(\frac{\hbar\omega}{2k_BT}\right)
++K_0\!\left(\frac{\hbar\omega}{2k_BT}\right),
++$$
++
++而 $\sigma_2/\sigma_n$ 的主量级约为
++
++$$
++\frac{\sigma_2}{\sigma_n}\sim\frac{\pi\Delta}{\hbar\omega}.
++$$
++
++因此升温/光生准粒子增加时，典型趋势是 $\sigma_1\uparrow$、$\sigma_2\downarrow$。
++
++## 4. 从 $\sigma$ 到表面阻抗
++
++实验和电磁仿真更直接接触的是
++
++$$
++\boxed{Z_s=R_s+iX_s}.
++$$
++
++厚体局域极限：
++
++$$
++Z_s=\sqrt{\frac{i\mu_0\omega}{\sigma}}.
++$$
++
++薄膜且厚度方向电流近似均匀时：
++
++$$
++\boxed{Z_{\Box}\approx\frac{1}{t\sigma}}.
++$$
++
++代入 $\sigma_1-i\sigma_2$ 得
++
++$$
++R_{\Box}=\frac{\sigma_1}{t(\sigma_1^2+\sigma_2^2)},\qquad
++X_{\Box}=\frac{\sigma_2}{t(\sigma_1^2+\sigma_2^2)}.
++$$
++
++若 $\sigma_2\gg\sigma_1$：
++
++$$
++R_{\Box}\approx\frac{\sigma_1}{t\sigma_2^2},\qquad
++X_{\Box}\approx\frac{1}{t\sigma_2}.
++$$
++
++## 5. 从 $\sigma_2$ 到 kinetic inductance
++
++因为 $X_{\Box}=\omega L_{k,\Box}$：
++
++$$
++\boxed{L_{k,\Box}\approx\frac{1}{\omega t\sigma_2}}.
++$$
++
++于是
++
++$$
++N_{qp}\uparrow\Rightarrow\sigma_2\downarrow\Rightarrow L_k\uparrow\Rightarrow f_0\downarrow.
++$$
++
++小信号关系：
++
++$$
++\boxed{\frac{\delta f_0}{f_0}\approx\frac{\alpha}{2}\frac{\delta\sigma_2}{\sigma_2}}.
++$$
++
++光照时通常 $\delta\sigma_2<0$，因此 $\delta f_0<0$。
++
++## 6. 从 $\sigma_1$ 到 $Q_i$
++
++薄膜近似中
++
++$$
++\frac{X_s}{R_s}\approx\frac{\sigma_2}{\sigma_1}.
++$$
++
++考虑 kinetic inductance fraction $\alpha$，可先建立
++
++$$
++\boxed{\frac{1}{Q_{i,qp}}\approx\alpha\frac{\sigma_1}{\sigma_2}}.
++$$
++
++因此
++
++$$
++N_{qp}\uparrow\Rightarrow\sigma_1\uparrow\Rightarrow R_s\uparrow\Rightarrow Q_i\downarrow.
++$$
++
++## 7. 同一批准粒子为什么有两种响应？
++
++因为准粒子改变的是整个复电导：
++
++$$
++\delta N_{qp}\Rightarrow(\delta\sigma_1,\delta\sigma_2),
++$$
++
++随后分别映射成
++
++$$
++\delta Q_i^{-1},\qquad \delta f_0/f_0.
++$$
++
++所以“幅度响应”和“相位/频率响应”不是两个独立探测机制，而是同一材料扰动的两个复数分量。
++
++## 8. GHz 读出与 150 GHz 光学频率不能混用材料参数
++
++同一块 meander 在 GHz 与 150 GHz 下承担不同任务：
++
++- GHz：通常 $\hbar\omega_{read}\ll2\Delta$，主要探测准粒子改变后的表面阻抗；
++- 150 GHz：对 Al 可满足 $h\nu>2\Delta$，入射场本身能够 pair break，材料已处于不同的频率区间。
++
++因此：GHz 拟合得到的单个 sheet impedance 不能不加判断地直接用于 150 GHz absorber 仿真。应使用随频率变化的 $Z_s(\omega,T,N_{qp})$ 或 $\sigma(\omega,T,N_{qp})$。
++
++## 9. 一个实用估算式
++
++低温低频 dirty-limit 中
++
++$$
++\frac{\sigma_2}{\sigma_n}\approx\frac{\pi\Delta_0}{\hbar\omega},
++$$
++
++配合 $R_{\Box,n}=1/(t\sigma_n)$ 得
++
++$$
++\boxed{L_{k,\Box}(0)\approx\frac{\hbar R_{\Box,n}}{\pi\Delta_0}}.
++$$
++
++它直接说明：在相同能隙下，正常态 sheet resistance 越大，单位方块 kinetic inductance 越大。
++
++## 10. MB 的边界
++
++真实器件还可能受到 TLS、非平衡准粒子、强读出功率、磁通俘获、残余损耗、无序与 DOS broadening、非局域电动力学等影响。正确做法是：先把 MB 当作基准，再研究偏离 MB 的部分。
++
++## 11. 本章最小闭环
++
++$$
++\sigma=\sigma_1-i\sigma_2,
++$$
++
++$$
++Z_{\Box}\approx\frac{1}{t\sigma},
++$$
++
++$$
++R_{\Box}\approx\frac{\sigma_1}{t\sigma_2^2},\qquad X_{\Box}\approx\frac{1}{t\sigma_2},
++$$
++
++$$
++L_{k,\Box}\approx\frac{1}{\omega t\sigma_2},
++$$
++
++$$
++\frac{\delta f_0}{f_0}\approx\frac{\alpha}{2}\frac{\delta\sigma_2}{\sigma_2},
++$$
++
++$$
++\frac{1}{Q_{i,qp}}\approx\alpha\frac{\sigma_1}{\sigma_2}.
++$$
++
++## 12. 建议练习
++
++1. 从 $Z_{\Box}=1/[t(\sigma_1-i\sigma_2)]$ 独立推导 $R_{\Box},X_{\Box}$；
++2. 计算 $\sigma_2/\sigma_1=10,10^2,10^3,10^4$ 时的 $X/R$；
++3. 用 Al、2 GHz 和低温 MB 近似画 $\sigma_1/\sigma_n$ 对 $T/T_c$ 的半对数图；
++4. 用 $L_{k,\Box}\approx\hbar R_{\Box,n}/(\pi\Delta_0)$ 扫描正常态 sheet resistance；
++5. 构造小扰动，数值计算 $\sigma_1,\sigma_2\rightarrow R_s,X_s\rightarrow f_0,Q_i$；
++6. 闭卷回答：为什么同一批光生准粒子会同时让 notch 左移并变宽？
++
++
+ # 后续版本计划
+ 
+ - v0.4：复电导、surface impedance 与 Mattis–Bardeen 的器件化理解
