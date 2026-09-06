@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.4 — 2026-09-06
+
+- 新增“复电导与 Mattis–Bardeen”完整章节；
+- 建立 `Nqp → σ1/σ2 → Rs/Xs → Qi/f0 → S21` 闭环；
+- 推导薄膜 `Z□ ≈ 1/(tσ)` 与 `Lk,□ ≈ 1/(ωtσ2)`；
+- 建立 `δf0/f0 ≈ (α/2)δσ2/σ2` 与简化的 `1/Qi,qp ≈ ασ1/σ2`；
+- 增加 `Lk,□(0) ≈ ħR□,n/(πΔ0)` 工程估算；
+- 区分 GHz readout 与 150 GHz optical absorber 的材料电磁模型；
+- 本地两次 XeLaTeX 编译并逐页视觉审查，正式 PDF 47 页；
+- 引入 `LATEST_VERSION`，根构建脚本与 GitHub Actions 不再硬编码某个版本；
+- 固定“每个版本必须提交正式 PDF 到仓库”的发布规则。
+
+详见 [`docs/v0.4/CHANGELOG.md`](docs/v0.4/CHANGELOG.md)。
+
+## v0.3 — 2026-09-04
+
+- 新增超导基础最小知识集；
+- 系统解释 Cooper pair、BCS 能隙、准粒子与 pair-breaking threshold；
+- 引入热准粒子、generation-recombination 与 quasiparticle lifetime；
+- 建立材料 `Tc`、工作温度与 150 GHz pair-breaking 条件的工程联系；
+- 讲义扩展至 38 页。
+
+详见 [`docs/v0.3/CHANGELOG.md`](docs/v0.3/CHANGELOG.md)。
+
 ## v0.2 — 2026-09-04
 
 - 重做全部核心流程图并统一箭头语义；
