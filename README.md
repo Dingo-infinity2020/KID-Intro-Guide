@@ -107,7 +107,7 @@ make pdf
 或者：
 
 ```bash
-./scripts/build_latest.sh
+bash ./scripts/build_latest.sh
 ```
 
 脚本读取根目录 `LATEST_VERSION`，无需手工修改版本路径。
