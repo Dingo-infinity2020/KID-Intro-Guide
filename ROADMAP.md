@@ -1,60 +1,60 @@
 # Roadmap
 
-## v0.3 — 超导基础最小知识集
+## 已完成
 
-计划主题：
+### v0.1 — 从一个光子到 `S21`
 
-- 正常态与超导态的区别；
-- Cooper pair 的物理图景；
-- BCS 能隙 `Δ`；
-- pair-breaking 条件 `hν > 2Δ`；
-- 热准粒子与 `Nqp(T)`；
-- recombination（复合）与 quasiparticle lifetime（准粒子寿命）；
-- 与毫米/亚毫米波 KID 工作频率的联系。
+建立 KID 的第一条完整因果链。
 
-## v0.4 — 复电导与 Mattis–Bardeen
+### v0.2 — 动能电感
 
-计划主题：
+从载流子惯性推到薄膜 sheet kinetic inductance 与 kinetic inductance fraction。
 
-- `σ = σ1 - jσ2`；
-- `σ1` 与耗散；
-- `σ2` 与感性响应；
-- Mattis–Bardeen 理论的物理意义；
-- 从复电导到表面阻抗、`Lk` 与 `Qi`。
+### v0.3 — 超导基础最小知识集
 
-## v0.5 — 微波谐振器与 I-Q 读出
+完成 Cooper pair、BCS 能隙、准粒子、热激发、generation-recombination 与 quasiparticle lifetime。
 
-- `Qi`、`Qc`、`Qr`；
-- notch resonator；
-- `S21` 模型；
-- I-Q 圆；
+### v0.4 — 复电导与 Mattis–Bardeen
+
+完成 `σ1/σ2`、Mattis–Bardeen、surface impedance、`Lk`、`Qi` 的器件化闭环，并区分 GHz / 150 GHz 两种电磁频率区间。
+
+## 下一阶段
+
+### v0.5 — 微波谐振器与 I-Q 读出
+
+计划：
+
+- `Qi`、`Qc`、`Qr` 的严格定义和能量意义；
+- notch resonator 的 `S21` 模型；
+- resonance linewidth 与 ring-down time；
+- I-Q 圆的几何意义；
+- cable delay、complex gain、impedance mismatch 对真实圆的扭曲；
 - resonance fitting；
-- 固定 tone 读出与频率跟踪。
+- 固定 tone 读出、phase/amplitude projection 与频率跟踪。
 
-## v0.6 — 光学响应、灵敏度与噪声
+### v0.6 — 光学响应、灵敏度与噪声
 
-- absorbed power；
-- responsivity；
+- absorbed power 与 quasiparticle responsivity；
 - photon noise；
 - generation-recombination noise；
 - TLS noise；
 - amplifier noise；
 - NEP 与 photon-noise-limited 条件。
 
-## v0.7 — LEKID 设计
+### v0.7 — LEKID 电磁设计
 
 - meander 作为 absorber + inductor；
 - IDC；
 - 偏振；
 - backshort；
 - 薄膜厚度、线宽、sheet impedance；
-- Sonnet / CST 仿真的角色与边界。
+- Sonnet / CST 的角色与边界。
 
-## v0.8+ — 数值练习、实验与阵列
+### v0.8+ — 数值练习、实验与真实项目闭环
 
 - Python notebooks；
 - resonator fitting；
 - 材料参数扫描；
 - 光学效率与实验标定；
 - FDM 阵列读出；
-- 真实双偏振 LEKID 案例。
+- 当前双偏振 150 GHz LEKID 的理论—Sonnet—CST—实验验证矩阵。
