@@ -1,0 +1,635 @@
+--- "/mnt/data/kid_intro_v0_3/KID\345\205\245\351\227\250\350\256\262\344\271\211_v0.3.tex"	2026-09-06 05:32:20.777723661 +0000
++++ "/mnt/data/kid_intro_v0_4/KID\345\205\245\351\227\250\350\256\262\344\271\211_v0.4.tex"	2026-09-06 05:36:39.509390504 +0000
+@@ -22,7 +22,7 @@
+ \definecolor{KidGray}{HTML}{F3F5F7}
+ \definecolor{KidDark}{HTML}{263238}
+ 
+-\hypersetup{colorlinks=true,linkcolor=KidBlue,urlcolor=KidBlue,citecolor=KidTeal,pdftitle={KID入门讲义 v0.3},pdfauthor={ChatGPT 辅助整理}}
++\hypersetup{colorlinks=true,linkcolor=KidBlue,urlcolor=KidBlue,citecolor=KidTeal,pdftitle={KID入门讲义 v0.4},pdfauthor={ChatGPT 辅助整理}}
+ \setstretch{1.15}
+ \setlist[itemize]{leftmargin=2em,itemsep=0.25em,topsep=0.4em}
+ \setlist[enumerate]{leftmargin=2em,itemsep=0.25em,topsep=0.4em}
+@@ -31,7 +31,7 @@
+ 
+ \pagestyle{fancy}
+ \fancyhf{}
+-\fancyhead[L]{KID 入门讲义 v0.3}
++\fancyhead[L]{KID 入门讲义 v0.4}
+ \fancyhead[R]{\leftmark}
+ \fancyfoot[C]{\thepage}
+ \renewcommand{\headrulewidth}{0.4pt}
+@@ -78,7 +78,7 @@
+ \vspace{0.5cm}
+ {\Large\color{KidBlue} 从“一个光子”到可读出的微波信号}\par
+ \vspace{1.4cm}
+-{\large Version 0.3 · 2026-09-04}\par
++{\large Version 0.4 · 2026-09-06}\par
+ \vfill
+ \begin{tcolorbox}[width=0.88\textwidth,colback=KidGray,colframe=KidBlue!55,arc=3mm]
+ \centering
+@@ -104,14 +104,15 @@
+   \item \textbf{与 LEKID 设计有什么关系？} —— 把材料、几何、电磁仿真和读出重新接回同一条链。
+ \end{enumerate}
+ 
+-当前版本 v0.3 在 v0.2 的基础上继续推进四件事：
++当前版本 v0.4 在 v0.3 的基础上继续推进五件事：
+ \begin{itemize}
+-  \item 保留整个 KID 入门学习路线与“从光子到 $\Stwentyone$”的基础物理图景；
+-  \item 保留第 3 章动能电感推导，并继续把宏观电路量连接到微观超导状态；
+-  \item 新增“超导基础最小知识集”：Cooper pair、BCS 能隙、准粒子与热激发；
+-  \item 新增 generation--recombination、quasiparticle lifetime，以及材料 $T_c$ 与 \SI{150}{GHz} pair-breaking threshold 的直接设计联系。
++  \item 完整保留 v0.1--v0.3 的因果链、动能电感推导与超导基础；
++  \item 正式引入复电导 $\sigma=\sigma_1-i\sigma_2$，区分耗散响应与感性响应；
++  \item 用 Mattis--Bardeen 理论把 $\Delta$、准粒子分布 $f(E)$ 与 $\sigma_1,\sigma_2$ 连接起来；
++  \item 从复电导推到表面阻抗 $Z_s=R_s+iX_s$，再推到薄膜 sheet kinetic inductance；
++  \item 建立 $\sigma_1,\sigma_2\rightarrow Q_i,f_0\rightarrow S_{21}$ 的器件化链条，并说明在 GHz 读出与 \SI{150}{GHz} 光学频率下建模时应避免哪些混用。
+ \end{itemize}
+-后续版本会继续进入复电导、Mattis--Bardeen、谐振器拟合、NEP、噪声与 LEKID 电磁设计。
++后续版本将进入谐振器 $Q_i/Q_c/Q_r$、IQ 圆与实际 fitting，再继续到 responsivity、NEP、噪声和 LEKID 电磁设计。
+ 
+ \chapter{KID 入门的总体路线图}
+ 
+@@ -1616,14 +1617,572 @@
+ \end{formula}
+ 
+ 
++
++\chapter{复电导与 Mattis--Bardeen：把准粒子真正连接到 $L_k$ 与 $Q_i$}
++
++\begin{goalbox}
++这一章要打开前几章一直保留的一个“黑箱”：为什么准粒子变多会\textbf{同时}让动能电感增大、微波损耗增大？学完后你应能沿着下面的链条独立解释：
++\[
++\boxed{
++N_{\qp}
++\rightarrow
++f(E),\Delta
++\rightarrow
++\sigma_1,\sigma_2
++\rightarrow
++R_s,X_s
++\rightarrow
++L_k,Q_i
++\rightarrow
++f_0,S_{21}
++}
++\]
++并能判断一个 Sonnet/CST 中的 PEC 或普通金属模型，到底漏掉了哪一层 KID 物理。
++\end{goalbox}
++
++\section{为什么需要“复电导”这层语言？}
++
++第 4 章已经告诉我们：光照或升温都会改变准粒子数 $N_{\qp}$。第 3 章又告诉我们：总电感包含 kinetic inductance。但是这两章之间仍缺一座桥：\textbf{微波电场作用在超导薄膜上时，材料到底如何产生电流？}
++
++普通直流金属常写
++\[
++J=\sigma E,
++\]
++其中 $\sigma$ 可以近似看成一个实数。对交流超导体，这样写还不够，因为电流相对于电场既有“同相”部分，也有“相差四分之一周期”的部分。于是要写成
++\[
++\boxed{
++\sigma(\omega,T)=\sigma_1(\omega,T)-i\sigma_2(\omega,T)
++}
++\]
++这里采用工程中常见的 $e^{+i\omega t}$ 时间约定；如果采用 $e^{-i\omega t}$，虚部符号会反过来，但物理结论不变。
++
++\begin{center}
++\begin{tikzpicture}[node distance=12mm and 18mm]
++\node[flowbox,fill=KidGray,minimum width=35mm] (E) {交流电场 $E(t)$};
++\node[flowbox,right=of E,minimum width=39mm] (sig) {超导复电导\\$\sigma_1-i\sigma_2$};
++\node[flowbox,above right=7mm and 16mm of sig,fill=KidRed!7,minimum width=36mm] (diss) {$\sigma_1$：耗散通道\\真正吸收微波能量};
++\node[flowbox,below right=7mm and 16mm of sig,fill=KidTeal!8,minimum width=36mm] (react) {$\sigma_2$：感性通道\\储存并返还能量};
++\draw[flowarrow] (E.east)--(sig.west);
++\draw[flowarrow] (sig.north east) -- (diss.west);
++\draw[flowarrow] (sig.south east) -- (react.west);
++\end{tikzpicture}
++\end{center}
++
++\begin{intuitionbox}
++$\sigma_1$ 和 $\sigma_2$ 不是“两种不同材料”。它们是\textbf{同一个超导电子系统对同一个交流电场的两种响应分量}。前者对应净能量被转成热，后者对应能量在电场与载流子惯性之间来回交换。
++\end{intuitionbox}
++
++\section{$\sigma_1$ 与 $\sigma_2$ 分别在物理上表示什么？}
++
++\subsection{$\sigma_1$：为什么它代表损耗？}
++
++若电场写成
++\[
++E(t)=\Re\{E_0e^{i\omega t}\},
++\]
++电流密度为
++\[
++J(t)=\Re\{(\sigma_1-i\sigma_2)E_0e^{i\omega t}\}.
++\]
++平均耗散功率密度是
++\[
++\boxed{
++\langle p\rangle=\frac12\sigma_1|E_0|^2.
++}
++\]
++因此 $\sigma_1$ 越大，单位体积每秒真正转化为热的微波能量越多。
++
++在 $T\ll T_c$ 且读出频率远低于 pair-breaking threshold 时，$\sigma_1$ 主要由已有准粒子承担。于是最重要的直觉是
++\[
++\boxed{
++N_{\qp}\uparrow\quad\Longrightarrow\quad\sigma_1\uparrow\quad\Longrightarrow\quad\text{microwave loss}\uparrow.
++}
++\]
++这就是后来 $Q_i$ 下降的微观起点。
++
++\subsection{$\sigma_2$：为什么它对应 kinetic inductance？}
++
++$-i\sigma_2E$ 代表一个与电场正交的电流分量。它不在一个周期内持续消耗净能量，而是体现超流载流子的惯性：电场做功把能量暂时存入载流子的集体运动，随后又还回电磁场。
++
++因此 $\sigma_2$ 大，意味着超流能够用较小的电场维持较大的感性电流；等效动能电感较小。反过来：
++\[
++\boxed{
++\sigma_2\downarrow
++\quad\Longrightarrow\quad
++L_k\uparrow.
++}
++\]
++后面我们会把这句话直接推成
++\[
++L_{k,\Box}\approx\frac{1}{\omega t\sigma_2}.
++\]
++
++\begin{mistakebox}
++不要把“$\sigma_2$ 很大”理解成“超导体有很大的电阻型导电能力”。$\sigma_2$ 是\textbf{反应性（reactive）}电导分量，主要对应感性储能，而不是焦耳热。
++\end{mistakebox}
++
++\section{Mattis--Bardeen 到底解决了什么问题？}
++
++BCS 告诉我们准粒子能谱、能隙和态密度；但 KID 实验真正需要的是：在给定
++\[
++\omega,\ T,\ \Delta,\ f(E)
++\]
++以后，材料的交流电导到底是多少？Mattis--Bardeen（MB）理论就是这座桥。
++
++在常用于超导薄膜微波器件的局域极限下，可以把响应写成
++\[
++\boxed{
++\sigma(\omega)=\sigma_1(\omega)-i\sigma_2(\omega).
++}
++\]
++对 $\hbar\omega<2\Delta$，MB 的标准积分形式可写成
++\[
++\frac{\sigma_1}{\sigma_n}
++=
++\frac{2}{\hbar\omega}
++\int_{\Delta}^{\infty}
++\frac{E^2+\Delta^2+\hbar\omega E}
++{\sqrt{E^2-\Delta^2}\sqrt{(E+\hbar\omega)^2-\Delta^2}}
++\left[f(E)-f(E+\hbar\omega)\right]dE,
++\]
++以及
++\[
++\frac{\sigma_2}{\sigma_n}
++=
++\frac{1}{\hbar\omega}
++\int_{\Delta}^{\Delta+\hbar\omega}
++\frac{E^2+\Delta^2-\hbar\omega E}
++{\sqrt{E^2-\Delta^2}\sqrt{\Delta^2-(E-\hbar\omega)^2}}
++\left[1-2f(E)\right]dE.
++\]
++
++\begin{intuitionbox}
++第一次学习 MB 时，不要试图背这两个积分。你只需要看懂其中四件事：
++\begin{enumerate}
++  \item 积分起点由能隙 $\Delta$ 决定；
++  \item $f(E)$ 告诉我们哪些准粒子态已被占据；
++  \item $\hbar\omega$ 决定微波一次能把准粒子在能量轴上搬多远；
++  \item BCS 态密度与 coherence factor 决定不同能量处的跃迁权重。
++\end{enumerate}
++所以 MB 的核心不是“两个可怕积分”，而是：\textbf{把超导微观态翻译成可测的交流电磁响应。}
++\end{intuitionbox}
++
++\section{低温、低读出频率下，MB 给出什么最重要的趋势？}
++
++KID 的 GHz 读出通常满足
++\[
++\hbar\omega\ll\Delta_0,
++\qquad
++k_BT\ll\Delta_0.
++\]
++在这一极限，$\sigma_1$ 有一个非常有用的近似：
++\[
++\boxed{
++\frac{\sigma_1}{\sigma_n}
++\approx
++\frac{4\Delta_0}{\hbar\omega}
++\exp\!\left(-\frac{\Delta_0}{k_BT}\right)
++\sinh\!\left(\frac{\hbar\omega}{2k_BT}\right)
++K_0\!\left(\frac{\hbar\omega}{2k_BT}\right)
++}
++\]
++其中 $K_0$ 是修正贝塞尔函数。它最值得看的不是函数形式，而是前面的
++\[
++\boxed{e^{-\Delta_0/k_BT}}.
++\]
++这正是上一章 thermal quasiparticle 的指数抑制重新出现在微波损耗里。
++
++同时，低温下 $\sigma_2$ 的主量级近似为
++\[
++\boxed{
++\frac{\sigma_2}{\sigma_n}\sim\frac{\pi\Delta}{\hbar\omega}
++}
++\]
++并在准粒子增加时下降。
++
++\begin{center}
++\begin{tikzpicture}[x=9.0cm,y=3.5cm]
++\draw[->,draw=KidDark!75] (0,0)--(1.02,0) node[right,font=\small] {$T/T_c$};
++\draw[->,draw=KidDark!75] (0,0)--(0,1.05) node[above,font=\small] {归一化响应};
++\draw[line width=1.15pt,draw=KidRed] plot[smooth] coordinates {(0.05,0.03) (0.15,0.035) (0.25,0.06) (0.35,0.12) (0.45,0.23) (0.55,0.40) (0.65,0.60) (0.75,0.78) (0.85,0.90) (0.95,0.98)};
++\draw[line width=1.15pt,draw=KidTeal] plot[smooth] coordinates {(0.05,0.98) (0.15,0.975) (0.25,0.96) (0.35,0.91) (0.45,0.83) (0.55,0.72) (0.65,0.58) (0.75,0.42) (0.85,0.25) (0.95,0.08)};
++\node[KidRed,right] at (0.77,0.80) {$\sigma_1$};
++\node[KidTeal,right] at (0.52,0.72) {$\sigma_2$};
++\node[font=\scriptsize,align=left,anchor=west,text=KidDark!75] at (0.05,0.82) {示意图，不是定量 MB 曲线};
++\end{tikzpicture}
++\end{center}
++
++于是升温或增加光生准粒子时，最典型的变化是
++\[
++\boxed{
++\sigma_1\uparrow,
++\qquad
++\sigma_2\downarrow.
++}
++\]
++这两个方向恰好对应 KID 的两个可测量响应：损耗增加与谐振频率下降。
++
++\section{从体电导 $\sigma$ 到实验真正“看到”的表面阻抗 $Z_s$}
++
++材料内部的 $\sigma$ 通常不是 VNA 直接测到的量。电磁场从薄膜表面看见的是
++\[
++\boxed{
++Z_s=R_s+iX_s.
++}
++\]
++其中
++\begin{itemize}
++  \item $R_s$：surface resistance（表面电阻），决定导体损耗；
++  \item $X_s$：surface reactance（表面电抗），在超导微波器件中主要是感性。
++\end{itemize}
++
++对厚体、局域极限，常写成
++\[
++\boxed{
++Z_s=\sqrt{\frac{i\mu_0\omega}{\sigma}}
++}
++\]
++而 KID 更常见的是薄膜。若膜厚 $t$ 足够薄，使电流在厚度方向近似均匀，则每方块阻抗近似为
++\[
++\boxed{
++Z_{\Box}
++\approx
++\frac{1}{t\sigma}.
++}
++\]
++代入 $\sigma=\sigma_1-i\sigma_2$：
++\[
++Z_{\Box}
++=
++\frac{\sigma_1+i\sigma_2}
++{t(\sigma_1^2+\sigma_2^2)}.
++\]
++因此
++\[
++\boxed{
++R_{\Box}
++=
++\frac{\sigma_1}
++{t(\sigma_1^2+\sigma_2^2)}
++}
++\]
++以及
++\[
++\boxed{
++X_{\Box}
++=
++\frac{\sigma_2}
++{t(\sigma_1^2+\sigma_2^2)}.
++}
++\]
++
++当 KID 正常工作且 $\sigma_2\gg\sigma_1$ 时，进一步简化为
++\[
++\boxed{
++R_{\Box}\approx\frac{\sigma_1}{t\sigma_2^2},
++\qquad
++X_{\Box}\approx\frac{1}{t\sigma_2}.
++}
++\]
++
++\section{终于闭环：从 $\sigma_2$ 再推一次 sheet kinetic inductance}
++
++感抗满足
++\[
++X_{\Box}=\omega L_{k,\Box},
++\]
++所以
++\[
++\boxed{
++L_{k,\Box}
++\approx
++\frac{1}{\omega t\sigma_2}.
++}
++\]
++这和第 3 章的 London / 几何推导是同一物理量的另一种写法。
++
++现在整条逻辑终于可以完全闭合：
++\[
++N_{\qp}\uparrow
++\Rightarrow
++\sigma_2\downarrow
++\Rightarrow
++X_{\Box}\uparrow
++\Rightarrow
++L_{k,\Box}\uparrow
++\Rightarrow
++f_0\downarrow.
++\]
++
++小信号下，因为 $L_k\propto1/\sigma_2$，有
++\[
++\frac{\delta L_k}{L_k}
++\approx
++-\frac{\delta\sigma_2}{\sigma_2}.
++\]
++代入第 3 章
++\[
++\frac{\delta f_0}{f_0}
++=-\frac{\alpha}{2}\frac{\delta L_k}{L_k},
++\]
++得到
++\[
++\boxed{
++\frac{\delta f_0}{f_0}
++\approx
++\frac{\alpha}{2}
++\frac{\delta\sigma_2}{\sigma_2}.
++}
++\]
++因为光照通常让 $\delta\sigma_2<0$，所以仍然得到
++\[
++\boxed{\delta f_0<0.}
++\]
++
++\section{从 $\sigma_1$ 到 $Q_i$：损耗支路也闭环}
++
++在最简单的薄膜/lumped 模型里，超导导体自身的损耗品质因数可以先看成
++\[
++Q_{\rm cond}
++\sim
++\frac{X_s}{R_s}.
++\]
++当 $\sigma_2\gg\sigma_1$ 时，
++\[
++\frac{X_s}{R_s}
++\approx
++\frac{\sigma_2}{\sigma_1}.
++\]
++但谐振器的总能量并不是全部储存在 kinetic inductance 里。引入
++\[
++\alpha=\frac{L_k}{L_g+L_k},
++\]
++则一个非常有用的器件级近似是
++\[
++\boxed{
++\frac{1}{Q_{i,\qp}}
++\approx
++\alpha\frac{R_s}{X_s}
++\approx
++\alpha\frac{\sigma_1}{\sigma_2}.
++}
++\]
++更一般的几何和厚度极限中会出现额外的几何因子，这里先保留最清晰的薄膜直觉。
++
++于是第二条链也闭合：
++\[
++N_{\qp}\uparrow
++\Rightarrow
++\sigma_1\uparrow
++\Rightarrow
++R_s\uparrow
++\Rightarrow
++Q_i\downarrow.
++\]
++
++\begin{center}
++\begin{tikzpicture}[node distance=8mm and 5mm]
++\node[flowbox,fill=KidGold!18,minimum width=28mm] (n) {$N_{\qp}\uparrow$};
++\node[flowbox,right=of n,minimum width=29mm] (sig) {$\sigma_1\uparrow$\\$\sigma_2\downarrow$};
++\node[flowbox,right=of sig,minimum width=30mm] (z) {$R_s\uparrow$\\$X_s\uparrow$};
++\node[flowbox,right=of z,minimum width=31mm] (res) {$Q_i\downarrow$\\$f_0\downarrow$};
++\node[flowbox,right=of res,minimum width=29mm] (s) {$S_{21}$\\幅度/相位改变};
++\draw[flowarrow] (n.east)--(sig.west);
++\draw[flowarrow] (sig.east)--(z.west);
++\draw[flowarrow] (z.east)--(res.west);
++\draw[flowarrow] (res.east)--(s.west);
++\end{tikzpicture}
++\end{center}
++
++\section{同一批准粒子为什么会产生“两种读出响应”？}
++
++现在可以真正回答 Day 1 的老问题了。一个准粒子不是先“选择”去改变频率或损耗。它改变的是整个超导体系的交流响应，因此复电导的实部和虚部一起变：
++\[
++\delta N_{\qp}
++\Rightarrow
++\left(\delta\sigma_1,\delta\sigma_2\right).
++\]
++随后才由器件把这两个材料响应映射成
++\[
++\boxed{
++\delta Q_i^{-1}
++\quad\text{和}\quad
++\delta f_0/f_0.
++}
++\]
++最终在 IQ 圆上，它们大致对应两个不同方向的运动。这个几何图景会在 v0.5 的谐振器与 IQ fitting 中正式展开。
++
++\section{GHz 读出与 \SI{150}{GHz} 光学响应：千万别把两个频段混成一个模型}
++
++你的 LEKID 同一块超导 meander 同时参与两种完全不同的电磁过程：
++\begin{enumerate}
++  \item \textbf{GHz 读出：}通常 $\hbar\omega_{\rm read}\ll2\Delta$，我们主要关心微波表面阻抗如何随已有准粒子变化；
++  \item \textbf{毫米波吸收：}例如 Al 在 \SI{150}{GHz} 下满足 $h\nu>2\Delta$，入射场本身可以直接打破 Cooper pair，且材料复电导已经处在接近/超过 gap frequency 的不同频率区间。
++\end{enumerate}
++
++\begin{center}
++\begin{tikzpicture}[x=0.085cm,y=1cm]
++\draw[->,draw=KidDark!75] (0,0)--(175,0) node[right,font=\small] {频率 / GHz};
++\draw[very thick,draw=KidBlue] (3,-0.10)--(3,0.10);
++\node[above,font=\scriptsize,align=center,text=KidBlue] at (3,0.13) {GHz readout\\$\sim1$--$5$};
++\draw[very thick,draw=KidRed] (88,-0.16)--(88,0.16);
++\node[above,font=\scriptsize,align=center,text=KidRed] at (88,0.19) {Al pair-breaking\\$\nu_{pb}\sim88$};
++\draw[very thick,draw=KidGold!80!black] (150,-0.16)--(150,0.16);
++\node[above,font=\scriptsize,align=center,text=KidGold!70!black] at (150,0.19) {目标光学频段\\\SI{150}{GHz}};
++\draw[dashed,draw=KidDark!35] (0,-0.45)--(88,-0.45);
++\node[below,font=\scriptsize,text=KidDark!65] at (44,-0.45) {$h\nu<2\Delta$：不能直接 pair break};
++\draw[dashed,draw=KidDark!35] (88,-0.45)--(175,-0.45);
++\node[below,font=\scriptsize,text=KidDark!65] at (131.5,-0.45) {$h\nu>2\Delta$：可直接 pair break};
++\end{tikzpicture}
++\end{center}
++
++\begin{projectbox}
++这对你现在的 Sonnet/CST 工作尤其重要：
++\begin{itemize}
++  \item 用 PEC 做 GHz 谐振器，会丢失 $R_s$ 与 $L_k$；
++  \item 用一个频点拟合出的 GHz sheet impedance，不能不加判断地直接当作 \SI{150}{GHz} absorber 的材料参数；
++  \item 真正严谨的多频段模型应使用 $Z_s(\omega,T,N_{\qp})$ 或等价的 $\sigma(\omega,T,N_{\qp})$；
++  \item 光学仿真主要回答“场如何耦合并被吸收”，微波谐振仿真主要回答“材料状态变化如何映射到 $f_0,Q_i$”。
++\end{itemize}
++\end{projectbox}
++
++\section{一个非常实用的材料关系：正常态 sheet resistance 与 $L_{k,\Box}$}
++
++在低温、低频、dirty-limit 的常用近似下，
++\[
++\frac{\sigma_2}{\sigma_n}\approx\frac{\pi\Delta_0}{\hbar\omega}.
++\]
++又因为正常态 sheet resistance
++\[
++R_{\Box,n}=\frac{1}{t\sigma_n},
++\]
++代入
++\[
++L_{k,\Box}\approx\frac{1}{\omega t\sigma_2},
++\]
++得到非常常用的估算式：
++\[
++\boxed{
++L_{k,\Box}(0)
++\approx
++\frac{\hbar R_{\Box,n}}{\pi\Delta_0}.
++}
++\]
++这告诉我们一个很有工程价值的趋势：在相同 $\Delta_0$ 下，正常态 sheet resistance 越高，kinetic inductance per square 越大。
++
++\begin{mistakebox}
++“高正常态电阻率”不等于“超导态一定损耗大”。例如某些高电阻率超导薄膜可以同时拥有较大的 kinetic inductance fraction 和很高的低温 $Q_i$。真正的微波损耗要看 $R_s/X_s$、材料缺陷、残余准粒子、TLS、磁通俘获等多个因素。
++\end{mistakebox}
++
++\section{Mattis--Bardeen 很重要，但它不是“所有 KID 现象的万能解释”}
++
++理想 MB 理论提供了一个基准模型，但真实器件常会偏离它。至少要记住以下边界：
++\begin{itemize}
++  \item \textbf{TLS（两能级系统）}可以引入额外频移、损耗与频率噪声；
++  \item \textbf{non-equilibrium quasiparticles} 使真实 $f(E)$ 不一定等于热平衡 Fermi--Dirac 分布；
++  \item \textbf{强 readout power} 会加热准粒子系统、产生非线性，甚至间接产生更多准粒子；
++  \item \textbf{磁通俘获、界面、氧化层、颗粒性、无序} 会带来 residual loss；
++  \item 对高无序材料，BCS density of states 可能出现 broadening，简单理想 DOS 需要修正；
++  \item 当 mean free path、penetration depth 与几何尺度关系不再满足局域近似时，需要更一般的非局域电动力学。
++\end{itemize}
++
++所以实验中真正正确的态度是：
++\[
++\boxed{
++\text{先用 MB 建立基准}
++\quad\rightarrow\quad
++\text{再研究偏离 MB 的部分。}
++}
++\]
++而不是一看到异常 $Q_i(T)$ 或 $f_0(T)$ 就把所有变化都归因于准粒子。
++
++\section{本章最小推导闭环}
++
++如果只允许保留六行公式，本章可以压缩成：
++\[
++\sigma=\sigma_1-i\sigma_2,
++\]
++\[
++Z_{\Box}\approx\frac{1}{t\sigma},
++\]
++\[
++R_{\Box}\approx\frac{\sigma_1}{t\sigma_2^2},
++\qquad
++X_{\Box}\approx\frac{1}{t\sigma_2},
++\]
++\[
++L_{k,\Box}=\frac{X_{\Box}}{\omega}
++\approx\frac{1}{\omega t\sigma_2},
++\]
++\[
++\frac{\delta f_0}{f_0}
++\approx
++\frac{\alpha}{2}\frac{\delta\sigma_2}{\sigma_2},
++\]
++\[
++\frac{1}{Q_{i,\qp}}
++\approx
++\alpha\frac{\sigma_1}{\sigma_2}.
++\]
++
++这六行把材料微观响应直接接到了你真正测量的 resonator frequency 与 dissipation。
++
++\section{建议用 90--120 分钟完成的代码与手算任务}
++
++\begin{enumerate}
++  \item 从
++  \[
++  Z_{\Box}=1/[t(\sigma_1-i\sigma_2)]
++  \]
++  独立推导 $R_{\Box}$ 和 $X_{\Box}$；
++  \item 在 $\sigma_2/\sigma_1=10,10^2,10^3,10^4$ 时，计算 $X/R$，直观看 conductivity quality factor；
++  \item 用低温 MB 近似，任选 Al 的 $T_c=\SI{1.2}{K}$ 与读出频率 \SI{2}{GHz}，画 $\sigma_1/\sigma_n$ 随 $T/T_c$ 的半对数曲线；
++  \item 用 $L_{k,\Box}\approx\hbar R_{\Box,n}/(\pi\Delta_0)$，扫描 $R_{\Box,n}=0.1$--$100\,\Omega/\Box$，观察高 sheet resistance 对 $L_k$ 的影响；
++  \item 构造一个极简模型：让 $\sigma_1$ 增加 $5\%$、$\sigma_2$ 减少 $0.1\%$，计算 $R_s,X_s,f_0,Q_i$ 的相对变化；
++  \item 最后闭卷回答：\textbf{为什么同一批光生准粒子会同时造成谐振频率移动和 notch 变宽？}
++\end{enumerate}
++
++\section{闭卷理解检查}
++
++\begin{checkpointbox}
++\begin{enumerate}
++  \item $\sigma_1$ 和 $\sigma_2$ 分别对应怎样的能量交换？
++  \item 为什么 $\sigma_2\downarrow$ 会导致 $L_k\uparrow$？
++  \item Mattis--Bardeen 理论输入哪些微观信息，输出什么器件需要的量？
++  \item 为什么 KID 的 GHz 读出一般工作在 $\hbar\omega\ll2\Delta$？
++  \item 为什么 $Z_s$ 比 $\sigma$ 更接近电磁仿真和 VNA 实际“看到”的材料量？
++  \item 薄膜极限下为什么有 $Z_{\Box}\approx1/(t\sigma)$？
++  \item 为什么 $Q_i^{-1}$ 与 $\sigma_1/\sigma_2$ 有关？
++  \item 为什么光照后通常 $\delta\sigma_2<0$，从而 $\delta f_0<0$？
++  \item GHz readout sheet impedance 为什么不能直接无脑用于 \SI{150}{GHz} optical absorber？
++  \item 如果实验 $f_0(T)$ 明显偏离 MB 基准，你首先会怀疑哪些额外机制？
++\end{enumerate}
++\end{checkpointbox}
++
++\begin{formula}[title=\bfseries 本章的一句话]
++\centering
++\[
++\boxed{
++\text{Mattis--Bardeen}
++:\quad
++(\Delta,f(E),\omega)
++\rightarrow
++(\sigma_1,\sigma_2)
++\rightarrow
++(R_s,X_s)
++\rightarrow
++(Q_i,f_0)
++}
++\]
++\end{formula}
++
+ \chapter*{后续版本计划}
+ \addcontentsline{toc}{chapter}{后续版本计划}
+ \begin{itemize}
+-  \item v0.4：复电导、surface impedance 与 Mattis--Bardeen 的器件化理解；
+-  \item v0.5：$Q_i/Q_c/Q_r$、notch resonator、IQ circle 与实际 fitting；
++  \item v0.5：$Q_i/Q_c/Q_r$、notch resonator、IQ circle、固定 tone 读出与实际 fitting；
+   \item v0.6：optical responsivity、NEP 与 photon / GR / TLS / amplifier noise；
+   \item v0.7：LEKID absorber / IDC / coupling / polarization / backshort 的电磁设计；
+-  \item v0.8：把上述理论逐项映射到当前双偏振 \SI{150}{GHz} LEKID 项目与 Sonnet/CST 验证矩阵。
++  \item v0.8：把上述理论逐项映射到当前双偏振 \SI{150}{GHz} LEKID 项目与 Sonnet/CST 验证矩阵，并加入 Python 数值练习。
+ \end{itemize}
+ 
+ \chapter*{建议参考资料}
+@@ -1637,6 +2196,7 @@
+   \item S. B. Kaplan et al., ``Quasiparticle and phonon lifetimes in superconductors,'' \textit{Physical Review B}, 14, 4854--4873 (1976).
+   \item A. Rothwarf and B. N. Taylor, ``Measurement of Recombination Lifetimes in Superconductors,'' \textit{Physical Review Letters}, 19, 27--30 (1967).
+   \item P. J. de Visser et al., ``Generation-Recombination Noise: The Fundamental Sensitivity Limit for Kinetic Inductance Detectors,'' \textit{Journal of Low Temperature Physics}, 167, 335--340 (2012).
++  \item D. C. Mattis and J. Bardeen, ``Theory of the Anomalous Skin Effect in Normal and Superconducting Metals,'' \textit{Physical Review}, 111, 412--417 (1958).
+ \end{enumerate}
+ 
+ \end{document}
