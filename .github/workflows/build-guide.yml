@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - 'docs/**/*.tex'
+      - 'LATEST_VERSION'
       - 'scripts/build_latest.sh'
       - 'Makefile'
       - '.github/workflows/build-guide.yml'
   pull_request:
     paths:
       - 'docs/**/*.tex'
+      - 'LATEST_VERSION'
       - 'scripts/build_latest.sh'
       - 'Makefile'
       - '.github/workflows/build-guide.yml'
@@ -26,20 +28,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Compile current PDF with XeLaTeX
+      - name: Resolve latest version
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < LATEST_VERSION)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "pdf=docs/$version/KID入门讲义_${version}.pdf" >> "$GITHUB_OUTPUT"
+
+      - name: Compile latest PDF with XeLaTeX
         uses: xu-cheng/texlive-action@v3
         with:
           os: debian
           scheme: full
           run: |
             set -euo pipefail
-            cd docs/v0.2
-            xelatex -interaction=nonstopmode -halt-on-error "KID入门讲义_v0.2.tex"
-            xelatex -interaction=nonstopmode -halt-on-error "KID入门讲义_v0.2.tex"
+            ./scripts/build_latest.sh
 
       - name: Upload compiled PDF
         uses: actions/upload-artifact@v4
         with:
-          name: KID-Intro-Guide-v0.2
-          path: docs/v0.2/KID入门讲义_v0.2.pdf
+          name: KID-Intro-Guide-${{ steps.meta.outputs.version }}
+          path: ${{ steps.meta.outputs.pdf }}
           if-no-files-found: error
