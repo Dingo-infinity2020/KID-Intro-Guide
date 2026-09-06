@@ -6,44 +6,20 @@
 
 **光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 噪声与 NEP → LEKID 电磁设计与实验。**
 
-> 当前版本：**v0.2（2026-09-04）**
+> 当前版本：**v0.4（2026-09-06）** · 47 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.2/KID入门讲义_v0.2.pdf)
-- [LaTeX 权威排版源文件](docs/v0.2/KID入门讲义_v0.2.tex)
-- [Markdown 内容源文件](docs/v0.2/KID入门讲义_v0.2.md)
-- [v0.2 修改记录](docs/v0.2/CHANGELOG.md)
+- [PDF 阅读版](docs/v0.4/KID入门讲义_v0.4.pdf)
+- [LaTeX 权威排版源文件](docs/v0.4/KID入门讲义_v0.4.tex)
+- [Markdown 内容源文件](docs/v0.4/KID入门讲义_v0.4.md)
+- [v0.4 修改记录](docs/v0.4/CHANGELOG.md)
 
-## 讲义定位
+## 当前已经打通的主链
 
-这份讲义希望最终回答的不只是“什么是 KID”，而是：
+到 v0.4 为止，讲义已经从“一个光子”推进到材料复电导：
 
-- 一个毫米/亚毫米波光子进入超导薄膜后，如何最终变成可测的 `S21` / I-Q 变化？
-- kinetic inductance（动能电感）为什么存在，又为什么会随光学负载变化？
-- `Qi`、`Qc`、`Qr`、复电导、Mattis–Bardeen、responsivity、NEP 分别位于哪一层物理链？
-- LEKID 的 meander、IDC、backshort、偏振结构分别承担什么作用？
-- Sonnet / CST 等电磁仿真到底验证了哪一层物理，又遗漏了什么？
-- 如何把材料、器件、电磁、读出和实验重新闭合成一套可验证的研究流程？
-
-## 总体学习路线
-
-| 模块 | 核心主题 |
-|---|---|
-| M1 | 从光子到 `S21` |
-| M2 | 超导基础：Cooper pair、能隙、准粒子 |
-| M3 | 动能电感与复电导 |
-| M4 | 微波谐振器与 I-Q 圆 |
-| M5 | 光学响应与 responsivity |
-| M6 | 噪声与 NEP |
-| M7 | LEKID 电磁设计 |
-| M8 | 阵列与频分复用读出 |
-| M9 | Sonnet / CST / 实验闭环 |
-| M10 | 从学习走向可发表的研究问题 |
-
-详细路线会随着版本迭代逐步补齐。
-
-## 当前版本内容
+`光子 / 光功率 → Cooper pair breaking → Nqp → σ1, σ2 → Rs, Xs → Lk, Qi → f0 → S21 / I-Q`
 
 ### v0.1
 
@@ -53,45 +29,76 @@
 
 ### v0.2
 
-在 v0.1 基础上：
+- 重做并统一流程图语义；
+- 从 `m dv/dt = qE` 推导 kinetic inductance；
+- 引入 London penetration depth、sheet kinetic inductance 与 `α`；
+- 建立 `δf0/f0` 与 `δLk/Lk` 的关系。
 
-- 重做并统一全部流程图语义；
-- 从 `m dv/dt = qE` 推导动能电感 `Lk`；
-- 使用能量法进行交叉验证；
-- 引入 London penetration depth；
-- 引入薄膜 sheet kinetic inductance；
-- 引入 kinetic inductance fraction `α`；
-- 建立 `δf0/f0` 与 `δLk/Lk` 的小信号关系；
-- 初步讨论 PEC 模型与真实超导薄膜建模的区别。
+### v0.3
 
-## 仓库结构
+- Cooper pair 与 BCS 能隙；
+- pair-breaking threshold；
+- thermal / non-equilibrium quasiparticles；
+- generation-recombination；
+- quasiparticle lifetime；
+- `Tc` 与 150 GHz 材料选择的直接关系。
+
+### v0.4
+
+- `σ = σ1 - iσ2`；
+- Mattis–Bardeen 的器件化理解；
+- `σ → Zs = Rs + iXs`；
+- 薄膜 `Z□ ≈ 1/(tσ)`；
+- `Lk,□ ≈ 1/(ωtσ2)`；
+- `δf0/f0 ≈ (α/2)δσ2/σ2`；
+- `1/Qi,qp ≈ ασ1/σ2` 的直观薄膜近似；
+- GHz readout 与 150 GHz optical absorber 的跨频段建模边界。
+
+## 总体学习路线
+
+| 模块 | 核心主题 | 状态 |
+|---|---|---|
+| M1 | 从光子到 `S21` | 已完成 |
+| M2 | 超导基础：Cooper pair、能隙、准粒子 | 已完成 |
+| M3 | 动能电感与复电导 | 已完成至 MB / surface impedance |
+| M4 | 微波谐振器与 I-Q 圆 | v0.5 |
+| M5 | 光学响应与 responsivity | 后续 |
+| M6 | 噪声与 NEP | 后续 |
+| M7 | LEKID 电磁设计 | 后续 |
+| M8 | 阵列与频分复用读出 | 后续 |
+| M9 | Sonnet / CST / 实验闭环 | 后续 |
+| M10 | 从学习走向可发表的研究问题 | 后续 |
+
+## 仓库结构与版本规则
 
 ```text
 KID-Intro-Guide/
 ├── README.md
+├── LATEST_VERSION
 ├── LICENSE
 ├── CONTRIBUTING.md
 ├── ROADMAP.md
 ├── CHANGELOG.md
 ├── Makefile
-├── .gitignore
-├── docs/
-│   ├── v0.1/
-│   │   ├── KID入门讲义_v0.1.pdf
-│   │   ├── KID入门讲义_v0.1.tex
-│   │   └── KID入门讲义_v0.1.md
-│   └── v0.2/
-│       ├── KID入门讲义_v0.2.pdf
-│       ├── KID入门讲义_v0.2.tex
-│       ├── KID入门讲义_v0.2.md
-│       └── CHANGELOG.md
-└── scripts/
-    └── build_latest.sh
+├── .github/workflows/build-guide.yml
+├── scripts/build_latest.sh
+└── docs/
+    ├── v0.1/
+    ├── v0.2/
+    ├── v0.3/
+    └── v0.4/
+        ├── KID入门讲义_v0.4.pdf
+        ├── KID入门讲义_v0.4.tex
+        ├── KID入门讲义_v0.4.md
+        ├── README.md
+        └── CHANGELOG.md
 ```
+
+**发布规则：每个版本必须同时保留 PDF + LaTeX + Markdown；最新 PDF 必须作为普通 GitHub 仓库文件存在。**
 
 ## 本地编译
 
-需要 XeLaTeX 与常见 TeX Live 宏包。
+需要 XeLaTeX 与常见 TeX Live 宏包：
 
 ```bash
 make pdf
@@ -103,31 +110,14 @@ make pdf
 ./scripts/build_latest.sh
 ```
 
-当前脚本默认编译 v0.2，两次运行 XeLaTeX 以刷新目录和交叉引用。
+脚本读取根目录 `LATEST_VERSION`，无需手工修改版本路径。
+
+GitHub Actions 也使用同一版本指针，在 push / PR 时实际执行两次 XeLaTeX 编译并上传构建产物用于校验。
 
 ## 如何参与
 
-欢迎提交：
-
-- 公式或物理解释纠错；
-- 更好的示意图和流程图；
-- KID / LEKID 教学案例；
-- Python 数值练习；
-- 实验与仿真验证案例；
-- 文献推荐与引用补充。
-
-具体约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-## 版本原则
-
-本项目优先保证：
-
-1. **物理因果关系正确**；
-2. **图示不误导**；
-3. **中文表达尽量清晰，专业英文首次出现时给出中文解释**；
-4. **公式不仅给结论，还说明它在器件中的意义**；
-5. **逐步连接到真实 LEKID 设计、仿真和实验。**
+欢迎提交公式或物理解释纠错、更好的示意图、KID / LEKID 教学案例、Python 数值练习、实验/仿真验证案例和文献补充。具体约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## License
 
-代码、脚本与原创文本内容采用 [MIT License](LICENSE) 发布。引用外部论文、图像或资料时，其版权仍归原作者或原出版方所有；后续版本会逐步完善正式参考文献与引用说明。
+代码、脚本与原创文本内容采用 [MIT License](LICENSE) 发布。外部论文、图像或资料的版权仍归原作者或原出版方所有。
