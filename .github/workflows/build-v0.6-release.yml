@@ -40,9 +40,7 @@ jobs:
             xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.6.tex'
             xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.6.tex'
             test -s 'KID入门讲义_v0.6.pdf'
-            pages=$(pdfinfo 'KID入门讲义_v0.6.pdf' | awk '/^Pages:/ {print $2}')
-            echo "pages=$pages"
-            test "$pages" -eq 67
+            grep -q 'Output written on KID入门讲义_v0.6.pdf (67 pages)' 'KID入门讲义_v0.6.log'
 
       - name: Commit built guide
         shell: bash
