@@ -4,22 +4,23 @@
 
 本项目不采用“先学完整套凝聚态物理，再开始做器件”的路线，而是从器件设计者真正需要理解的物理因果链出发：
 
-**光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 噪声与 NEP → LEKID 电磁设计与实验。**
+**光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计与实验。**
 
-> 当前版本：**v0.5（2026-09-07）** · 57 页
+> 当前版本：**v0.6（2026-09-07）** · 67 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.5/KID入门讲义_v0.5.pdf)
-- [LaTeX 权威排版源文件](docs/v0.5/KID入门讲义_v0.5.tex)
-- [Markdown 内容源文件](docs/v0.5/KID入门讲义_v0.5.md)
-- [v0.5 修改记录](docs/v0.5/CHANGELOG.md)
+- [PDF 阅读版](docs/v0.6/KID入门讲义_v0.6.pdf)
+- [LaTeX 权威排版源文件](docs/v0.6/KID入门讲义_v0.6.tex)
+- [Markdown 内容源文件](docs/v0.6/KID入门讲义_v0.6.md)
+- [v0.6 修改记录](docs/v0.6/CHANGELOG.md)
+- [v0.6 Python 示例](docs/v0.6/examples/)
 
 ## 当前已经打通的主链
 
-到 v0.5 为止，讲义已经从“一个光子”推进到可拟合的微波谐振器与 IQ 读出：
+到 v0.6 为止，讲义已经从“一个光子”推进到可比较的输入端灵敏度：
 
-`光子 / 光功率 → Cooper pair breaking → Nqp → σ1, σ2 → Rs, Xs → Lk, Qi → f0, Qr, Qc → S21(f) → IQ circle → fixed-tone I/Q`
+`P_abs → Γ_qp → Nqp → σ1, σ2 → Rs, Xs → Lk, Qi → f0, Qr, Qc → S21(f) → IQ circle → fixed-tone I/Q → responsivity → PSD/ASD → input-referred NEP`
 
 ### v0.1
 
@@ -63,6 +64,17 @@
 - cable delay / complex gain / asymmetry / fitting；
 - Python 数值示例。
 
+### v0.6
+
+- `P_abs → Γ_qp → Nqp` 的光学响应链；
+- pair-breaking efficiency 与 quasiparticle lifetime；
+- frequency / dissipation / complex I-Q responsivity；
+- quasiparticle 与 resonator 两个动态时间尺度；
+- PSD / ASD 与 input-referred NEP；
+- photon shot / bunching、GR、TLS、amplifier/readout noise；
+- 150 GHz Al LEKID、1 pW absorbed loading 数值例子；
+- 两个新的 Python 示例。
+
 ## 总体学习路线
 
 | 模块 | 核心主题 | 状态 |
@@ -70,10 +82,10 @@
 | M1 | 从光子到 `S21` | 已完成 |
 | M2 | 超导基础：Cooper pair、能隙、准粒子 | 已完成 |
 | M3 | 动能电感与复电导 | 已完成至 MB / surface impedance |
-| M4 | 微波谐振器与 I-Q 圆 | v0.5 |
-| M5 | 光学响应与 responsivity | 后续 |
-| M6 | 噪声与 NEP | 后续 |
-| M7 | LEKID 电磁设计 | 后续 |
+| M4 | 微波谐振器与 I-Q 圆 | 已完成 |
+| M5 | 光学响应与 responsivity | 已完成基础模型 |
+| M6 | 噪声与 NEP | 已完成基础 noise budget |
+| M7 | LEKID 电磁设计 | 下一阶段 v0.7 |
 | M8 | 阵列与频分复用读出 | 后续 |
 | M9 | Sonnet / CST / 实验闭环 | 后续 |
 | M10 | 从学习走向可发表的研究问题 | 后续 |
@@ -96,15 +108,19 @@ KID-Intro-Guide/
     ├── v0.2/
     ├── v0.3/
     ├── v0.4/
-    └── v0.5/
-        ├── KID入门讲义_v0.5.pdf
-        ├── KID入门讲义_v0.5.tex
-        ├── KID入门讲义_v0.5.md
+    ├── v0.5/
+    └── v0.6/
+        ├── KID入门讲义_v0.6.pdf
+        ├── KID入门讲义_v0.6.tex
+        ├── KID入门讲义_v0.6.md
         ├── README.md
         ├── CHANGELOG.md
         └── examples/
+            ├── README.md
             ├── resonator_basics.py
-            └── resonator_fit_demo.py
+            ├── resonator_fit_demo.py
+            ├── optical_responsivity_demo.py
+            └── noise_budget_demo.py
 ```
 
 **发布规则：每个版本必须同时保留 PDF + LaTeX + Markdown；最新 PDF 必须作为普通 GitHub 仓库文件存在。**
