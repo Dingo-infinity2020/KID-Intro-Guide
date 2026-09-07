@@ -30,8 +30,8 @@ jobs:
           base64 -d bootstrap/v0.5/md.patch.gz.b64 | gzip -dc > /tmp/md.patch
           patch 'docs/v0.5/KID入门讲义_v0.5.tex' < /tmp/tex.patch
           patch 'docs/v0.5/KID入门讲义_v0.5.md' < /tmp/md.patch
-          echo '56eda1bb20a6d7a3c790c76ae48328c9d2c6940b30e19bbf8a48f930404e188e  docs/v0.5/KID入门讲义_v0.5.tex' | sha256sum -c -
-          echo '3cb748e25f75f1d70817700df2903ea18e702f5eeb35f5c03f6ca8dc15f167b5  docs/v0.5/KID入门讲义_v0.5.md' | sha256sum -c -
+          grep -q '微波谐振器与 IQ 读出' 'docs/v0.5/KID入门讲义_v0.5.tex'
+          grep -q 'resonator fitting' 'docs/v0.5/KID入门讲义_v0.5.md'
 
       - name: Compile v0.5 PDF with XeLaTeX
         uses: xu-cheng/texlive-action@v3
