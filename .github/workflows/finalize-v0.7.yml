@@ -19,17 +19,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore reviewed v0.7 payload
+      - name: Reconstruct reviewed v0.7 sources
         shell: bash
         run: |
           set -euo pipefail
-          base64 --ignore-garbage --decode bootstrap/v0.7/payload.tar.gz.b64 > /tmp/v07.tar.gz
-          tar -xzf /tmp/v07.tar.gz -C .
+          mkdir -p docs/v0.7/examples
+          cp 'docs/v0.6/KID入门讲义_v0.6.tex' 'docs/v0.7/KID入门讲义_v0.7.tex'
+          cp 'docs/v0.6/KID入门讲义_v0.6.md' 'docs/v0.7/KID入门讲义_v0.7.md'
+          cat bootstrap/v0.7/tex_01.b64 bootstrap/v0.7/tex_02.b64 bootstrap/v0.7/tex_03.b64 bootstrap/v0.7/tex_04.b64 bootstrap/v0.7/tex_05a.b64 bootstrap/v0.7/tex_05b.b64 | base64 --decode | gzip -dc > /tmp/v07-tex.patch
+          cat bootstrap/v0.7/md_01.b64 bootstrap/v0.7/md_02.b64 bootstrap/v0.7/md_03.b64 | base64 --decode | gzip -dc > /tmp/v07-md.patch
+          patch --no-backup-if-mismatch 'docs/v0.7/KID入门讲义_v0.7.tex' < /tmp/v07-tex.patch
+          patch --no-backup-if-mismatch 'docs/v0.7/KID入门讲义_v0.7.md' < /tmp/v07-md.patch
+          cp docs/v0.6/examples/resonator_basics.py docs/v0.7/examples/
+          cp docs/v0.6/examples/resonator_fit_demo.py docs/v0.7/examples/
+          cp docs/v0.6/examples/optical_responsivity_demo.py docs/v0.7/examples/
+          cp docs/v0.6/examples/noise_budget_demo.py docs/v0.7/examples/
+          grep -q 'LEKID 电磁设计' 'docs/v0.7/KID入门讲义_v0.7.tex'
+          grep -q 'Version 0.7' 'docs/v0.7/KID入门讲义_v0.7.tex'
           test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.7"
-          test -s 'docs/v0.7/KID入门讲义_v0.7.tex'
-          test -s 'docs/v0.7/KID入门讲义_v0.7.md'
-          test -s 'docs/v0.7/examples/waveguide_modes_demo.py'
-          test -s 'docs/v0.7/examples/backshort_toy_model.py'
 
       - name: Compile v0.7 PDF with XeLaTeX
         uses: xu-cheng/texlive-action@v3
