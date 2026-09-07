@@ -18,19 +18,11 @@
 
 完成 `σ1/σ2`、Mattis–Bardeen、surface impedance、`Lk`、`Qi` 的器件化闭环，并区分 GHz / 150 GHz 两种电磁频率区间。
 
-## 下一阶段
-
 ### v0.5 — 微波谐振器与 I-Q 读出
 
-计划：
+已完成：`Qi/Qc/Qr`、linewidth、ring-down、ideal notch、IQ circle、fixed tone、非理想传输、resonance fitting 与 Python 示例。
 
-- `Qi`、`Qc`、`Qr` 的严格定义和能量意义；
-- notch resonator 的 `S21` 模型；
-- resonance linewidth 与 ring-down time；
-- I-Q 圆的几何意义；
-- cable delay、complex gain、impedance mismatch 对真实圆的扭曲；
-- resonance fitting；
-- 固定 tone 读出、phase/amplitude projection 与频率跟踪。
+## 下一阶段
 
 ### v0.6 — 光学响应、灵敏度与噪声
 
