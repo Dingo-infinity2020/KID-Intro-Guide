@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5 — 2026-09-07
+
+- 新增微波谐振器与 IQ 读出完整章节；
+- 推导 `Qi/Qc/Qr`、linewidth 与 ring-down；
+- 推导 ideal notch `S21` 与 IQ circle；
+- 引入 fixed-tone readout 和 frequency/dissipation response；
+- 引入 cable delay、complex gain、asymmetry 与 resonance fitting；
+- 新增两个 Python 教学示例。
+
+详见 [`docs/v0.5/CHANGELOG.md`](docs/v0.5/CHANGELOG.md)。
+
 ## v0.4 — 2026-09-06
 
 - 新增“复电导与 Mattis–Bardeen”完整章节；
