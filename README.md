@@ -6,20 +6,20 @@
 
 **光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 噪声与 NEP → LEKID 电磁设计与实验。**
 
-> 当前版本：**v0.4（2026-09-06）** · 47 页
+> 当前版本：**v0.5（2026-09-07）** · 57 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.4/KID入门讲义_v0.4.pdf)
-- [LaTeX 权威排版源文件](docs/v0.4/KID入门讲义_v0.4.tex)
-- [Markdown 内容源文件](docs/v0.4/KID入门讲义_v0.4.md)
-- [v0.4 修改记录](docs/v0.4/CHANGELOG.md)
+- [PDF 阅读版](docs/v0.5/KID入门讲义_v0.5.pdf)
+- [LaTeX 权威排版源文件](docs/v0.5/KID入门讲义_v0.5.tex)
+- [Markdown 内容源文件](docs/v0.5/KID入门讲义_v0.5.md)
+- [v0.5 修改记录](docs/v0.5/CHANGELOG.md)
 
 ## 当前已经打通的主链
 
-到 v0.4 为止，讲义已经从“一个光子”推进到材料复电导：
+到 v0.5 为止，讲义已经从“一个光子”推进到可拟合的微波谐振器与 IQ 读出：
 
-`光子 / 光功率 → Cooper pair breaking → Nqp → σ1, σ2 → Rs, Xs → Lk, Qi → f0 → S21 / I-Q`
+`光子 / 光功率 → Cooper pair breaking → Nqp → σ1, σ2 → Rs, Xs → Lk, Qi → f0, Qr, Qc → S21(f) → IQ circle → fixed-tone I/Q`
 
 ### v0.1
 
@@ -54,6 +54,15 @@
 - `1/Qi,qp ≈ ασ1/σ2` 的直观薄膜近似；
 - GHz readout 与 150 GHz optical absorber 的跨频段建模边界。
 
+### v0.5
+
+- `Qi/Qc/Qr` 与损耗/耦合率；
+- linewidth 与 ring-down；
+- ideal notch `S21` 与 IQ circle；
+- fixed-tone readout；
+- cable delay / complex gain / asymmetry / fitting；
+- Python 数值示例。
+
 ## 总体学习路线
 
 | 模块 | 核心主题 | 状态 |
@@ -86,12 +95,16 @@ KID-Intro-Guide/
     ├── v0.1/
     ├── v0.2/
     ├── v0.3/
-    └── v0.4/
-        ├── KID入门讲义_v0.4.pdf
-        ├── KID入门讲义_v0.4.tex
-        ├── KID入门讲义_v0.4.md
+    ├── v0.4/
+    └── v0.5/
+        ├── KID入门讲义_v0.5.pdf
+        ├── KID入门讲义_v0.5.tex
+        ├── KID入门讲义_v0.5.md
         ├── README.md
-        └── CHANGELOG.md
+        ├── CHANGELOG.md
+        └── examples/
+            ├── resonator_basics.py
+            └── resonator_fit_demo.py
 ```
 
 **发布规则：每个版本必须同时保留 PDF + LaTeX + Markdown；最新 PDF 必须作为普通 GitHub 仓库文件存在。**
