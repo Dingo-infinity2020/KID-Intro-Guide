@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6 — 2026-09-07
+
+- 新增“光学响应、噪声与 NEP”完整章节；
+- 建立 `P_abs → Γ_qp → Nqp → f0/Qi → I/Q` 的 responsivity 链；
+- 引入 quasiparticle lifetime 与 resonator ring-down 的级联动态响应；
+- 区分 PSD / ASD，并定义 input-referred NEP；
+- 系统介绍 photon shot / bunching、GR、TLS、amplifier/readout noise；
+- 增加 150 GHz Al LEKID、1 pW absorbed loading 数值例子；
+- 新增 optical responsivity 与 noise budget 两个 Python 示例；
+- GitHub Actions 在独立 TeX Live 2026 环境中完成两次 XeLaTeX 编译，正式 PDF 为 67 页并作为普通 Git 文件保存。
+
+详见 [`docs/v0.6/CHANGELOG.md`](docs/v0.6/CHANGELOG.md)。
+
 ## v0.5 — 2026-09-07
 
 - 新增微波谐振器与 IQ 读出完整章节；
