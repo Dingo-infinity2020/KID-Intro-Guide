@@ -18,17 +18,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Reconstruct v0.6 reviewed sources
+      - name: Reconstruct v0.6 reviewed LaTeX source
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p docs/v0.6
           cp 'docs/v0.5/KID入门讲义_v0.5.tex' 'docs/v0.6/KID入门讲义_v0.6.tex'
-          cp 'docs/v0.5/KID入门讲义_v0.5.md' 'docs/v0.6/KID入门讲义_v0.6.md'
           base64 -d bootstrap/v0.6/tex.patch.gz.b64 | gzip -dc > /tmp/tex.patch
-          base64 -d bootstrap/v0.6/md.patch.gz.b64 | gzip -dc > /tmp/md.patch
           patch 'docs/v0.6/KID入门讲义_v0.6.tex' < /tmp/tex.patch
-          patch 'docs/v0.6/KID入门讲义_v0.6.md' < /tmp/md.patch
           grep -q '光学响应、噪声与 NEP' 'docs/v0.6/KID入门讲义_v0.6.tex'
           grep -q 'Version 0.6' 'docs/v0.6/KID入门讲义_v0.6.tex'
 
@@ -53,6 +50,6 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/v0.6/KID入门讲义_v0.6.tex docs/v0.6/KID入门讲义_v0.6.md docs/v0.6/KID入门讲义_v0.6.pdf
+          git add docs/v0.6/KID入门讲义_v0.6.tex docs/v0.6/KID入门讲义_v0.6.pdf
           git commit -m 'Build KID Intro Guide v0.6'
           git push origin HEAD:v0.6-publish
