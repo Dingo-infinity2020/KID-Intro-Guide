@@ -27,7 +27,7 @@ jobs:
           cp 'docs/v0.6/KID入门讲义_v0.6.tex' 'docs/v0.7/KID入门讲义_v0.7.tex'
           cp 'docs/v0.6/KID入门讲义_v0.6.md' 'docs/v0.7/KID入门讲义_v0.7.md'
           cat bootstrap/v0.7/tex_01.b64 bootstrap/v0.7/tex_02.b64 bootstrap/v0.7/tex_03.b64 bootstrap/v0.7/tex_04.b64 bootstrap/v0.7/tex_05a.b64 bootstrap/v0.7/tex_05b.b64 | base64 --decode | gzip -dc > /tmp/v07-tex.patch
-          cat bootstrap/v0.7/md_01.b64 bootstrap/v0.7/md_02.b64 bootstrap/v0.7/md_03.b64 | base64 --decode | gzip -dc > /tmp/v07-md.patch
+          cat bootstrap/v0.7/mdg_01.b64 bootstrap/v0.7/mdg_02.b64 bootstrap/v0.7/mdg_03.b64 bootstrap/v0.7/mdg_04.b64 | base64 --decode | gzip -dc > /tmp/v07-md.patch
           patch --no-backup-if-mismatch 'docs/v0.7/KID入门讲义_v0.7.tex' < /tmp/v07-tex.patch
           patch --no-backup-if-mismatch 'docs/v0.7/KID入门讲义_v0.7.md' < /tmp/v07-md.patch
           cp docs/v0.6/examples/resonator_basics.py docs/v0.7/examples/
@@ -55,10 +55,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python docs/v0.7/examples/waveguide_modes_demo.py >/tmp/v07-waveguide.txt
-          python docs/v0.7/examples/backshort_toy_model.py >/tmp/v07-backshort.txt
-          python docs/v0.7/examples/optical_responsivity_demo.py >/tmp/v07-optical.txt
-          python docs/v0.7/examples/noise_budget_demo.py >/tmp/v07-noise.txt
+          python -m py_compile docs/v0.7/examples/*.py
           grep -q 'v0.7' README.md
           grep -q 'v0.7' ROADMAP.md
           grep -q 'v0.7' CHANGELOG.md
@@ -68,7 +65,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf bootstrap/v0.7
+          git rm -rf bootstrap/v0.7
           git rm -f .github/workflows/finalize-v0.7.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
