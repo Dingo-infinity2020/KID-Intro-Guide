@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 -d bootstrap/v0.7/payload.tar.gz.b64 > /tmp/v07.tar.gz
+          base64 --ignore-garbage --decode bootstrap/v0.7/payload.tar.gz.b64 > /tmp/v07.tar.gz
           tar -xzf /tmp/v07.tar.gz -C .
           test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.7"
           test -s 'docs/v0.7/KID入门讲义_v0.7.tex'
