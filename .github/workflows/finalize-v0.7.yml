@@ -1,0 +1,70 @@
+name: Finalize KID guide v0.7
+
+'on':
+  push:
+    branches: [v0.7-publish]
+    paths:
+      - '.github/workflows/finalize-v0.7.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore reviewed v0.7 payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d bootstrap/v0.7/payload.tar.gz.b64 > /tmp/v07.tar.gz
+          tar -xzf /tmp/v07.tar.gz -C .
+          test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.7"
+          test -s 'docs/v0.7/KID入门讲义_v0.7.tex'
+          test -s 'docs/v0.7/KID入门讲义_v0.7.md'
+          test -s 'docs/v0.7/examples/waveguide_modes_demo.py'
+          test -s 'docs/v0.7/examples/backshort_toy_model.py'
+
+      - name: Compile v0.7 PDF with XeLaTeX
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd docs/v0.7
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.7.tex' | tee /tmp/v07-xe1.log
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.7.tex' | tee /tmp/v07-xe2.log
+            test -s 'KID入门讲义_v0.7.pdf'
+            grep -q 'Output written on KID入门讲义_v0.7.pdf (81 pages' /tmp/v07-xe2.log
+
+      - name: Validate examples and repository pointers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python docs/v0.7/examples/waveguide_modes_demo.py >/tmp/v07-waveguide.txt
+          python docs/v0.7/examples/backshort_toy_model.py >/tmp/v07-backshort.txt
+          python docs/v0.7/examples/optical_responsivity_demo.py >/tmp/v07-optical.txt
+          python docs/v0.7/examples/noise_budget_demo.py >/tmp/v07-noise.txt
+          grep -q 'v0.7' README.md
+          grep -q 'v0.7' ROADMAP.md
+          grep -q 'v0.7' CHANGELOG.md
+          test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.7"
+
+      - name: Publish final v0.7 and remove one-time machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf bootstrap/v0.7
+          git rm -f .github/workflows/finalize-v0.7.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md ROADMAP.md CHANGELOG.md LATEST_VERSION docs/v0.7
+          git commit -m 'Finalize KID Intro Guide v0.7'
+          git push origin HEAD:v0.7-publish
