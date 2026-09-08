@@ -4,23 +4,23 @@
 
 本项目不采用“先学完整套凝聚态物理，再开始做器件”的路线，而是从器件设计者真正需要理解的物理因果链出发：
 
-**光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计 → 仿真/实验闭环。**
+**光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计 → 理论闭环复习 → 仿真/实验闭环。**
 
-> 当前版本：**v0.7（2026-09-07）** · 81 页
+> 当前版本：**v0.8（2026-09-08）** · 106 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.7/KID入门讲义_v0.7.pdf)
-- [LaTeX 权威排版源文件](docs/v0.7/KID入门讲义_v0.7.tex)
-- [Markdown 内容源文件](docs/v0.7/KID入门讲义_v0.7.md)
-- [v0.7 修改记录](docs/v0.7/CHANGELOG.md)
-- [v0.7 Python 示例](docs/v0.7/examples/)
+- [PDF 阅读版](docs/v0.8/KID入门讲义_v0.8.pdf)
+- [LaTeX 权威排版源文件](docs/v0.8/KID入门讲义_v0.8.tex)
+- [Markdown 内容源文件](docs/v0.8/KID入门讲义_v0.8.md)
+- [v0.8 修改记录](docs/v0.8/CHANGELOG.md)
+- [v0.8 Python 示例](docs/v0.8/examples/)
 
 ## 当前已经打通的主链
 
-到 v0.7 为止，讲义已经从“一个光子”推进到真实 LEKID 几何的双频电磁设计：
+到 v0.8 为止，讲义已经从“一个光子”推进到真实 LEKID 几何，并加入了一整套可闭卷复述、手写推导和自测的理论闭环：
 
-`P_abs → Γ_qp → Nqp → σ1,σ2 → Rs,Xs → Lk,Qi → f0,Qr,Qc → S21(f) → IQ → responsivity → PSD/ASD → NEP`
+`hν → pair breaking → Nqp → σ1,σ2 → Rs,Xs → Lk,Qi → f0,Qr,Qc → S21(f) → IQ → responsivity → PSD/ASD → NEP`
 
 并进一步把同一几何拆成两条工程链：
 
@@ -47,16 +47,16 @@ Cooper pair、BCS 能隙、热/非平衡准粒子、generation-recombination、q
 absorbed power、responsivity、detector dynamics、PSD/ASD、input-referred NEP、photon/GR/TLS/amplifier noise。
 
 ### v0.7
-- meander 作为 150 GHz absorber + GHz kinetic inductor；
-- fill factor / effective sheet impedance / active volume 权衡；
-- quarter-wave backshort 的 transmission-line 物理；
-- 圆波导 TE11/TM01/TE21 cutoff 与 TE11 偏振简并；
-- co-pol / cross-pol、hairpin end-turn、双偏振对称性；
-- IDC/TLS、coupling capacitor 与 `Qc`；
-- optical cross-pol 与 microwave resonator crosstalk 的区分；
-- Sonnet vs CST/HFSS 分工、full-wave mode power closure；
-- D=1.6 mm、149–151 GHz 的直接数值示例；
-- waveguide / backshort 两个新的 Python 教学脚本。
+LEKID 双频电磁设计：meander absorber/inductor 双重角色、sheet impedance、IDC/Qc、圆波导模态、双偏振、backshort、solver 分工与 full-wave power closure。
+
+### v0.8
+- 新增“从光子到 IQ”的阶段性理论闭环复习；
+- 9 张核心笔记卡与 5 组公式阶梯；
+- 引入“公式三问”：数学上说什么、物理上为什么、工程上意味着什么；
+- 新增 15 道闭卷概念自测；
+- 新增 150 GHz Al LEKID 综合闭环题；
+- 独立答案章给出逐步推导、单位检查、物理解释、工程意义与常见误区；
+- 新增 `capstone_chain_demo.py` 与 `iq_circle_workbook.py`。
 
 ## 总体学习路线
 
@@ -68,10 +68,10 @@ absorbed power、responsivity、detector dynamics、PSD/ASD、input-referred NEP
 | M4 | 微波谐振器与 I-Q 圆 | 已完成 |
 | M5 | 光学响应与 responsivity | 已完成基础模型 |
 | M6 | 噪声与 NEP | 已完成基础 noise budget |
-| M7 | LEKID 电磁设计 | **v0.7 已完成** |
-| M8 | 当前 150 GHz 项目验证矩阵 | 下一阶段 v0.8 |
-| M9 | 阵列/FDM 与实时读出 | 后续 |
-| M10 | 从学习走向可发表研究问题 | 后续 |
+| M7 | LEKID 电磁设计 | 已完成 |
+| M8 | 理论闭环复习、手写训练与自测 | **v0.8 已完成** |
+| M9 | 当前 150 GHz 项目验证矩阵 | 下一阶段 v0.9 |
+| M10 | 阵列/FDM、实时读出与研究闭环 | 后续 |
 
 ## 仓库结构与版本规则
 
@@ -89,21 +89,14 @@ KID-Intro-Guide/
 └── docs/
     ├── v0.1/
     ├── ...
-    ├── v0.6/
-    └── v0.7/
-        ├── KID入门讲义_v0.7.pdf
-        ├── KID入门讲义_v0.7.tex
-        ├── KID入门讲义_v0.7.md
+    ├── v0.7/
+    └── v0.8/
+        ├── KID入门讲义_v0.8.pdf
+        ├── KID入门讲义_v0.8.tex
+        ├── KID入门讲义_v0.8.md
         ├── README.md
         ├── CHANGELOG.md
         └── examples/
-            ├── README.md
-            ├── resonator_basics.py
-            ├── resonator_fit_demo.py
-            ├── optical_responsivity_demo.py
-            ├── noise_budget_demo.py
-            ├── waveguide_modes_demo.py
-            └── backshort_toy_model.py
 ```
 
 **发布规则：每个版本必须同时保留 PDF + LaTeX + Markdown；最新 PDF 必须作为普通 GitHub 仓库文件存在。**
