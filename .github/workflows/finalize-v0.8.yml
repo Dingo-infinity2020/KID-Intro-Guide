@@ -1,0 +1,121 @@
+name: Finalize KID guide v0.8
+
+'on':
+  push:
+    branches: [v0.8-publish]
+    paths:
+      - '.github/workflows/finalize-v0.8.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct reviewed v0.8 sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/v0.8/examples
+          TEX='docs/v0.8/KID入门讲义_v0.8.tex'
+          MD='docs/v0.8/KID入门讲义_v0.8.md'
+          cp 'docs/v0.7/KID入门讲义_v0.7.tex' "$TEX"
+          cp 'docs/v0.7/KID入门讲义_v0.7.md' "$MD"
+
+          cat bootstrap/v0.8/tex_01.b64 bootstrap/v0.8/tex_02.b64 bootstrap/v0.8/tex_03.b64 bootstrap/v0.8/tex_04.b64 bootstrap/v0.8/tex_05.b64 bootstrap/v0.8/tex_06.b64 bootstrap/v0.8/tex_07.b64 bootstrap/v0.8/tex_08.b64 | base64 --decode | gzip -dc > /tmp/v08-tex.patch
+          cat bootstrap/v0.8/md_01.b64 bootstrap/v0.8/md_02.b64 bootstrap/v0.8/md_03.b64 bootstrap/v0.8/md_04.b64 | base64 --decode | gzip -dc > /tmp/v08-md.patch
+
+          patch --no-backup-if-mismatch "$TEX" < /tmp/v08-tex.patch
+
+          set +e
+          patch --no-backup-if-mismatch "$MD" < /tmp/v08-md.patch
+          MD_PATCH_RC=$?
+          set -e
+
+          if [ "$MD_PATCH_RC" -ne 0 ]; then
+            test -s "$MD.rej"
+            python - <<'PY'
+          from pathlib import Path
+
+          md = Path('docs/v0.8/KID入门讲义_v0.8.md')
+          rej = Path(str(md) + '.rej')
+          text = md.read_text(encoding='utf-8')
+          lines = rej.read_text(encoding='utf-8').splitlines()
+          added = []
+          in_hunk = False
+          for line in lines:
+              if line.startswith('@@ '):
+                  in_hunk = True
+                  continue
+              if in_hunk and line.startswith('+') and not line.startswith('+++'):
+                  added.append(line[1:])
+          if not added:
+              raise SystemExit('No added lines found in rejected Markdown hunk')
+          marker = '# 后续版本计划'
+          if marker not in text:
+              raise SystemExit('Markdown insertion marker not found')
+          insert = '\n'.join(added).rstrip() + '\n\n'
+          text = text.replace(marker, insert + marker, 1)
+          md.write_text(text, encoding='utf-8')
+          rej.unlink()
+          PY
+          fi
+
+          # Fix the historical version line left in the Markdown source.
+          sed -i 's/\*\*版本：v0\.7 · 2026-09-07\*\*/**版本：v0.8 · 2026-09-08**/' "$MD"
+
+          # Keep each release self-contained by carrying forward earlier examples.
+          cp docs/v0.7/examples/*.py docs/v0.8/examples/
+
+          test ! -e "$TEX.rej"
+          test ! -e "$MD.rej"
+          grep -q '理论闭环复习与手写笔记册' "$TEX"
+          grep -q 'v0.8 参考答案与详细解析' "$TEX"
+          grep -q 'Version 0.8' "$TEX"
+          grep -q '^# KID 入门讲义 v0.8' "$MD"
+          grep -q '版本：v0.8 · 2026-09-08' "$MD"
+          grep -q '^# 10\. v0.8 参考答案与详细解析' "$MD"
+          test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.8"
+
+      - name: Compile v0.8 PDF with XeLaTeX
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd docs/v0.8
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.8.tex' | tee /tmp/v08-xe1.log
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.8.tex' | tee /tmp/v08-xe2.log
+            test -s 'KID入门讲义_v0.8.pdf'
+            grep -q 'Output written on KID入门讲义_v0.8.pdf (106 pages' /tmp/v08-xe2.log
+
+      - name: Validate examples and repository pointers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile docs/v0.8/examples/*.py
+          python docs/v0.8/examples/capstone_chain_demo.py | grep -q 'pair breaking allowed at 150 GHz? True'
+          grep -q 'v0.8' README.md
+          grep -q 'v0.8' ROADMAP.md
+          grep -q 'v0.8' CHANGELOG.md
+          test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.8"
+
+      - name: Publish final v0.8 and remove one-time machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -rf bootstrap/v0.8
+          git rm -f .github/workflows/finalize-v0.8.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md ROADMAP.md CHANGELOG.md LATEST_VERSION docs/v0.8
+          git commit -m 'Finalize KID Intro Guide v0.8'
+          git push origin HEAD:v0.8-publish
