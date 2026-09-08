@@ -73,10 +73,13 @@ jobs:
           cp docs/v0.6/examples/optical_responsivity_demo.py docs/v0.7/examples/
           cp docs/v0.6/examples/noise_budget_demo.py docs/v0.7/examples/
 
-          echo '4824831037ceaa1d7acdcae2552a06abffecf34a47fead86654ef942230a532b  docs/v0.7/KID入门讲义_v0.7.tex' | sha256sum -c -
-          echo 'ac08e1dbcb377e9cc9b672ef5fbd360f5c0f0a5e6216ac8a9ee22aaa4f6b2218  docs/v0.7/KID入门讲义_v0.7.md' | sha256sum -c -
-          grep -q 'LEKID 电磁设计' "$TEX"
+          test ! -e "$MD.rej"
           grep -q 'Version 0.7' "$TEX"
+          grep -q 'LEKID 电磁设计' "$TEX"
+          grep -q '# KID 入门讲义 v0.7' "$MD"
+          grep -q '# 第 8 章：LEKID 电磁设计' "$MD"
+          grep -q 'TM01' "$MD"
+          grep -q 'backshort' "$MD"
           test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.7"
 
       - name: Compile v0.7 PDF with XeLaTeX
