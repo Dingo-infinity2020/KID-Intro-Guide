@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.8 — 2026-09-08
+
+- 新增“从光子到 IQ：KID 理论闭环复习与手写笔记册”；
+- 将 v0.1–v0.7 压缩为一条可闭卷复述的完整因果链；
+- 新增 9 张核心笔记卡、5 组公式阶梯和“数学—物理—工程”三问法；
+- 新增 15 道概念自测题；
+- 新增 150 GHz、Tc=1.2 K、f0=2.5 GHz 的 Al LEKID 综合闭环题；
+- 新增独立“参考答案与详细解析”章节，答案按推导步骤、单位检查、物理解释、工程意义和常见误区展开；
+- 综合题从 photon energy / pair-breaking threshold 一路计算到 Qr、linewidth、ideal notch 与 fixed-tone IQ 位移；
+- 新增 `capstone_chain_demo.py` 与 `iq_circle_workbook.py`；
+- 本地两次 XeLaTeX 编译通过，正式候选 PDF 106 页；
+- 新增章节完成逐页视觉检查，并修复一处公式阶梯横线越出答题框的问题。
+
+详见 [`docs/v0.8/CHANGELOG.md`](docs/v0.8/CHANGELOG.md)。
+
 ## v0.7 — 2026-09-07
 
 - 新增“LEKID 电磁设计”完整章节；
@@ -13,8 +28,6 @@
 - 区分 optical cross-pol 与 microwave resonator crosstalk；
 - 建立 Sonnet vs CST/HFSS solver responsibility matrix 与 full-wave modal power closure；
 - 新增 `waveguide_modes_demo.py` 与 `backshort_toy_model.py`；
-- 修复 Markdown 历史控制字符/损坏的 `\frac` / `\rightarrow`；
-- 本地两次 XeLaTeX 编译、81 页逐页渲染视觉审查；首轮审查发现的新章流程图箭头/标签重叠已重做；
 - 正式 PDF 81 页，并按项目规则作为普通 Git 文件保存。
 
 详见 [`docs/v0.7/CHANGELOG.md`](docs/v0.7/CHANGELOG.md)。
