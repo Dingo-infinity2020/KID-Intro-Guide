@@ -4,76 +4,59 @@
 
 本项目不采用“先学完整套凝聚态物理，再开始做器件”的路线，而是从器件设计者真正需要理解的物理因果链出发：
 
-**光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计与实验。**
+**光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计 → 仿真/实验闭环。**
 
-> 当前版本：**v0.6（2026-09-07）** · 67 页
+> 当前版本：**v0.7（2026-09-07）** · 81 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.6/KID入门讲义_v0.6.pdf)
-- [LaTeX 权威排版源文件](docs/v0.6/KID入门讲义_v0.6.tex)
-- [Markdown 内容源文件](docs/v0.6/KID入门讲义_v0.6.md)
-- [v0.6 修改记录](docs/v0.6/CHANGELOG.md)
-- [v0.6 Python 示例](docs/v0.6/examples/)
+- [PDF 阅读版](docs/v0.7/KID入门讲义_v0.7.pdf)
+- [LaTeX 权威排版源文件](docs/v0.7/KID入门讲义_v0.7.tex)
+- [Markdown 内容源文件](docs/v0.7/KID入门讲义_v0.7.md)
+- [v0.7 修改记录](docs/v0.7/CHANGELOG.md)
+- [v0.7 Python 示例](docs/v0.7/examples/)
 
 ## 当前已经打通的主链
 
-到 v0.6 为止，讲义已经从“一个光子”推进到可比较的输入端灵敏度：
+到 v0.7 为止，讲义已经从“一个光子”推进到真实 LEKID 几何的双频电磁设计：
 
-`P_abs → Γ_qp → Nqp → σ1, σ2 → Rs, Xs → Lk, Qi → f0, Qr, Qc → S21(f) → IQ circle → fixed-tone I/Q → responsivity → PSD/ASD → input-referred NEP`
+`P_abs → Γ_qp → Nqp → σ1,σ2 → Rs,Xs → Lk,Qi → f0,Qr,Qc → S21(f) → IQ → responsivity → PSD/ASD → NEP`
+
+并进一步把同一几何拆成两条工程链：
+
+`150 GHz: waveguide / polarization / Z_eff / backshort → absorption`
+
+`GHz: meander Lg+Lk / IDC C / coupler Cc → f0, Qi, Qc, S21`
 
 ### v0.1
-
-建立第一条完整因果链：
-
-`入射光子 → pair breaking → Nqp ↑ → ns ↓ → Lk ↑ → f0 ↓ → S21 / I-Q 改变`
+建立第一条完整因果链：`入射光子 → pair breaking → Nqp ↑ → ns ↓ → Lk ↑ → f0 ↓ → S21 / I-Q 改变`。
 
 ### v0.2
-
-- 重做并统一流程图语义；
-- 从 `m dv/dt = qE` 推导 kinetic inductance；
-- 引入 London penetration depth、sheet kinetic inductance 与 `α`；
-- 建立 `δf0/f0` 与 `δLk/Lk` 的关系。
+动能电感推导、London penetration depth、sheet kinetic inductance、`α` 与频移。
 
 ### v0.3
-
-- Cooper pair 与 BCS 能隙；
-- pair-breaking threshold；
-- thermal / non-equilibrium quasiparticles；
-- generation-recombination；
-- quasiparticle lifetime；
-- `Tc` 与 150 GHz 材料选择的直接关系。
+Cooper pair、BCS 能隙、热/非平衡准粒子、generation-recombination、quasiparticle lifetime。
 
 ### v0.4
-
-- `σ = σ1 - iσ2`；
-- Mattis–Bardeen 的器件化理解；
-- `σ → Zs = Rs + iXs`；
-- 薄膜 `Z□ ≈ 1/(tσ)`；
-- `Lk,□ ≈ 1/(ωtσ2)`；
-- `δf0/f0 ≈ (α/2)δσ2/σ2`；
-- `1/Qi,qp ≈ ασ1/σ2` 的直观薄膜近似；
-- GHz readout 与 150 GHz optical absorber 的跨频段建模边界。
+复电导 `σ1/σ2`、Mattis–Bardeen、surface impedance、`Lk`、`Qi` 与 GHz/150 GHz 材料模型边界。
 
 ### v0.5
-
-- `Qi/Qc/Qr` 与损耗/耦合率；
-- linewidth 与 ring-down；
-- ideal notch `S21` 与 IQ circle；
-- fixed-tone readout；
-- cable delay / complex gain / asymmetry / fitting；
-- Python 数值示例。
+`Qi/Qc/Qr`、linewidth、ring-down、ideal notch、IQ circle、fixed-tone readout 与 complex `S21` fitting。
 
 ### v0.6
+absorbed power、responsivity、detector dynamics、PSD/ASD、input-referred NEP、photon/GR/TLS/amplifier noise。
 
-- `P_abs → Γ_qp → Nqp` 的光学响应链；
-- pair-breaking efficiency 与 quasiparticle lifetime；
-- frequency / dissipation / complex I-Q responsivity；
-- quasiparticle 与 resonator 两个动态时间尺度；
-- PSD / ASD 与 input-referred NEP；
-- photon shot / bunching、GR、TLS、amplifier/readout noise；
-- 150 GHz Al LEKID、1 pW absorbed loading 数值例子；
-- 两个新的 Python 示例。
+### v0.7
+- meander 作为 150 GHz absorber + GHz kinetic inductor；
+- fill factor / effective sheet impedance / active volume 权衡；
+- quarter-wave backshort 的 transmission-line 物理；
+- 圆波导 TE11/TM01/TE21 cutoff 与 TE11 偏振简并；
+- co-pol / cross-pol、hairpin end-turn、双偏振对称性；
+- IDC/TLS、coupling capacitor 与 `Qc`；
+- optical cross-pol 与 microwave resonator crosstalk 的区分；
+- Sonnet vs CST/HFSS 分工、full-wave mode power closure；
+- D=1.6 mm、149–151 GHz 的直接数值示例；
+- waveguide / backshort 两个新的 Python 教学脚本。
 
 ## 总体学习路线
 
@@ -81,14 +64,14 @@
 |---|---|---|
 | M1 | 从光子到 `S21` | 已完成 |
 | M2 | 超导基础：Cooper pair、能隙、准粒子 | 已完成 |
-| M3 | 动能电感与复电导 | 已完成至 MB / surface impedance |
+| M3 | 动能电感与复电导 | 已完成 |
 | M4 | 微波谐振器与 I-Q 圆 | 已完成 |
 | M5 | 光学响应与 responsivity | 已完成基础模型 |
 | M6 | 噪声与 NEP | 已完成基础 noise budget |
-| M7 | LEKID 电磁设计 | 下一阶段 v0.7 |
-| M8 | 阵列与频分复用读出 | 后续 |
-| M9 | Sonnet / CST / 实验闭环 | 后续 |
-| M10 | 从学习走向可发表的研究问题 | 后续 |
+| M7 | LEKID 电磁设计 | **v0.7 已完成** |
+| M8 | 当前 150 GHz 项目验证矩阵 | 下一阶段 v0.8 |
+| M9 | 阵列/FDM 与实时读出 | 后续 |
+| M10 | 从学习走向可发表研究问题 | 后续 |
 
 ## 仓库结构与版本规则
 
@@ -105,14 +88,12 @@ KID-Intro-Guide/
 ├── scripts/build_latest.sh
 └── docs/
     ├── v0.1/
-    ├── v0.2/
-    ├── v0.3/
-    ├── v0.4/
-    ├── v0.5/
-    └── v0.6/
-        ├── KID入门讲义_v0.6.pdf
-        ├── KID入门讲义_v0.6.tex
-        ├── KID入门讲义_v0.6.md
+    ├── ...
+    ├── v0.6/
+    └── v0.7/
+        ├── KID入门讲义_v0.7.pdf
+        ├── KID入门讲义_v0.7.tex
+        ├── KID入门讲义_v0.7.md
         ├── README.md
         ├── CHANGELOG.md
         └── examples/
@@ -120,7 +101,9 @@ KID-Intro-Guide/
             ├── resonator_basics.py
             ├── resonator_fit_demo.py
             ├── optical_responsivity_demo.py
-            └── noise_budget_demo.py
+            ├── noise_budget_demo.py
+            ├── waveguide_modes_demo.py
+            └── backshort_toy_model.py
 ```
 
 **发布规则：每个版本必须同时保留 PDF + LaTeX + Markdown；最新 PDF 必须作为普通 GitHub 仓库文件存在。**
@@ -139,13 +122,11 @@ make pdf
 bash ./scripts/build_latest.sh
 ```
 
-脚本读取根目录 `LATEST_VERSION`，无需手工修改版本路径。
-
-GitHub Actions 也使用同一版本指针，在 push / PR 时实际执行两次 XeLaTeX 编译并上传构建产物用于校验。
+脚本读取根目录 `LATEST_VERSION`。GitHub Actions 使用同一版本指针，在 push / PR 时执行两次 XeLaTeX 编译并上传构建产物作为独立校验。
 
 ## 如何参与
 
-欢迎提交公式或物理解释纠错、更好的示意图、KID / LEKID 教学案例、Python 数值练习、实验/仿真验证案例和文献补充。具体约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎提交公式/物理解释纠错、示意图、KID/LEKID 教学案例、Python 数值练习、实验/仿真验证案例和文献补充。具体约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## License
 
