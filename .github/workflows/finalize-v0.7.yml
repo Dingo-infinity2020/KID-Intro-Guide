@@ -72,3 +72,5 @@ jobs:
           git add README.md ROADMAP.md CHANGELOG.md LATEST_VERSION docs/v0.7
           git commit -m 'Finalize KID Intro Guide v0.7'
           git push origin HEAD:v0.7-publish
+
+# trigger: final-v0.7-2026-09-08
