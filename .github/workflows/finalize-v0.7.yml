@@ -24,18 +24,59 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p docs/v0.7/examples
-          cp 'docs/v0.6/KID入门讲义_v0.6.tex' 'docs/v0.7/KID入门讲义_v0.7.tex'
-          cp 'docs/v0.6/KID入门讲义_v0.6.md' 'docs/v0.7/KID入门讲义_v0.7.md'
+          TEX='docs/v0.7/KID入门讲义_v0.7.tex'
+          MD='docs/v0.7/KID入门讲义_v0.7.md'
+          cp 'docs/v0.6/KID入门讲义_v0.6.tex' "$TEX"
+          cp 'docs/v0.6/KID入门讲义_v0.6.md' "$MD"
+
           cat bootstrap/v0.7/tex_01.b64 bootstrap/v0.7/tex_02.b64 bootstrap/v0.7/tex_03.b64 bootstrap/v0.7/tex_04.b64 bootstrap/v0.7/tex_05a.b64 bootstrap/v0.7/tex_05b.b64 | base64 --decode | gzip -dc > /tmp/v07-tex.patch
           cat bootstrap/v0.7/mdg_01.b64 bootstrap/v0.7/mdg_02.b64 bootstrap/v0.7/mdg_03.b64 bootstrap/v0.7/mdg_04.b64 | base64 --decode | gzip -dc > /tmp/v07-md.patch
-          patch --no-backup-if-mismatch 'docs/v0.7/KID入门讲义_v0.7.tex' < /tmp/v07-tex.patch
-          patch --no-backup-if-mismatch 'docs/v0.7/KID入门讲义_v0.7.md' < /tmp/v07-md.patch
+
+          patch --no-backup-if-mismatch "$TEX" < /tmp/v07-tex.patch
+
+          set +e
+          patch --no-backup-if-mismatch "$MD" < /tmp/v07-md.patch
+          MD_PATCH_RC=$?
+          set -e
+
+          if [ "$MD_PATCH_RC" -ne 0 ]; then
+            test -s "$MD.rej"
+            python - <<'PY'
+          from pathlib import Path
+
+          md = Path('docs/v0.7/KID入门讲义_v0.7.md')
+          rej = Path(str(md) + '.rej')
+          text = md.read_text(encoding='utf-8')
+          lines = rej.read_text(encoding='utf-8').splitlines()
+          added = []
+          in_hunk = False
+          for line in lines:
+              if line.startswith('@@ '):
+                  in_hunk = True
+                  continue
+              if in_hunk and line.startswith('+') and not line.startswith('+++'):
+                  added.append(line[1:])
+          if not added:
+              raise SystemExit('No added lines found in rejected Markdown hunk')
+          marker = '# 后续版本计划'
+          if marker not in text:
+              raise SystemExit('Markdown insertion marker not found')
+          insert = '\n'.join(added).rstrip() + '\n\n'
+          text = text.replace(marker, insert + marker, 1)
+          md.write_text(text, encoding='utf-8')
+          rej.unlink()
+          PY
+          fi
+
           cp docs/v0.6/examples/resonator_basics.py docs/v0.7/examples/
           cp docs/v0.6/examples/resonator_fit_demo.py docs/v0.7/examples/
           cp docs/v0.6/examples/optical_responsivity_demo.py docs/v0.7/examples/
           cp docs/v0.6/examples/noise_budget_demo.py docs/v0.7/examples/
-          grep -q 'LEKID 电磁设计' 'docs/v0.7/KID入门讲义_v0.7.tex'
-          grep -q 'Version 0.7' 'docs/v0.7/KID入门讲义_v0.7.tex'
+
+          echo '4824831037ceaa1d7acdcae2552a06abffecf34a47fead86654ef942230a532b  docs/v0.7/KID入门讲义_v0.7.tex' | sha256sum -c -
+          echo 'ac08e1dbcb377e9cc9b672ef5fbd360f5c0f0a5e6216ac8a9ee22aaa4f6b2218  docs/v0.7/KID入门讲义_v0.7.md' | sha256sum -c -
+          grep -q 'LEKID 电磁设计' "$TEX"
+          grep -q 'Version 0.7' "$TEX"
           test "$(tr -d '[:space:]' < LATEST_VERSION)" = "v0.7"
 
       - name: Compile v0.7 PDF with XeLaTeX
@@ -72,5 +113,3 @@ jobs:
           git add README.md ROADMAP.md CHANGELOG.md LATEST_VERSION docs/v0.7
           git commit -m 'Finalize KID Intro Guide v0.7'
           git push origin HEAD:v0.7-publish
-
-# trigger: final-v0.7-2026-09-08
