@@ -21,25 +21,24 @@ Cooper pair、BCS 能隙、准粒子、generation-recombination 与 quasiparticl
 `P_abs → Nqp → responsivity`、detector dynamics、PSD/ASD、NEP 与 photon/GR/TLS/amplifier noise。
 
 ### v0.7 — LEKID 电磁设计
+meander 双频角色、sheet impedance、fill factor、quarter-wave backshort、圆波导模态、双偏振、IDC/Qc、solver 分工与 full-wave power closure。
+
+### v0.8 — 理论闭环复习与手写笔记册
 完成：
-- meander 的 absorber + kinetic-inductor 双重角色；
-- fill factor、effective sheet impedance 与 absorber volume；
-- quarter-wave backshort 与其偏离理想 λ/4 的原因；
-- circular-waveguide TE11/TM01/TE21 cutoff；
-- TE11 简并与 polarization mode basis；
-- co-pol/cross-pol、hairpin end-turn 与双偏振对称性；
-- IDC/TLS、coupling capacitor 与 `Qc`；
-- optical cross-pol vs microwave crosstalk；
-- Sonnet / CST / HFSS 分工；
-- full-wave propagating-mode power closure；
-- D=1.6 mm、149–151 GHz 直接数值示例；
-- waveguide/backshort Python exercises。
+- 一页式 `hν → pair breaking → Nqp → σ1/σ2 → Lk/Qi → f0/S21 → IQ → responsivity/noise → NEP` 总因果链；
+- 9 张核心笔记卡；
+- 5 组公式阶梯；
+- “数学—物理—工程”三问法；
+- 15 道闭卷概念自测；
+- 150 GHz、Tc=1.2 K、f0=2.5 GHz 的 Al LEKID 综合闭环题；
+- 独立详细答案章，逐题给出推导步骤、单位检查、物理解释、工程意义和常见误区；
+- `capstone_chain_demo.py` 与 `iq_circle_workbook.py` 两个复习脚本。
 
 ## 下一阶段
 
-### v0.8 — 当前 150 GHz 双偏振 LEKID 的完整验证矩阵
+### v0.9 — 当前 150 GHz 双偏振 LEKID 的完整验证矩阵
 
-目标不是再增加一层“通用知识”，而是把 v0.1–v0.7 逐项变成当前项目可执行的验证项：
+目标是把 v0.1–v0.8 的理论逐项变成当前项目可执行、可复现、可对照实验的验证项：
 - 设计参数表与 nominal geometry；
 - Sonnet：`f0/Qc/current/IDC/coupler`；
 - CST：TE11-X/Y、TM01、mode closure、co/cross-pol absorption；
@@ -47,9 +46,10 @@ Cooper pair、BCS 能隙、准粒子、generation-recombination 与 quasiparticl
 - superconducting material model sensitivity；
 - optical `P_abs` → responsivity / NEP 的端到端映射；
 - mesh/frequency/adaptive convergence 与 reproducibility；
-- 将模拟指标对应到未来 cryogenic VNA / optical load / polarization test。
+- 将模拟指标对应到未来 cryogenic VNA / optical load / polarization test；
+- 形成“理论预测—仿真—加工—低温测量—光学标定”闭环表格与验收门槛。
 
-### v0.9+ — 阵列与实时读出
+### v1.0+ — 阵列与实时读出
 
 - FDM / resonance placement / collision budget；
 - tone tracking 与自动 notch identification；
