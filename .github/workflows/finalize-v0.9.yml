@@ -1,0 +1,102 @@
+name: Finalize KID guide v0.9
+
+on:
+  push:
+    branches: [v0.9-publish]
+    paths:
+      - '.github/workflows/finalize-v0.9.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.9-publish
+          fetch-depth: 0
+
+      - name: Reconstruct reviewed v0.9 sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs/v0.9
+
+          TEX08='docs/v0.8/KID入门讲义_v0.8.tex'
+          TEX09='docs/v0.9/KID入门讲义_v0.9.tex'
+          MD08='docs/v0.8/KID入门讲义_v0.8.md'
+          MD09='docs/v0.9/KID入门讲义_v0.9.md'
+
+          cp "$TEX08" "$TEX09"
+          cat bootstrap/v0.9/tex_00.b64 bootstrap/v0.9/tex_01.b64 bootstrap/v0.9/tex_tail.b64 \
+            | base64 --decode | gzip -dc > /tmp/v09_tex.patch
+          patch --batch --forward --fuzz=3 "$TEX09" < /tmp/v09_tex.patch
+
+          cp "$MD08" "$MD09"
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('docs/v0.9/KID入门讲义_v0.9.md')
+          s = p.read_text(encoding='utf-8')
+          s = re.sub(r'^# KID 入门讲义 v0\.8$', '# KID 入门讲义 v0.9', s, count=1, flags=re.M)
+          s = re.sub(r'^\*\*版本：v0\.8 · 2026-09-08\*\*$', '**版本：v0.9 · 2026-09-08**', s, count=1, flags=re.M)
+          old = '''当前 v0.7 在 v0.6 的基础上进入 LEKID 电磁设计：
+          - 保留 v0.1–v0.6 已建立的材料、谐振器、IQ、responsivity 与 NEP 主链；
+          - 建立 meander 在 150 GHz 与 GHz 两个频率尺度下的双重角色；
+          - 引入 fill factor、effective sheet impedance、absorber volume 与 optical matching；
+          - 系统加入 circular-waveguide cutoff、TE11 简并、TM01 传播通道、偏振 basis；
+          - 用 transmission-line toy model 解释 quarter-wave backshort；
+          - 把 IDC、$Q_c$、cross-pol、Sonnet/CST 分工和 full-wave power closure 纳入同一验证矩阵。'''
+          new = '''v0.8 已经完成阶段性理论复习与手写训练；当前 v0.9 不再增加新的基础理论，而是把已有知识变成可执行的项目验证链：
+          - 冻结 nominal geometry 与参数单一真相源；
+          - 用 Sonnet 验证 GHz resonance、IDC、coupler 与 current identity；
+          - 用 CST/HFSS 验证 150 GHz modal power closure、co/cross-pol 与 B0/B1 backshort；
+          - 把 mesh/frequency convergence、材料 sensitivity 与制造 tolerance 变成正式 gate；
+          - 将仿真继续连接到 fabrication、cryogenic VNA、optical loading 与 polarization calibration；
+          - 用 traceability matrix、run manifest、evidence level 和 stop rule 管理“一个结果怎样成为论文证据”。'''
+          if old in s:
+              s = s.replace(old, new, 1)
+          else:
+              raise SystemExit('intro block not found in v0.8 Markdown')
+          chapter = Path('bootstrap/v0.9/chapter_v09.md').read_text(encoding='utf-8').rstrip() + '\n\n'
+          marker = '- v0.9：把 v0.1–v0.8 理论逐项映射到当前双偏振 150 GHz LEKID'
+          idx = s.find(marker)
+          if idx < 0:
+              raise SystemExit('v0.9 roadmap insertion marker not found')
+          s = s[:idx] + chapter + s[idx:]
+          p.write_text(s, encoding='utf-8')
+          PY
+
+          grep -q 'Version 0.9' "$TEX09"
+          grep -q '150 GHz 双偏振 LEKID 项目验证矩阵' "$TEX09"
+          grep -q '^# KID 入门讲义 v0.9$' "$MD09"
+          grep -q 'Traceability Matrix' "$MD09"
+
+      - name: Compile v0.9 PDF with XeLaTeX
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd docs/v0.9
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.9.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.9.tex'
+            test -s 'KID入门讲义_v0.9.pdf'
+            grep -Eq 'Output written on .*\(121 pages' 'KID入门讲义_v0.9.log'
+
+      - name: Publish formal v0.9 sources and PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f docs/v0.9/*.aux docs/v0.9/*.log docs/v0.9/*.out docs/v0.9/*.toc
+          rm -rf bootstrap/v0.9
+          rm -f .github/workflows/finalize-v0.9.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Finalize KID Intro Guide v0.9 sources and 121-page PDF'
+          git push origin HEAD:v0.9-publish
