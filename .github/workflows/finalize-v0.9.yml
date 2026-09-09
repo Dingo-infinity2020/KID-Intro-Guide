@@ -31,8 +31,7 @@ jobs:
           MD09='docs/v0.9/KID入门讲义_v0.9.md'
 
           cp "$TEX08" "$TEX09"
-          cat bootstrap/v0.9/tex_00.b64 bootstrap/v0.9/tex_01.b64 bootstrap/v0.9/tex_tail.b64 \
-            | base64 --decode | gzip -dc > /tmp/v09_tex.patch
+          cat bootstrap/v0.9/patch2_*.b64 | tr -d '\n\r' | base64 --decode | gzip -dc > /tmp/v09_tex.patch
           patch --batch --forward --fuzz=3 "$TEX09" < /tmp/v09_tex.patch
 
           cp "$MD08" "$MD09"
@@ -57,10 +56,9 @@ jobs:
           - 把 mesh/frequency convergence、材料 sensitivity 与制造 tolerance 变成正式 gate；
           - 将仿真继续连接到 fabrication、cryogenic VNA、optical loading 与 polarization calibration；
           - 用 traceability matrix、run manifest、evidence level 和 stop rule 管理“一个结果怎样成为论文证据”。'''
-          if old in s:
-              s = s.replace(old, new, 1)
-          else:
+          if old not in s:
               raise SystemExit('intro block not found in v0.8 Markdown')
+          s = s.replace(old, new, 1)
           chapter = Path('bootstrap/v0.9/chapter_v09.md').read_text(encoding='utf-8').rstrip() + '\n\n'
           marker = '- v0.9：把 v0.1–v0.8 理论逐项映射到当前双偏振 150 GHz LEKID'
           idx = s.find(marker)
