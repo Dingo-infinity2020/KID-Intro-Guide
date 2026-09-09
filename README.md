@@ -6,19 +6,18 @@
 
 **光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计 → 理论闭环复习 → 仿真/实验闭环。**
 
-> 当前版本：**v0.8（2026-09-08）** · 106 页
+> 当前版本：**v0.9（2026-09-08）** · 121 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.8/KID入门讲义_v0.8.pdf)
-- [LaTeX 权威排版源文件](docs/v0.8/KID入门讲义_v0.8.tex)
-- [Markdown 内容源文件](docs/v0.8/KID入门讲义_v0.8.md)
-- [v0.8 修改记录](docs/v0.8/CHANGELOG.md)
-- [v0.8 Python 示例](docs/v0.8/examples/)
+- [PDF 阅读版](docs/v0.9/KID入门讲义_v0.9.pdf)
+- [LaTeX 权威排版源文件](docs/v0.9/KID入门讲义_v0.9.tex)
+- [Markdown 内容源文件](docs/v0.9/KID入门讲义_v0.9.md)
+- [v0.9 修改记录](docs/v0.9/CHANGELOG.md)
+- [v0.9 Python 示例](docs/v0.9/examples/)
+- [v0.9 项目验证模板](docs/v0.9/templates/)
 
 ## 当前已经打通的主链
-
-到 v0.8 为止，讲义已经从“一个光子”推进到真实 LEKID 几何，并加入了一整套可闭卷复述、手写推导和自测的理论闭环：
 
 `hν → pair breaking → Nqp → σ1,σ2 → Rs,Xs → Lk,Qi → f0,Qr,Qc → S21(f) → IQ → responsivity → PSD/ASD → NEP`
 
@@ -28,35 +27,14 @@
 
 `GHz: meander Lg+Lk / IDC C / coupler Cc → f0, Qi, Qc, S21`
 
-### v0.1
-建立第一条完整因果链：`入射光子 → pair breaking → Nqp ↑ → ns ↓ → Lk ↑ → f0 ↓ → S21 / I-Q 改变`。
+### v0.1–v0.8
+依次建立光子到 S21、动能电感、超导基础、Mattis–Bardeen、微波谐振器/IQ、responsivity/NEP、LEKID 电磁设计，以及完整理论复习与手写训练。
 
-### v0.2
-动能电感推导、London penetration depth、sheet kinetic inductance、`α` 与频移。
-
-### v0.3
-Cooper pair、BCS 能隙、热/非平衡准粒子、generation-recombination、quasiparticle lifetime。
-
-### v0.4
-复电导 `σ1/σ2`、Mattis–Bardeen、surface impedance、`Lk`、`Qi` 与 GHz/150 GHz 材料模型边界。
-
-### v0.5
-`Qi/Qc/Qr`、linewidth、ring-down、ideal notch、IQ circle、fixed-tone readout 与 complex `S21` fitting。
-
-### v0.6
-absorbed power、responsivity、detector dynamics、PSD/ASD、input-referred NEP、photon/GR/TLS/amplifier noise。
-
-### v0.7
-LEKID 双频电磁设计：meander absorber/inductor 双重角色、sheet impedance、IDC/Qc、圆波导模态、双偏振、backshort、solver 分工与 full-wave power closure。
-
-### v0.8
-- 新增“从光子到 IQ”的阶段性理论闭环复习；
-- 9 张核心笔记卡与 5 组公式阶梯；
-- 引入“公式三问”：数学上说什么、物理上为什么、工程上意味着什么；
-- 新增 15 道闭卷概念自测；
-- 新增 150 GHz Al LEKID 综合闭环题；
-- 独立答案章给出逐步推导、单位检查、物理解释、工程意义与常见误区；
-- 新增 `capstone_chain_demo.py` 与 `iq_circle_workbook.py`。
+### v0.9
+- 将当前 150 GHz 双偏振 LEKID 拆成 geometry / GHz / optical / numerical / fabrication / cryogenic / calibration 多层 gate；
+- 建立 `Claim–Observable–Method–Acceptance–Evidence` traceability；
+- 增加 B0/B1 FOM、modal closure、convergence、material/tolerance、run manifest 与 evidence level；
+- 增加 fabrication checklist、validation matrix 和三个项目验证 Python 示例。
 
 ## 总体学习路线
 
@@ -69,58 +47,22 @@ LEKID 双频电磁设计：meander absorber/inductor 双重角色、sheet impeda
 | M5 | 光学响应与 responsivity | 已完成基础模型 |
 | M6 | 噪声与 NEP | 已完成基础 noise budget |
 | M7 | LEKID 电磁设计 | 已完成 |
-| M8 | 理论闭环复习、手写训练与自测 | **v0.8 已完成** |
-| M9 | 当前 150 GHz 项目验证矩阵 | 下一阶段 v0.9 |
-| M10 | 阵列/FDM、实时读出与研究闭环 | 后续 |
+| M8 | 理论闭环复习、手写训练与自测 | v0.8 已完成 |
+| M9 | 当前 150 GHz 项目验证矩阵 | **v0.9 已完成** |
+| M10 | 阵列/FDM、实时读出与研究闭环 | 下一阶段 v1.0 |
 
 ## 仓库结构与版本规则
 
-```text
-KID-Intro-Guide/
-├── README.md
-├── LATEST_VERSION
-├── LICENSE
-├── CONTRIBUTING.md
-├── ROADMAP.md
-├── CHANGELOG.md
-├── Makefile
-├── .github/workflows/build-guide.yml
-├── scripts/build_latest.sh
-└── docs/
-    ├── v0.1/
-    ├── ...
-    ├── v0.7/
-    └── v0.8/
-        ├── KID入门讲义_v0.8.pdf
-        ├── KID入门讲义_v0.8.tex
-        ├── KID入门讲义_v0.8.md
-        ├── README.md
-        ├── CHANGELOG.md
-        └── examples/
-```
-
-**发布规则：每个版本必须同时保留 PDF + LaTeX + Markdown；最新 PDF 必须作为普通 GitHub 仓库文件存在。**
+每个发布版本保留 PDF + LaTeX + Markdown；最新版 PDF 必须作为普通 GitHub 仓库文件存在。`LATEST_VERSION` 是唯一最新版指针，永久 GitHub Actions 使用同一指针独立重编译。
 
 ## 本地编译
 
-需要 XeLaTeX 与常见 TeX Live 宏包：
-
 ```bash
 make pdf
-```
-
-或者：
-
-```bash
+# 或
 bash ./scripts/build_latest.sh
 ```
 
-脚本读取根目录 `LATEST_VERSION`。GitHub Actions 使用同一版本指针，在 push / PR 时执行两次 XeLaTeX 编译并上传构建产物作为独立校验。
-
-## 如何参与
-
-欢迎提交公式/物理解释纠错、示意图、KID/LEKID 教学案例、Python 数值练习、实验/仿真验证案例和文献补充。具体约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
 ## License
 
-代码、脚本与原创文本内容采用 [MIT License](LICENSE) 发布。外部论文、图像或资料的版权仍归原作者或原出版方所有。
+代码、脚本与原创文本内容采用 [MIT License](LICENSE) 发布。外部论文、图像或资料版权归原作者/出版方所有。

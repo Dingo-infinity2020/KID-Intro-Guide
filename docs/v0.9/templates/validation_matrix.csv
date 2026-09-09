@@ -1,0 +1,11 @@
+claim_id,claim,observable,method,acceptance_rule,evidence,status
+G0,Geometry topology is manufacturable,continuity+clearance,geometry audit,DRC and connectivity pass,report+geometry commit,PENDING
+G1,GHz target mode is controllable,"f0,Qc,current map",Sonnet,"monotonic tuning and correct mode identity",CSV+fit+current map,PENDING
+O1,Modal power accounting closes,power closure,CST/HFSS,"closure error < project threshold",modal CSV+manifest,PENDING
+O2,Dual-polarization optical response is usable,"AX,AY,leakage",TE11-X/Y sweeps,"both polarizations meet predefined FOM",curves+notebook,PENDING
+B1,B1 improves robustness,"band/angle FOM",B0/B1 comparison,"improvement > solver+tolerance uncertainty",comparison report,PENDING
+N1,Numerical result is converged,metric change,mesh/frequency/adaptive tiers,"uncertainty < claim margin",convergence report,PENDING
+F1,Design is fabrication-robust,worst-case/tolerance FOM,tolerance sweep,"predefined yield or worst-case rule",tolerance report,PENDING
+M1,Microwave hardware closes model,"f0,Qi,Qc",cryogenic VNA,"deviation is quantified and attributable",fit database,PENDING
+L1,Optical hardware closes model,dx/dP+noise,optical load,"trend and scale are physically consistent",load curves,PENDING
+P1,Polarization closes model,"angle,leakage,efficiency",rotating source,"orthogonality/leakage meet target",polarization fit,PENDING
