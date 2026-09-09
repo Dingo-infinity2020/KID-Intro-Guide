@@ -1,0 +1,40 @@
+run_id: YYYYMMDD_solver_design_variant
+purpose: ""
+geometry:
+  commit: ""
+  source_file: ""
+  variant: B0
+  nominal_parameter_set: ""
+solver:
+  name: CST
+  version: ""
+  frequency_ghz: [149.0, 151.0]
+  port_reference_plane: ""
+  incident_mode: TE11-X
+  propagating_modes: [TE11-X, TE11-Y, TM01]
+material:
+  model: ""
+  film_thickness_nm: null
+  Tc_K: null
+  Rs_ohm_sq: null
+  Lk_pH_sq: null
+mesh:
+  tier: ""
+  adaptive: true
+  convergence_rule: ""
+backshort:
+  type: B0
+  parameters: {}
+alignment:
+  dx_um: 0
+  dy_um: 0
+  rotation_deg: 0
+outputs:
+  raw: []
+  derived: []
+  figures: []
+acceptance:
+  metric: ""
+  threshold: ""
+  result: PENDING
+notes: ""
