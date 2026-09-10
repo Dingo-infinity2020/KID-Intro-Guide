@@ -68,12 +68,16 @@ $$
 | $T_c$ | 超导临界温度 | 决定超导能隙的典型尺度 |
 | $\Delta$ | 超导能隙 | pair breaking 的基本阈值是 $h\nu\ge2\Delta$ |
 | $N_{\rm qp}$ | 准粒子数 | 光到材料状态之间的关键中间量 |
+| $n_{\rm qp}$ | 准粒子数密度 | 单位体积内的准粒子数；均匀时 $N_{\rm qp}\approx n_{\rm qp}V$ |
 | $L_g,L_k$ | 几何/动能电感 | $L_k$ 对超导状态敏感 |
 | $\alpha$ | 动能电感占比 | $L_k/(L_g+L_k)$ |
 | $f_0$ | 谐振频率 | KID 最重要的可测状态量之一 |
 | $Q_i,Q_c,Q_r$ | 内部/耦合/总品质因数 | $Q_r^{-1}=Q_i^{-1}+Q_c^{-1}$ |
 | $S_{21}$ | 前向传输系数 | 复数，可写成 $I+jQ$ |
+| $P_{\rm inc}$ | 入射光功率 | 到达器件/参考面的光功率；通常 $P_{\rm abs}\le P_{\rm inc}$ |
 | $P_{\rm abs}$ | 吸收光功率 | 真正进入 absorber 的功率 |
+| $P_{\rm read}$ | 微波读出功率 | GHz probe tone 功率，与被探测光功率不同 |
+| $\Delta\nu$ | 光学等效带宽 | 频带宽度，与超导能隙 $\Delta$ 不同 |
 | $\eta_{\rm pb}$ | 破对效率 | 吸收能量进入准粒子产生链的效率参数 |
 | $\tau_{\rm qp}$ | 准粒子寿命 | 影响稳态响应与时间带宽 |
 | $\sigma_1,\sigma_2$ | 复电导两部分 | 分别主要关联耗散与感性/超流响应 |
@@ -92,6 +96,13 @@ $$
 - **backshort（背短路反射结构）**：利用反射、干涉与阻抗匹配增强 absorber 吸收；$\lambda/4$ 通常只是起点。
 
 **特别提醒：** $\nu$ 常表示被探测光频率，$f_0$ 表示 GHz 谐振频率，而噪声谱里的 $f$ 常表示 Fourier frequency。三者都叫“频率”，但职责不同。
+
+> **全书统一约定：五组最容易混淆的符号。**  
+> 1. $N_{\rm qp}$ 是准粒子**总数**，$n_{\rm qp}$ 是准粒子**数密度**；给定有效体积后才能互换。  
+> 2. $\Delta$ 是超导能隙，$\Delta\nu$ 是光学频带宽度，量纲不同。  
+> 3. $P_{\rm inc}$、$P_{\rm abs}$、$P_{\rm read}$ 分别是入射光功率、吸收光功率和 GHz 读出功率；写 responsivity/NEP 时必须声明输入功率定义。  
+> 4. $i$ 与 $j$ 都是虚数单位。本书在材料复电导/表面阻抗中优先用 $i$，在 RF 的 $S_{21}$/IQ 公式中保留常见的 $j$。  
+> 5. ASD 是 PSD 的平方根；比较绝对噪声系数时还要声明 one-sided / two-sided PSD 约定，否则很容易出现因子 2。
 
 
 # Part I：先建立 KID 直觉
@@ -1483,7 +1494,7 @@ $$
 
 ---
 
-## 4.11 映射到当前 150 GHz 双偏振 LEKID
+## 4.11 工程案例：150 GHz 双偏振 LEKID 的材料判据
 
 建议以后每次谈材料参数，都同时写：
 
@@ -2132,7 +2143,7 @@ raw complex S21
   -> f0, Qr, Qc, Qi + uncertainty
 ```
 
-## 7. 映射到当前 LEKID
+## 7. 工程案例：从 GHz resonance 回到可解释的器件参数
 
 以后分析 Sonnet 的 GHz resonance，不只报告 “谐振在 2.5 GHz、notch 很深”，而至少输出 $f_0,Q_r,Q_c$；只有材料模型包含真实 $Z_s/L_k/loss$ 时，$Q_i$ 和频移才有资格继续解释成超导材料或光学响应。
 
@@ -2784,7 +2795,7 @@ $$
 ## 9.5 笔记卡 3：准粒子为什么同时改变频率和损耗？
 
 $$
-\sigma=\sigma_1-j\sigma_2.
+\sigma=\sigma_1-i\sigma_2.
 $$
 
 填写：
@@ -3006,7 +3017,7 @@ $$
 ### C：复电导到薄膜阻抗
 
 $$
-\sigma=\sigma_1-j\sigma_2,
+\sigma=\sigma_1-i\sigma_2,
 \qquad
 Z_\Box\approx\underline{\hspace{5cm}}.
 $$
@@ -3175,7 +3186,7 @@ $$
 本讲义约定：
 
 $$
-\sigma=\sigma_1-j\sigma_2.
+\sigma=\sigma_1-i\sigma_2.
 $$
 
 - $\sigma_1$：主要对应 dissipative microwave response；
@@ -3698,7 +3709,7 @@ $$
 1=P_{refl}^{(m)}+P_{trans}^{(m)}+P_{abs}^{(m)}+\cdots
 $$
 
-当前 $D=1.6$ mm 圆波导在约 150 GHz 需要至少 accounting：TE11-X、TE11-Y、TM01；TE21 仍为 cutoff consistency check。
+以 $D=1.6$ mm 圆波导为例在约 150 GHz 需要至少 accounting：TE11-X、TE11-Y、TM01；TE21 仍为 cutoff consistency check。
 
 $$
 P_{refl}=|S_{\mathrm{TE11X}\leftarrow m}|^2+|S_{\mathrm{TE11Y}\leftarrow m}|^2+|S_{\mathrm{TM01}\leftarrow m}|^2.

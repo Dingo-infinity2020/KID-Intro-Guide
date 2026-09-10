@@ -28,3 +28,12 @@ Step 4-A 已覆盖 7 个基础公式/关系：$E=h\nu$、$h\nu\ge2\Delta$、$\al
 ## Step 4-D — LEKID electromagnetic co-design
 
 第 8 章新增 9 组公式四层解释，将 fill factor、absorber volume、backshort matching、quarter-wave、waveguide cutoff、polarization selectivity、coupling Q、power closure 与 band-weighted absorption 从“会写公式”提升到“知道为什么、怎么用、哪里会失效”。同时把 Markdown 中残留的私人项目标题改成公开教材的工程案例标题。
+
+
+## Step 4-E — notation / public-textbook consistency
+
+- 清理剩余“当前项目/当前器件”式私人语境，把 150 GHz 双偏振 LEKID 固定为公开教材中的工程案例；
+- 统一材料复电导使用 $i$，同时说明 RF/$S_{21}$ 公式保留工程习惯 $j$，二者均为虚数单位；
+- 明确 $N_{qp}$（总数）与 $n_{qp}$（数密度）、$Delta$（能隙）与 $Delta nu$（光学带宽）；
+- 明确 incident / absorbed / readout 三种功率定义；
+- 在 PSD/ASD 处加入 one-sided / two-sided convention 警告。

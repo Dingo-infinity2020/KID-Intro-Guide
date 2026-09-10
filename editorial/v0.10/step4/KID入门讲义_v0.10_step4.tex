@@ -232,6 +232,7 @@ $h$ & Planck 常数 & 把“频率”连接到“单个光子的能量”。 \\
 $T_c$ & 超导临界温度 & 粗略决定能隙尺度；弱耦合 BCS 下 $\Delta(0)\simeq1.764k_BT_c$。 \\
 $\Delta$ & 超导能隙 & 本书取单准粒子能隙；最基本的 pair-breaking 阈值是 $h\nu\ge2\Delta$。 \\
 $N_{\rm qp}$ & 准粒子数 & 吸收功率增加后通常会上升，是“光”到“材料状态”之间的关键中间量。 \\
+$n_{\rm qp}$ & 准粒子数密度 & 单位体积内的准粒子数；若体积为 $V$ 且分布近似均匀，则 $N_{\rm qp}\approx n_{\rm qp}V$。 \\
 $n_s$ & 超流载流子密度 & 越低通常意味着动能电感越大。 \\
 $L_g$ & 几何电感 & 主要对应导体周围磁场储能。 \\
 $L_k$ & 动能电感 & 来自超导载流子的惯性，是 KID 对材料状态敏感的核心。 \\
@@ -243,12 +244,15 @@ $Q_c$ & coupling quality factor & 耦合品质因数，描述谐振器与 feedli
 $Q_r$ & loaded/resonator quality factor & 实际读到的总品质因数，满足 $Q_r^{-1}=Q_i^{-1}+Q_c^{-1}$。 \\
 $S_{21}$ & 前向传输系数 & 一个复数；可同时看幅度/相位，也可写成 $I+jQ$。 \\
 $I,Q$ & 复基带两分量 & $S_{21}=I+jQ$ 的实部与虚部坐标，不是两个独立探测器。 \\
+$P_{\rm inc}$ & 入射光功率 & 到达器件/定义参考面的光功率；通常有 $P_{\rm abs}\le P_{\rm inc}$。 \\
 $P_{\rm abs}$ & 吸收光功率 & 真正进入 absorber 并转化为探测器激发的功率。 \\
+$P_{\rm read}$ & 微波读出功率 & GHz probe tone 的功率；与被探测的毫米波/亚毫米波光功率不是同一个量。 \\
+$\Delta\nu$ & 光学等效带宽 & 频带宽度；这里的 $\Delta\nu$ 与超导能隙 $\Delta$ 完全不是同一个物理量。 \\
 $\eta_{\rm pb}$ & pair-breaking efficiency & 吸收能量中有效进入准粒子产生链条的比例参数。 \\
 $\tau_{\rm qp}$ & 准粒子寿命 & 决定稳态准粒子数与一部分时间响应带宽。 \\
 $\sigma_1,\sigma_2$ & 复电导两部分 & $\sigma_1$ 主要关联耗散，$\sigma_2$ 主要关联感性/超流响应。 \\
 $R_{\square,n}$ & 正常态方块电阻 & 薄膜工艺中常用的每方块电阻，可用于估算低温 $L_{k,\square}$。 \\
-$Z_s=R_s+jX_s$ & 表面阻抗 & 把有限损耗与感性响应放在同一个复数材料参数里。 \\
+$Z_s=R_s+iX_s$ & 表面阻抗 & 把有限损耗与感性响应放在同一个复数材料参数里。 \\
 \bottomrule
 \end{longtable}
 \normalsize
@@ -268,6 +272,16 @@ $Z_s=R_s+jX_s$ & 表面阻抗 & 把有限损耗与感性响应放在同一个复
 \begin{checkpointbox}
 三个特别值得从一开始就区分的量：\textbf{$\nu$ 是被探测光的频率，$f_0$ 是 GHz 谐振器的谐振频率，$f$ 在噪声谱章节里还会表示 Fourier frequency。} 它们都叫“频率”，但在物理链条中的职责完全不同。
 \end{checkpointbox}
+
+\begin{tcolorbox}[colback=white,colframe=KidBlue!55,arc=2mm,title=全书统一约定：五组最容易混淆的符号,fonttitle=\bfseries]
+\begin{enumerate}
+  \item \textbf{$N_{\rm qp}$ 与 $n_{\rm qp}$：}前者是准粒子总数，后者是准粒子数密度；只有在给定有效体积后才能互相换算。
+  \item \textbf{$\Delta$ 与 $\Delta\nu$：}$\Delta$ 是超导能隙，$\Delta\nu$ 是光学频带宽度；看起来相似，量纲完全不同。
+  \item \textbf{$P_{\rm inc}$、$P_{\rm abs}$ 与 $P_{\rm read}$：}分别表示入射光功率、真正被 absorber 吸收的光功率和 GHz 微波读出功率。响应度/NEP 的分母必须写清到底指哪一种功率。
+  \item \textbf{$i$ 与 $j$：}二者都表示虚数单位，$i^2=j^2=-1$。本书在材料复电导/表面阻抗中优先用 $i$，在 RF 的 $S_{21}$、IQ 和电路公式中常保留工程习惯 $j$。
+  \item \textbf{PSD 与 ASD：}ASD 是 PSD 的平方根。涉及绝对噪声系数或与文献比较时，还必须声明采用 one-sided 还是 two-sided PSD；这类约定常带来因子 2。
+\end{enumerate}
+\end{tcolorbox}
 
 \part{先建立 KID 直觉}
 \setcounter{chapter}{-1}
@@ -1885,10 +1899,10 @@ f_{\rm 3dB}\sim\frac{1}{2\pi\tau_{\qp}}.
 
 因此“$T_c$ 越低越好”或“$T_c$ 越高越好”都不是普遍结论。
 
-\section{映射到当前 \SI{150}{GHz} 双偏振 LEKID}
+\section{工程案例：\SI{150}{GHz} 双偏振 LEKID 的材料判据}
 
 \begin{projectbox}
-对当前 \SI{150}{GHz} LEKID，建议以后每次谈材料或仿真参数，都同时写出四个量：
+对于这一 \SI{150}{GHz} 工程案例，建议每次谈材料或仿真参数时都同时写出四个量：
 \[
 T_c,\qquad
 \Delta_0,\qquad
@@ -4497,7 +4511,7 @@ n_s\downarrow\Rightarrow L_k\ \rule{2cm}{0.4pt}.
 
 微波频段把薄膜写成复电导：
 \[
-\sigma=\sigma_1-j\sigma_2.
+\sigma=\sigma_1-i\sigma_2.
 \]
 
 \begin{notebookbox}[title=填空并解释]
@@ -4745,7 +4759,7 @@ f_0=\rule{5cm}{0.4pt},
 
 \begin{notebookbox}[title=公式阶梯 C：从复电导到薄膜表面阻抗]
 \[
-\sigma=\sigma_1-j\sigma_2,
+\sigma=\sigma_1-i\sigma_2,
 \qquad
 Z_{\Box}\approx\rule{6cm}{0.4pt}.
 \]
@@ -4946,7 +4960,7 @@ n_s\downarrow\Rightarrow L_k\uparrow.
 
 采用本讲义约定：
 \[
-\sigma=\sigma_1-j\sigma_2.
+\sigma=\sigma_1-i\sigma_2.
 \]
 其中：
 \[
@@ -5650,9 +5664,9 @@ Dark 时固定 tone 正好位于谐振点，$S_{21}=0.333+0j$。光照后 tone �
 真正有说服力的论文结果，不是“蓝线比红线高”，而是：\textbf{蓝线与红线的差异大于模型不确定度，而且这种差异能追溯到明确的设计变量。}
 \end{intuitionbox}
 
-\section{当前器件的系统边界：不要把所有东西塞进一个模型}
+\section{工程案例的系统边界：不要把所有东西塞进一个模型}
 
-当前像素同时存在两个相差约两个数量级的频率域：
+该工程案例的像素同时存在两个相差约两个数量级的频率域：
 \[
 \text{readout: }\sim\SI{1}{--}\SI{3}{GHz},
 \qquad
@@ -5676,7 +5690,7 @@ GHz resonator & $f_0$、$Q_c$、IDC、coupler、寄生耦合、current continuit
 \end{center}
 
 \begin{projectbox}
-对当前双偏振 LEKID，一个很有用的项目原则是：\textbf{Sonnet 负责把 GHz resonator 做对；CST/HFSS 负责把 150 GHz optical coupling 做对；低温测试负责告诉你真实材料参数与模型偏差到底在哪里。}
+对双偏振 LEKID 工程案例，一个很有用的建模原则是：\textbf{Sonnet 负责把 GHz resonator 做对；CST/HFSS 负责把 150 GHz optical coupling 做对；低温测试负责告诉你真实材料参数与模型偏差到底在哪里。}
 \end{projectbox}
 
 \section{建立“单一真相源”：Nominal Design Ledger}
@@ -5692,8 +5706,8 @@ GHz resonator & $f_0$、$Q_c$、IDC、coupler、寄生耦合、current continuit
 类别 & 参数 & 说明 \\
 \midrule
 \endhead
-Optical port & $D_{wg}$ & 当前圆波导名义直径，例如 \SI{1.6}{mm}；必须标注 reference plane \\
-Optical band & $f_{opt}$ & 当前 149--151 GHz 属于窄带验证窗口，不应自动等同最终 science band \\
+Optical port & $D_{wg}$ & 圆波导名义直径，例如 \SI{1.6}{mm}；必须标注 reference plane \\
+Optical band & $f_{opt}$ & 例如 149--151 GHz 可作为窄带验证窗口，不应自动等同最终 science band \\
 Absorber & $w,p,l_{wiggle}$ & meander 线宽、pitch、wiggle 长度；X/Y 必须使用同一命名规则 \\
 Film & $t,T_c,R_\square$ & 膜厚、临界温度、sheet resistance；区分 nominal 与 measured \\
 Kinetic & $L_{k,\square}$ & GHz 材料模型关键量；应记录来源是估算、文献还是低温拟合 \\
@@ -5712,7 +5726,7 @@ Solver & mesh / modes / ports & 网格、端口模态、边界、adaptive 设置
 
 \section{Gate 0：几何拓扑与制造可行性}
 
-在任何 expensive solver 之前先做静态审计。当前双偏振单层结构至少要检查：
+在任何 expensive solver 之前先做静态审计。本工程案例的双偏振单层结构至少要检查：
 \begin{enumerate}
   \item X/Y absorber 导体是否连续，是否存在意外断路或短路；
   \item hairpin / half-hairpin 的 end-turn 是否满足目标对称性；
@@ -5788,9 +5802,9 @@ P_{closure}
 
 \subsection*{为什么“所有传播模”四个字很重要？}
 
-当前 $D=\SI{1.6}{mm}$ 圆波导在 150 GHz 附近，TE$_{11}$ 已传播，TM$_{01}$ 也已超过截止，而 TE$_{21}$ 仍截止。因此若只看 TE$_{11}\rightarrow$TE$_{11}$，就可能把转换到 TM$_{01}$ 的功率误认为吸收。
+以 $D=\SI{1.6}{mm}$ 圆波导、150 GHz 附近为例，TE$_{11}$ 已传播，TM$_{01}$ 也已超过截止，而 TE$_{21}$ 仍截止。因此若只看 TE$_{11}\rightarrow$TE$_{11}$，就可能把转换到 TM$_{01}$ 的功率误认为吸收。
 
-\begin{formula}[title=当前窄带验证的 modal accounting]
+\begin{formula}[title=工程案例窄带验证的 modal accounting]
 \[
 \boxed{
 P_{refl}
@@ -5842,7 +5856,7 @@ R_{0X}(f)&=|S_{\mathrm{TM01}\leftarrow\mathrm{TE11X}}|^2.
 
 \section{Gate 4：B0 vs B1 backshort——把研究问题写成矩阵}
 
-当前研究问题的价值不在“B1 看起来更复杂”，而在它能否在不牺牲其他性能的前提下带来可重复的收益。
+该工程问题的价值不在“B1 看起来更复杂”，而在它能否在不牺牲其他性能的前提下带来可重复的收益。
 
 \begin{center}
 \noindent\begin{tabularx}{\textwidth}{p{3.3cm}X X}
@@ -5919,7 +5933,7 @@ Cross-pol & leakage / mode conversion & 是否引入额外极化污染？ \\
 \delta M_{solver}+\delta M_{tolerance}
 }
 \]
-否则只能说“在当前模型下有趋势”，不能说“已证明 B1 更好”。
+否则只能说“在给定模型下有趋势”，不能说“已证明 B1 更好”。
 \end{formula}
 
 \section{Gate 6：材料模型 sensitivity——PEC 不是超导薄膜}
