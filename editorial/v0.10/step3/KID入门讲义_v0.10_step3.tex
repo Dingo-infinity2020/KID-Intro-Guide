@@ -498,6 +498,12 @@ M10 & 研究课题化 & 如何从“能工作的 KID”走向可发表的问题�
 \end{enumerate}
 \end{goalbox}
 
+\begin{tcolorbox}[colback=KidGold!10,colframe=KidGold!75!black,boxrule=0.7pt,arc=2mm,title=第一次读这一章：先看地图，不要试图当场学完所有理论,fonttitle=\bfseries]
+这一章会提前出现 $\Delta$、$N_{\rm qp}$、$L_k$、$Q_i$ 和 $S_{21}$。它们中的大多数都会在后面各用一整章重新解释。\textbf{第一次阅读时，先把这些符号当作路标，而不是考试内容。}
+
+只要求先跟住四件事：\textbf{光把能量送进薄膜；材料状态改变；谐振器状态改变；微波读出把变化显示出来。} 如果某一步暂时只能接受“后面会解释”，完全正常。本章的任务是先知道整台机器怎样连起来，后文再逐个打开黑箱。
+\end{tcolorbox}
+
 \section{先看全局：KID 是一台“两种频率协同工作”的机器}
 KID 初学时最容易混淆的一点，是把“被探测的光”和“用于读出的微波”混为一谈。事实上，它们通常相差几十到上百倍频率。
 
@@ -968,6 +974,18 @@ h\nu_{\rm signal}>2\Delta,
 \end{enumerate}
 \end{goalbox}
 
+\begin{tcolorbox}[colback=KidBlue!4,colframe=KidBlue!60,boxrule=0.7pt,arc=2mm,title=先认清两套语言：这一章为什么突然出现 $E$、$J$、$n_s$ 和 $v$？,fonttitle=\bfseries]
+前面一直在用\textbf{电路语言}：电压 $V$、电流 $I$、电感 $L$。这一章要回答“$L_k$ 从材料内部哪里来”，所以必须短暂切换到\textbf{材料语言}：电场 $E$、电流密度 $J$、有效超导载流子密度 $n_s$ 和平均速度 $v$。
+
+两套语言并不矛盾。对一段近似均匀的条带，最重要的转换只有
+\[
+\boxed{V=El,\qquad I=JA.}
+\]
+其中 $l$ 是条带长度，$A=wt$ 是横截面积，而 $J$ 可以先直观理解成“\textbf{每单位横截面积流过多少电流}”。接下来的推导只是把微观的“载流子需要被加速”翻译成端口看到的 $V=L_k\,dI/dt$。
+
+此处也\textbf{不要求已经理解 Cooper pair 的完整量子理论}。$m^*$、$q^*$、$n_s$ 先作为有效参数使用；第 4 章会再解释超导状态和准粒子到底是什么。
+\end{tcolorbox}
+
 \section{先把“电感”拆成两种储能机制}
 对于 LEKID 的一段 meander，总电感可以写成
 \[
@@ -1377,6 +1395,15 @@ L_k,Q_i,S_{21}
 \begin{intuitionbox}
 把超导体想成一个“低能激发被能隙挡住的电子系统”。KID 的工作，本质上是用毫米波/亚毫米波给这个系统制造少量准粒子，再用 GHz 谐振器非常灵敏地读出这些准粒子改变了多少复电导。
 \end{intuitionbox}
+
+\begin{tcolorbox}[colback=KidTeal!5,colframe=KidTeal!70!black,boxrule=0.7pt,arc=2mm,title=在看能带图之前，先把三个词翻成普通话,fonttitle=\bfseries]
+\begin{itemize}
+  \item \textbf{$E_F$（Fermi energy，费米能）：}这里主要把它当作描述“哪些电子态最容易参与低能变化”的参考能量。图上画一条 $E_F$，不表示材料内部真的有一堵能量墙。
+  \item \textbf{$\Delta$（energy gap，能隙）：}它是\textbf{激发能量上的门槛}，不是材料内部裂开了一条空间缝隙。对最低能的单个 BCS 准粒子，其激发能量至少为 $\Delta$。
+  \item \textbf{quasiparticle（准粒子）：}它是描述超导体系激发的一种有效语言，不应简单等同为“一颗恢复正常的普通电子”。KID 之所以关心它，是因为准粒子人口变化会改变薄膜的微波电磁响应。
+\end{itemize}
+先抓住这三句话，再看 $E=\sqrt{\xi^2+\Delta^2}$，公式就不再只是突然出现的一串符号。
+\end{tcolorbox}
 
 \section{正常金属与超导态：区别不只是“电阻变成零”}
 
@@ -1863,7 +1890,7 @@ L_k,Q_i
 S_{21}
 }
 \]
-下一版将正式打开中间这一步：Mattis--Bardeen 与 surface impedance。
+下一章将正式打开中间这一步：Mattis--Bardeen 与 surface impedance。
 
 \section{建议用 90--120 分钟完成的代码与手算任务}
 
@@ -1956,6 +1983,22 @@ f_0,S_{21}
 \]
 并能判断一个 Sonnet/CST 中的 PEC 或普通金属模型，到底漏掉了哪一层 KID 物理。
 \end{goalbox}
+
+\begin{tcolorbox}[colback=KidGold!9,colframe=KidGold!75!black,boxrule=0.7pt,arc=2mm,title=这一章建议读两遍：第一遍只抓住 $\sigma_1$ 和 $\sigma_2$,fonttitle=\bfseries]
+Mattis--Bardeen 往往是 KID 初学者第一次明显“掉队”的地方，因为它把超导微观理论、复数交流响应和器件参数同时放在了一页上。\textbf{第一遍不需要会算 MB 积分。}
+
+第一遍只建立下面的翻译关系：
+\[
+\boxed{
+\sigma_1\;\longleftrightarrow\;\text{耗散更像电阻支路},
+\qquad
+\sigma_2\;\longleftrightarrow\;\text{储能更像感性支路}
+}
+\]
+这里的“像”是帮助理解交流相位关系，并不是说超导薄膜真的由一个独立电阻和一个独立电感拼起来。理解 $\sigma_1$ 会进入损耗、$\sigma_2$ 会进入动能电感，就已经完成第一遍。
+
+第二遍再回来追问：给定 $T$、$\omega$、$\Delta$ 和准粒子分布，Mattis--Bardeen 怎样定量给出 $\sigma_1$、$\sigma_2$，以及怎样进一步得到 $Z_s$、$Q_i$ 和 $f_0$。这样读，比第一次就死磕积分更稳。
+\end{tcolorbox}
 
 \section{为什么需要“复电导”这层语言？}
 
