@@ -28,6 +28,8 @@ def insert_after_tex_display(text, scope, anchor, addition, marker):
     sentinel = f'% STEP4C:{marker}'
     if sentinel in text:
         return text
+    scope = scope.replace('\\\\', '\\')
+    anchor = anchor.replace('\\\\', '\\').replace('\\n', '\n')
     s = text.find(scope)
     if s < 0:
         raise SystemExit(f'Missing TeX scope: {scope}')
@@ -45,6 +47,8 @@ def insert_after_md_display(text, scope, anchor, addition, marker):
     sentinel = f'<!-- STEP4C:{marker} -->'
     if sentinel in text:
         return text
+    scope = scope.replace('\\\\', '\\')
+    anchor = anchor.replace('\\\\', '\\').replace('\\n', '\n')
     s = text.find(scope)
     if s < 0:
         raise SystemExit(f'Missing Markdown scope: {scope}')

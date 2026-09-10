@@ -1945,6 +1945,13 @@ $$
 Q=\omega_0\frac{U}{P_{\rm loss}}.
 $$
 
+<!-- STEP4C:q-definition -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 品质因数是“每个弧度储存的能量 / 损失的能量”的无量纲比值；$Q$ 越大，同样储能下单位时间损失越小。  
+> **物理上：** 谐振器并不是凭空把信号放大，而是让能量在结构里反复交换许多周期；损失越慢，频率选择性越尖锐。  
+> **工程上：** 它是理解 $Q_i,Q_c,Q_r$ 的共同起点，也能把材料损耗、耦合和最终 linewidth 放进同一套能量语言。  
+> **适用条件：** 默认线性、稳定的谐振模式，并用周期平均储能与损耗定义。强非线性、模式混合或随时间快速变化时，一个单一 $Q$ 可能不足以描述系统。
+
 内部损耗和 feedline 耦合的能量衰减率分别为
 
 $$
@@ -1958,6 +1965,13 @@ $$
 \boxed{\frac1{Q_r}=\frac1{Q_i}+\frac1{Q_c}}.
 $$
 
+<!-- STEP4C:loaded-q -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 独立能量衰减通道的“损耗率”相加，因此是 $1/Q$ 相加，而不是 $Q$ 本身相加。  
+> **物理上：** $Q_i$ 像器件内部的漏水口，$Q_c$ 像与 feedline 相连的可控出口；两个出口同时存在时，总排空速度是两者之和。  
+> **工程上：** 从实测 $Q_r$ 判断器件时必须同时分解 $Q_i$ 与 $Q_c$；否则 notch 变宽究竟来自材料变差还是耦合变强无法区分。  
+> **适用条件：** 假设两个通道可近似独立并由同一个单模谐振器描述。复杂非对称耦合、多端口、辐射模或模式杂化时需要更完整的耦合模模型。
+
 $Q_i$ 表示器件自身损耗，$Q_c$ 表示外部耦合强度，$Q_r$ 是实际扫频看到的 loaded Q。
 
 ## 2. linewidth 与 ring-down
@@ -1965,6 +1979,13 @@ $Q_i$ 表示器件自身损耗，$Q_c$ 表示外部耦合强度，$Q_r$ 是实�
 $$
 \boxed{\Delta f_{\rm FWHM}\approx\frac{f_0}{Q_r}}.
 $$
+
+<!-- STEP4C:linewidth -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 谐振器的半功率带宽约等于中心频率除以 loaded $Q$；因此 $Q_r=f_0/\Delta f$。  
+> **物理上：** 能量保存得越久，系统对“驱动频率是否刚好匹配”越挑剔，所以频域 resonance 越窄。  
+> **工程上：** 它把拟合得到的 $Q_r$ 立刻转换成 tone spacing、扫频步长和允许频移的工程尺度。  
+> **适用条件：** 适用于孤立、近似 Lorentzian、弱非线性的单模 resonance。强功率导致 bifurcation、邻近 resonance 重叠或非 Lorentzian 线形时不能机械使用。
 
 能量寿命：
 
@@ -1978,6 +1999,13 @@ $$
 \boxed{\tau_A=\frac{2Q_r}{\omega_0}=\frac{Q_r}{\pi f_0}=\frac1{\pi\Delta f}}.
 $$
 
+<!-- STEP4C:ringdown-factor2 -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 能量时间常数 $\tau_E=Q_r/\omega_0$，振幅时间常数 $\tau_A=2Q_r/\omega_0$；二者相差 2，因为能量正比于振幅平方。  
+> **物理上：** 若场振幅衰减为 $e^{-t/\tau_A}$，能量就按 $e^{-2t/\tau_A}$ 衰减，所以能量更快下降。  
+> **工程上：** 阅读论文或设定 detector bandwidth 时必须先确认作者所谓 resonator lifetime 指能量还是振幅；差一个 2 足以造成带宽估计错误。  
+> **适用条件：** 这里使用单指数 ring-down 的线性单模模型。读出链滤波、多模 beating 或非线性恢复过程会引入额外时间尺度。
+
 注意文献里的 “resonator lifetime” 可能指其中任意一个，二者相差 2。
 
 ## 3. ideal notch resonator
@@ -1989,6 +2017,13 @@ $$
 S_{21}(f)=1-\frac{Q_r/Q_c}{1+2jQ_r(f-f_0)/f_0}.
 }
 $$
+
+<!-- STEP4C:ideal-s21 -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 最小 hanger 模型把一个直通背景“1”和一个经谐振器再耦回 feedline 的复振幅相减；分母中的 detuning 决定离 resonance 多远。  
+> **物理上：** notch 来自两条相干路径的干涉，不等于“谐振器把所有功率吸收掉”；内部损耗与外部耦合共同决定凹口深度和宽度。  
+> **工程上：** 这是理解 notch、IQ circle、$Q$ 拟合和 fixed-tone 工作点的母公式，也是合成 VNA 数据的第一层模型。  
+> **适用条件：** 假设已做背景归一化、没有 cable delay、耦合可视为实数且系统线性。真实数据通常还需要 complex gain、delay 与 asymmetry 参数。
 
 定义
 
@@ -2031,6 +2066,13 @@ $$
 }
 $$
 
+<!-- STEP4C:iq-circle -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 消去 detuning 参数 $y$ 后，理想复数 $S_{21}$ 满足标准圆方程，圆心为 $(1-d/2,0)$、半径为 $d/2$。  
+> **物理上：** 扫频改变的是同一个谐振响应的相位与幅度组合，所以复平面轨迹不是任意曲线，而被一维 detuning 参数限制在圆上。  
+> **工程上：** circle fit 利用了这个几何约束，因此通常比只拟合 $|S_{21}|$ 更充分地使用信息，也更容易识别 delay/baseline 问题。  
+> **适用条件：** 严格圆形依赖理想单 pole、线性和正确背景处理。阻抗失配、频率依赖 gain、邻近模与非线性会使圆被旋转、偏置或变形。
+
 理想 IQ 圆的圆心是 $(1-d/2,0)$，半径是 $d/2$。
 
 ## 5. 固定 tone KID 读出
@@ -2051,6 +2093,13 @@ $$
 }
 $$
 
+<!-- STEP4C:fixed-tone-linearization -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 在固定工作点对 $S_{21}(f_0,Q_i^{-1})$ 做一阶 Taylor 展开，把小的频移和损耗变化线性映射到复数 IQ 位移。  
+> **物理上：** probe tone 本身不需要跟着信号扫频；器件 resonance 移动时，相当于固定探针在局部响应曲面上看到位置发生变化。  
+> **工程上：** 这是把 detector physics 接到实时 DDC 输出 $I(t),Q(t)$ 的核心公式，也说明为什么需要选合适的 tone 位置与局部基底。  
+> **适用条件：** 只在小信号、工作点附近线性有效。大光学负载导致 resonance 漂出线性区、$Q_i$ 大幅变化或读出进入 bifurcation 时要重新扫频/跟踪或用非线性模型。
+
 $\delta f_0$ 主要产生 frequency quadrature，$\delta Q_i^{-1}$ 主要产生 dissipation quadrature；真实系统中二者不保证严格正交。
 
 ## 6. 真实 VNA 数据
@@ -2063,6 +2112,13 @@ S_{21}^{\rm meas}(f)=G(f)e^{-j2\pi f\tau}
 \left[1-\frac{(Q_r/Q_c)e^{j\phi}}{1+2jQ_r(f-f_0)/f_0}\right].
 }
 $$
+
+<!-- STEP4C:measured-s21 -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 实测模型在理想 notch 外乘上复增益 $G(f)$ 和 electrical-delay 相位，并用 $\phi$ 描述有效非对称耦合。  
+> **物理上：** VNA 看到的是“器件 + 线缆 + 放大器 + 阻抗失配”的总复传输；这些读出链效应会旋转、缩放甚至扭曲原本的谐振圆。  
+> **工程上：** 拟合时把器件参数与 readout-chain nuisance parameters 分开，才能避免把 cable delay 或 baseline 错认成 $Q_i$、$Q_c$ 或真实光学响应。  
+> **适用条件：** 不同文献对 complex $Q_c$、$\phi$ 和背景多项式的参数化不完全相同；复现结果时必须使用同一模型约定，并检查残差与窗口稳定性。
 
 $G(f)$ 表示 complex gain/baseline，$\tau$ 是 electrical delay，$\phi$ 表示有效 asymmetry。不同文献的 complex coupling 约定并不完全一致，复现 fitting 时必须与所用模型一致。
 
@@ -2111,17 +2167,45 @@ $$P_{\rm abs}\to \Gamma_{\rm qp}\to N_{\rm qp}\to (f_0,Q_i)\to I/Q.$$
 
 $$\Gamma_{\rm qp}\simeq \frac{\eta_{\rm pb}P_{\rm abs}}{\Delta},$$
 
+<!-- STEP4C:qp-generation -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 吸收功率除以单个准粒子的特征能量 $\Delta$ 给出每秒可产生的激发数量级，再乘 $\eta_{\rm pb}$ 表示能量级联的有效效率。  
+> **物理上：** 连续光功率不断向准粒子系统注入能量；高能光子先破对，再通过声子级联形成更多接近能隙边缘的激发。  
+> **工程上：** 它是从 full-wave 得到的 $P_{\rm abs}$ 接到 detector dynamics 的第一座桥，可用于响应度与噪声预算。  
+> **适用条件：** 这是能量守恒的有效工程近似，$\eta_{\rm pb}$ 依赖材料、频率、声子逃逸与非平衡动力学；不能理解成每个光子固定产生某个整数准粒子。
+
 在线性 lifetime 模型中
 
 $$\delta N_{\rm qp}\simeq \frac{\eta_{\rm pb}\tau_{\rm qp}}{\Delta}\delta P_{\rm abs}.$$
+
+<!-- STEP4C:qp-responsivity -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 在线性稳态模型里，准粒子数对吸收功率的斜率为 $\eta_{\rm pb}\tau_{\rm qp}/\Delta$。  
+> **物理上：** 产生得越快或活得越久，稳态池子里积累的准粒子就越多；因此 lifetime 同时是“积分时间”和物理增益。  
+> **工程上：** 这个斜率把材料动力学压缩成一个可直接与光功率标定连接的参数，是计算 frequency/dissipation responsivity 的公共因子。  
+> **适用条件：** 假设小扰动、单一有效 lifetime 且 $\tau_{\rm qp}$ 在工作点附近近似常数。强负载下 recombination 往往使 lifetime 随 $N_{\rm qp}$ 改变。
 
 定义 $x=\delta f_0/f_0$，则 frequency responsivity
 
 $$\mathcal R_x=\frac{dx}{dP_{\rm abs}}=\frac{dx}{dN_{\rm qp}}\frac{\eta_{\rm pb}\tau_{\rm qp}}{\Delta}.$$
 
+<!-- STEP4C:frequency-responsivity -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 链式法则把“每个准粒子造成多少 fractional frequency shift”和“每瓦吸收功率产生多少准粒子”相乘。  
+> **物理上：** 响应度不是新的独立物理机制，而是把材料敏感度与准粒子 population gain 串联后的系统斜率。  
+> **工程上：** 有了 $\mathcal R_x$ 才能把测得的 frequency-noise ASD 折回 input-referred NEP，也能比较不同体积、材料和 lifetime 的器件。  
+> **适用条件：** 只针对给定 bias/temperature/loading 工作点附近的小信号导数。响应明显非线性时应使用局部标定曲线或完整 $x(P)$ 模型。
+
 ## 动态响应
 
 $$H_{\rm qp}(f)=\frac{1}{1+j2\pi f\tau_{\rm qp}},\qquad f_{3\rm dB}=\frac{1}{2\pi\tau_{\rm qp}}.$$
+
+<!-- STEP4C:detector-transfer -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 最小动态模型把准粒子的一阶低通和谐振器振幅 ring-down 的一阶低通相乘。  
+> **物理上：** 信号必须先改变准粒子 population，再通过有限响应速度的谐振器被读出；两道“惯性”中更慢的一个通常主导带宽。  
+> **工程上：** 它帮助决定采样率、调制频率、脉冲恢复时间，并判断优化 $Q_r$ 或 $\tau_{\rm qp}$ 哪一个更有意义。  
+> **适用条件：** 假设两个过程近似线性、可串联且分别由单一时间常数描述。真实器件可能还有 thermal、phonon、electronics/filter 等额外 poles。
 
 同时 resonator ring-down 也提供一个低通时间尺度。
 
@@ -2131,15 +2215,36 @@ $$H_{\rm qp}(f)=\frac{1}{1+j2\pi f\tau_{\rm qp}},\qquad f_{3\rm dB}=\frac{1}{2\p
 
 $$\mathrm{NEP}(f)=\frac{\sqrt{S_x(f)}}{|dx/dP_{\rm abs}|}.$$
 
+<!-- STEP4C:nep-definition -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** NEP 等于输出 observable 的噪声 ASD 除以该 observable 对输入功率的响应度，量纲因此是 $\mathrm{W}/\sqrt{Hz}$。  
+> **物理上：** 它问的是：需要多大的等效输入功率涨落，才能在输出端产生与现有噪声一样大的变化。  
+> **工程上：** NEP 把不同读出坐标、不同 gain 的探测器投影回统一的输入功率尺度，因此可以公平比较灵敏度和建立系统 noise budget。  
+> **适用条件：** 噪声与响应度必须使用同一个 observable、同一个 Fourier-frequency convention 和同一个输入功率定义（absorbed/incident 必须说明）。
+
 单位为 $\mathrm{W}/\sqrt{\mathrm{Hz}}$。
 
 常见 photon noise 单模近似：
 
 $$\mathrm{NEP}_{\rm ph}^2\simeq 2h\nu P_{\rm abs}+\frac{2P_{\rm abs}^2}{\Delta\nu}.$$
 
+<!-- STEP4C:photon-nep -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 单模近似中 photon-noise 方差由与 $P$ 成正比的 shot term 和与 $P^2/\Delta\nu$ 成正比的 bunching/wave term 相加。  
+> **物理上：** 光子到达本身是随机过程；热场还具有 Bose bunching，因此即使探测器完全无噪声，输入光也存在不可消除的统计涨落。  
+> **工程上：** 它给出“photon-noise limited”必须面对的输入端基准，可与 detector/readout NEP 平方相加做预算。  
+> **适用条件：** 该形式对应简化单模、给定等效带宽的情形；多模、多偏振、非平坦 bandpass 或非热辐射源应对频率、模式和 occupation number 积分。
+
 常见低频 GR noise 形式：
 
 $$\mathrm{NEP}_{\rm GR}\simeq \frac{2\Delta}{\eta_{\rm pb}}\sqrt{\frac{N_{\rm qp}}{\tau_{\rm qp}}}.$$
+
+<!-- STEP4C:gr-nep -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** GR NEP 把随机准粒子数涨落折回输入功率，尺度随 $\Delta/\eta_{\rm pb}$ 增大，并随 $\sqrt{N_{\rm qp}/\tau_{\rm qp}}$ 增大。  
+> **物理上：** generation 和 recombination 都是离散随机事件；即使平均准粒子数稳定，瞬时 population 仍会围绕平均值涨落。  
+> **工程上：** 可用于判断器件是受光子统计、准粒子统计还是读出链限制，也能检查改变 lifetime 后“响应变大”和“GR noise 改变”之间的联动。  
+> **适用条件：** one-sided/two-sided PSD、事件定义和 spin convention 会造成常见 factor-of-two 差异；与文献比较必须先对齐定义。
 
 TLS 往往表现为低频 excess frequency noise，amplifier/readout noise 则发生在 detector 之后。独立噪声源可在 input-referred NEP 平方上相加。
 

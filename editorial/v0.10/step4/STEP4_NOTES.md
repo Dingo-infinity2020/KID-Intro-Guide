@@ -14,3 +14,12 @@ Step 4-A 已覆盖 7 个基础公式/关系：$E=h\nu$、$h\nu\ge2\Delta$、$\al
 特别强调：公式解释层不替代原有推导，而是放在公式与后续工程叙述之间，帮助第一次接触 KID 的读者知道“为什么值得记、什么时候该怀疑”。
 
 下一步 Step 4-B 继续覆盖超导热准粒子、复电导/表面阻抗、$Q_i/Q_c/Q_r$、notch $S_{21}$ 和 ring-down；Step 4-C 再处理 responsivity、NEP、photon/GR/TLS noise 与 optical coupling。
+
+
+## Step 4-C — Resonator/readout + responsivity/noise
+
+- 第 6 章补齐 Q、linewidth、ring-down、hanger S21、IQ circle、fixed-tone 与真实 VNA 模型的四层解释；
+- 明确 energy lifetime 与 amplitude lifetime 的 factor-of-two 来源；
+- 强调 notch 是相干路径干涉，不等于“全部功率被吸收”；
+- 第 7 章把 $P_{abs}$、quasiparticle gain、responsivity、dynamic response、PSD/ASD 与 NEP 串成同一条量纲闭合链；
+- 对 photon noise 和 GR noise 明确写出模型边界与 convention 风险。
