@@ -32,7 +32,7 @@ jobs:
           git show "$SRC:editorial/v0.10/step4/KID入门讲义_v0.10_step4.tex" > "$OUT/KID入门讲义_v0.10.tex"
           git show "$SRC:editorial/v0.10/step4/KID入门讲义_v0.10_step4.md" > "$OUT/KID入门讲义_v0.10.md"
 
-          # Preserve the v0.9 project-validation examples/templates, then overlay
+          # Preserve v0.9 engineering-validation examples/templates, then overlay
           # the audited canonical examples added/refreshed during v0.10.
           cp -a docs/v0.9/examples/. "$OUT/examples/"
           cp -a docs/v0.9/templates/. "$OUT/templates/"
@@ -43,12 +43,12 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
-          import re
 
           out = Path('docs/v0.10')
           tex = out / 'KID入门讲义_v0.10.tex'
           md = out / 'KID入门讲义_v0.10.md'
 
+          # Freeze reader-facing titles as a real release rather than an editorial preview.
           t = tex.read_text(encoding='utf-8')
           replacements = {
               'KID入门讲义 v0.10 Step 4 Formula Pedagogy Preview': 'KID入门讲义 v0.10',
@@ -64,6 +64,13 @@ jobs:
           m = m.replace('**版本：v0.10 Step 4 Formula Pedagogy Preview · 2026-09-10**', '**版本：v0.10 · 2026-09-10**')
           md.write_text(m, encoding='utf-8')
 
+          # One preserved v0.8 teaching script carried a stale banner only; make it version-neutral.
+          cap = out / 'examples' / 'capstone_chain_demo.py'
+          if cap.exists():
+              cs = cap.read_text(encoding='utf-8')
+              cs = cs.replace('=== KID v0.8 capstone chain ===', '=== KID capstone chain ===')
+              cap.write_text(cs, encoding='utf-8')
+
           # Public-release guard: development labels must not leak into the guide itself.
           bad = []
           for p in (tex, md):
@@ -73,6 +80,8 @@ jobs:
                       bad.append(f'{p}: {pat}')
           if bad:
               raise SystemExit('Release-label leak:\n' + '\n'.join(bad))
+          if cap.exists() and 'KID v0.8 capstone chain' in cap.read_text(encoding='utf-8'):
+              raise SystemExit('Stale capstone release banner remains')
 
           # Root README: move the public pointer from v0.9 to v0.10 without
           # erasing the v0.9 historical notes.
@@ -202,14 +211,26 @@ jobs:
           if border_bad:
               raise SystemExit(f'Ink touches extreme page border: {border_bad[:10]}')
 
+          # pdffonts columns are: name, type, encoding, emb, sub, uni, object ID.
+          # The type column can contain spaces (e.g. "CID Type 0C"), so parse
+          # emb/sub/uni from the row tail rather than by a fixed split index.
           fonts=Path('/tmp/kid-v010-pdffonts.txt').read_text(encoding='utf-8',errors='replace').splitlines()
           not_embedded=[]
+          unparsable=[]
           for line in fonts[2:]:
-              cols=line.split()
-              if len(cols)>=6 and cols[4].lower()!='yes':
+              if not line.strip():
+                  continue
+              m=re.search(r'\s+(yes|no)\s+(yes|no)\s+(yes|no)\s+\d+\s+\d+\s*$', line, re.I)
+              if not m:
+                  unparsable.append(line)
+                  continue
+              if m.group(1).lower()!='yes':
                   not_embedded.append(line)
+          if unparsable:
+              raise SystemExit('Could not parse pdffonts rows:\n'+'\n'.join(unparsable))
           if not_embedded:
               raise SystemExit('Non-embedded fonts detected:\n'+'\n'.join(not_embedded))
+
           text=Path('/tmp/kid-v010-text.txt').read_text(encoding='utf-8',errors='replace')
           if '\ufffd' in text:
               raise SystemExit('Unicode replacement character found in pdftotext output')
