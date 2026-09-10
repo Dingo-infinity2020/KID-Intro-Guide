@@ -188,7 +188,7 @@ md = add_after(md, md_marker, md_guide(
 # ---------------------------------------------------------------------------
 # 7) Sheet kinetic inductance
 # ---------------------------------------------------------------------------
-marker = """\\begin{formula}\n\\[\n\\boxed{\nL_{k,\\Box}\\equiv\\mu_0\\frac{\\lambda_L^2}{t}\n}\n\\]\n\\end{formula}"""
+marker = """\\begin{formula}\n\\[\n\\boxed{\nL_{k,\\Box}\\equiv\\mu_0\\frac{\\lambda_L^2}{t}\n}\n\\qquad (t\\ll\\lambda_L\\text{ 的简单 London 极限})\n\\]\n\\end{formula}"""
 addition = r'''\formulaexplain
 {$L_{k,\square}$ 把“材料 + 膜厚”的动能电感能力压缩成每一个几何方块的电感；总条带近似为 $L_k\approx L_{k,\square}(l/w)$。}
 {对均匀薄膜而言，一个长宽相等的方块无论整体尺寸多大，$l/w=1$。因此“每方块”不是一块固定面积，而是一种特别适合二维薄膜版图的几何计数语言。}
@@ -209,7 +209,7 @@ MD_PATH.write_text(md, encoding="utf-8")
 
 # Semantic gates.  Exactly seven formula guides are intentionally introduced in A.
 if tex.count(r"\formulaexplain") != 8:  # 1 macro definition + 7 invocations
-    raise SystemExit(f"Unexpected TeX formulaexplain count: {tex.count(r'\\formulaexplain')}")
+    raise SystemExit("Unexpected TeX formulaexplain count: " + str(tex.count(r"\formulaexplain")))
 if md.count("**公式怎么读：不要只背等号**") != 7:
     raise SystemExit(f"Unexpected Markdown formula-guide count: {md.count('**公式怎么读：不要只背等号**')}")
 
