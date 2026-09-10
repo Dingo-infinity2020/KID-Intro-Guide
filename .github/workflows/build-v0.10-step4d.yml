@@ -19,7 +19,7 @@ jobs:
           ref: v0.10-step4-formulas
           fetch-depth: 0
 
-      - name: Fix anchor normalization and apply Step 4-D transform
+      - name: Normalize anchors and apply Step 4-D transform
         shell: bash
         run: |
           set -euo pipefail
@@ -28,6 +28,7 @@ jobs:
           p=Path('editorial/v0.10/step4/step4d_formula_transform.py')
           s=p.read_text(encoding='utf-8')
           s=s.replace("return s.replace('\\\\\\\\','\\\\').replace('\\\\n','\\n')", "return s.replace('\\\\\\\\','\\\\')")
+          s=s.replace("r'd_{\\\\lambda/4}=\\\\frac{\\\\lambda_0}{4n}=\\\\frac{c}{4n\\\\nu}'", "r'd_{\\\\lambda/4}=\\\\frac{c}{4n\\\\nu}'", 1)
           p.write_text(s,encoding='utf-8')
           PY
           python3 editorial/v0.10/step4/step4d_formula_transform.py
