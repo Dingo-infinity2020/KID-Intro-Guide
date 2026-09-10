@@ -1,0 +1,64 @@
+name: Build v0.10 Step 4-C resonator and NEP pedagogy
+
+on:
+  push:
+    branches: [v0.10-step4-formulas]
+    paths:
+      - '.github/workflows/build-v0.10-step4c.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-step4c:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step 4 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.10-step4-formulas
+          fetch-depth: 0
+
+      - name: Apply Step 4-C formula pedagogy transform
+        run: python3 editorial/v0.10/step4/step4c_formula_transform.py
+
+      - name: Compile and audit Step 4-C PDF
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd editorial/v0.10/step4
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step4.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step4.tex'
+            test -s 'KID入门讲义_v0.10_step4.pdf'
+            python3 - <<'PY'
+            from pathlib import Path
+            import re
+            log = Path('KID入门讲义_v0.10_step4.log').read_text(encoding='utf-8', errors='replace')
+            pages_m = re.findall(r'Output written on .*?\((\d+) pages', log)
+            if not pages_m: raise SystemExit('No PDF page count')
+            pages = int(pages_m[-1])
+            over = len(re.findall(r'Overfull \\hbox', log))
+            bookmark = 'Token not allowed in a PDF string' in log
+            p = Path('STEP4C_FORMULA_AUDIT.md')
+            s = p.read_text(encoding='utf-8')
+            s += f'\n## Compilation / layout gate\n\n- PDF pages: **{pages}**\n- Overfull hbox count: **{over}**\n- Hyperref math-token bookmark warning: **{"YES" if bookmark else "NO"}**\n- Step 4-C build gate: **{"PASS" if over == 0 and not bookmark else "FAIL"}**\n'
+            p.write_text(s, encoding='utf-8')
+            if pages < 138: raise SystemExit(f'Unexpectedly short PDF: {pages}')
+            if over: raise SystemExit(f'Introduced {over} overfull hboxes')
+            if bookmark: raise SystemExit('Reintroduced bookmark math warning')
+            print(f'Step 4-C gate PASS: {pages} pages')
+            PY
+
+      - name: Commit Step 4-C checkpoint
+        run: |
+          set -euo pipefail
+          ROOT='editorial/v0.10/step4'
+          rm -f "$ROOT"/*.aux "$ROOT"/*.log "$ROOT"/*.out "$ROOT"/*.toc "$ROOT"/*.orig "$ROOT"/*.rej
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ROOT"
+          git commit -m 'Add v0.10 Step 4-C resonator and NEP formula pedagogy'
+          git push origin HEAD:v0.10-step4-formulas
