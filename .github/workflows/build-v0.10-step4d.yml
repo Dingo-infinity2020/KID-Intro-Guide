@@ -28,7 +28,10 @@ jobs:
           p=Path('editorial/v0.10/step4/step4d_formula_transform.py')
           s=p.read_text(encoding='utf-8')
           s=s.replace("return s.replace('\\\\\\\\','\\\\').replace('\\\\n','\\n')", "return s.replace('\\\\\\\\','\\\\')")
-          s=s.replace("r'd_{\\\\lambda/4}=\\\\frac{\\\\lambda_0}{4n}=\\\\frac{c}{4n\\\\nu}'", "r'd_{\\\\lambda/4}=\\\\frac{c}{4n\\\\nu}'", 1)
+          old="'quarter-wave': r'd_{\\\\lambda/4}=\\\\frac{\\\\lambda_0}{4n}=\\\\frac{c}{4n\\\\nu}',"
+          new="'quarter-wave': r'd_{\\\\lambda/4}=\\\\frac{c}{4n\\\\nu}',"
+          if old not in s: raise SystemExit('Missing targeted Markdown quarter-wave anchor in transform')
+          s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
           PY
           python3 editorial/v0.10/step4/step4d_formula_transform.py
