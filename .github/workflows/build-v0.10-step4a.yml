@@ -1,0 +1,85 @@
+name: Build v0.10 Step 4-A formula pedagogy
+
+on:
+  push:
+    branches: [v0.10-step4-formulas]
+    paths:
+      - '.github/workflows/build-v0.10-step4a.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-step4a:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step 4 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.10-step4-formulas
+          fetch-depth: 0
+
+      - name: Normalize transform guard and apply Step 4-A
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('editorial/v0.10/step4/step4a_formula_transform.py')
+          lines = p.read_text(encoding='utf-8').splitlines()
+          out = []
+          for line in lines:
+              if 'Unexpected TeX formulaexplain count:' in line:
+                  out.append('    raise SystemExit("Unexpected TeX formulaexplain count: " + str(tex.count(r"\\formulaexplain")))')
+              else:
+                  out.append(line)
+          p.write_text('\n'.join(out) + '\n', encoding='utf-8')
+          PY
+          python3 editorial/v0.10/step4/step4a_formula_transform.py
+
+      - name: Compile and audit Step 4-A PDF
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd editorial/v0.10/step4
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step4.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step4.tex'
+            test -s 'KID入门讲义_v0.10_step4.pdf'
+
+            python3 - <<'PY'
+            from pathlib import Path
+            import re
+            log = Path('KID入门讲义_v0.10_step4.log').read_text(encoding='utf-8', errors='replace')
+            pages_m = re.findall(r'Output written on .*?\((\d+) pages', log)
+            if not pages_m:
+                raise SystemExit('Could not determine Step 4 PDF page count')
+            pages = int(pages_m[-1])
+            over = len(re.findall(r'Overfull \\hbox', log))
+            bookmark_warning = 'Token not allowed in a PDF string' in log
+            audit_path = Path('STEP4_FORMULA_AUDIT.md')
+            audit = audit_path.read_text(encoding='utf-8')
+            audit += f'\n## Compilation / layout gate\n\n- PDF pages: **{pages}**\n- Overfull hbox count: **{over}**\n- Hyperref math-token bookmark warning: **{"YES" if bookmark_warning else "NO"}**\n- Step 4-A build gate: **{"PASS" if over == 0 and not bookmark_warning else "FAIL"}**\n'
+            audit_path.write_text(audit, encoding='utf-8')
+            if pages < 134:
+                raise SystemExit(f'Unexpectedly short PDF: {pages} pages')
+            if over:
+                raise SystemExit(f'Step 4-A introduced {over} Overfull hbox warnings')
+            if bookmark_warning:
+                raise SystemExit('Step 4-A reintroduced PDF bookmark math warnings')
+            print(f'Step 4-A gate PASS: {pages} pages')
+            PY
+
+      - name: Commit Step 4-A checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='editorial/v0.10/step4'
+          rm -f "$ROOT"/*.aux "$ROOT"/*.log "$ROOT"/*.out "$ROOT"/*.toc "$ROOT"/*.orig "$ROOT"/*.rej
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ROOT"
+          git commit -m 'Add v0.10 Step 4-A foundational formula pedagogy'
+          git push origin HEAD:v0.10-step4-formulas
