@@ -1,0 +1,104 @@
+name: Build v0.10 Step 3-D layout cleanup
+
+on:
+  push:
+    branches: [v0.10-step3-editorial]
+    paths:
+      - '.github/workflows/build-v0.10-step3d.yml'
+      - 'editorial/v0.10/step3/step3d_layout_transform.py'
+
+permissions:
+  contents: write
+
+jobs:
+  build-step3d:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step 3 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.10-step3-editorial
+          fetch-depth: 0
+
+      - name: Apply Step 3-D layout transform
+        run: python3 editorial/v0.10/step3/step3d_layout_transform.py
+
+      - name: Compile and audit Step 3-D PDF
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd editorial/v0.10/step3
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step3.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step3.tex'
+            test -s 'KID入门讲义_v0.10_step3.pdf'
+
+            python3 - <<'PY'
+            from pathlib import Path
+            import re
+
+            log = Path('KID入门讲义_v0.10_step3.log').read_text(encoding='utf-8', errors='replace')
+            page_matches = re.findall(r'Output written on .*?\((\d+) pages', log)
+            if not page_matches:
+                raise SystemExit('Could not determine PDF page count')
+            pages = int(page_matches[-1])
+            if pages < 120:
+                raise SystemExit(f'Unexpectedly short PDF: {pages} pages')
+
+            over = []
+            for m in re.finditer(r'Overfull \\hbox \(([0-9.]+)pt too wide\)(?:.*?lines? ([0-9]+)(?:--([0-9]+))?)?', log):
+                width = float(m.group(1))
+                line1 = m.group(2) or '?'
+                line2 = m.group(3)
+                lines = f'{line1}--{line2}' if line2 else line1
+                over.append((width, lines))
+
+            # XeTeX can report "detected at line" rather than "in paragraph".
+            for m in re.finditer(r'Overfull \\hbox \(([0-9.]+)pt too wide\) detected at line ([0-9]+)', log):
+                item = (float(m.group(1)), m.group(2))
+                if item not in over:
+                    over.append(item)
+
+            severe = [x for x in over if x[0] > 8.0]
+            bookmark_warning = 'Token not allowed in a PDF string' in log
+
+            lines = [
+                '# v0.10 Step 3-D — Layout audit',
+                '',
+                f'- PDF pages: **{pages}**',
+                f'- Overfull hbox count: **{len(over)}**',
+                f'- Overfull hbox > 8 pt: **{len(severe)}**',
+                f'- Hyperref math-token bookmark warning: **{"YES" if bookmark_warning else "NO"}**',
+                '',
+                '## Remaining overfull boxes',
+                '',
+            ]
+            if over:
+                for width, loc in sorted(over, reverse=True):
+                    lines.append(f'- {width:.3f} pt at source line(s) {loc}')
+            else:
+                lines.append('- None')
+            Path('STEP3_LAYOUT_AUDIT.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+            if severe:
+                details = ', '.join(f'{w:.3f}pt@{loc}' for w, loc in severe)
+                raise SystemExit('Severe overfull hbox remains (>8 pt): ' + details)
+            if bookmark_warning:
+                raise SystemExit('Hyperref PDF-string math warning remains')
+
+            print(f'Layout gate PASS: {pages} pages; max overfull=' + (f'{max(w for w,_ in over):.3f} pt' if over else '0 pt'))
+            PY
+
+      - name: Commit Step 3-D checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='editorial/v0.10/step3'
+          rm -f "$ROOT"/*.aux "$ROOT"/*.log "$ROOT"/*.out "$ROOT"/*.toc "$ROOT"/*.orig "$ROOT"/*.rej
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ROOT/KID入门讲义_v0.10_step3.tex" "$ROOT/KID入门讲义_v0.10_step3.md" "$ROOT/KID入门讲义_v0.10_step3.pdf" "$ROOT/STEP3_NOTES.md" "$ROOT/STEP3_LAYOUT_AUDIT.md"
+          git commit -m 'Add v0.10 Step 3-D layout and bookmark cleanup'
+          git push origin HEAD:v0.10-step3-editorial
