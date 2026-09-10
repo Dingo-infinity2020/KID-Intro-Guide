@@ -37,6 +37,63 @@ $$
 
 ---
 
+
+
+# 符号、缩写与术语速查
+
+这一节不是要求在开始前背诵，而是一张随手查的“路标”。第一次遇到陌生缩写或符号时，先确认它在“光 → 材料状态 → 谐振器 → 微波读出”链条中的位置，再回正文继续读。
+
+> 本书会保留一些 KID 论文、微波测量和电磁仿真中极常见的英文词，例如 meander、notch、feedline、backshort 和 probe tone。第一次出现时给出中文含义，后文可能直接沿用英文，目的是让教材术语与论文和软件界面能够对应。
+
+## 常见缩写
+
+| 缩写 | 英文全称 | 本书中的含义 |
+|---|---|---|
+| KID | kinetic inductance detector | 动能电感探测器 |
+| LEKID | lumped-element kinetic inductance detector | 集总元件 KID |
+| VNA | vector network analyzer | 矢量网络分析仪，扫频测复数 $S$ 参数 |
+| ADC | analog-to-digital converter | 模数转换器 |
+| DDC | digital down conversion | 数字下变频，得到低速 $I(t),Q(t)$ |
+| FDM | frequency-division multiplexing | 频分复用 |
+| NEP | noise-equivalent power | 噪声等效功率 |
+| PSD | power spectral density | 功率谱密度 |
+| ASD | amplitude spectral density | 幅度谱密度，等于 PSD 的平方根 |
+| TLS | two-level system | 两能级系统，一类常见低频频率噪声来源 |
+
+## 最常用符号
+
+| 符号 | 名称 | 先记住什么 |
+|---|---|---|
+| $\nu$ | 信号光频率 | 光子能量为 $h\nu$ |
+| $T_c$ | 超导临界温度 | 决定超导能隙的典型尺度 |
+| $\Delta$ | 超导能隙 | pair breaking 的基本阈值是 $h\nu\ge2\Delta$ |
+| $N_{\rm qp}$ | 准粒子数 | 光到材料状态之间的关键中间量 |
+| $L_g,L_k$ | 几何/动能电感 | $L_k$ 对超导状态敏感 |
+| $\alpha$ | 动能电感占比 | $L_k/(L_g+L_k)$ |
+| $f_0$ | 谐振频率 | KID 最重要的可测状态量之一 |
+| $Q_i,Q_c,Q_r$ | 内部/耦合/总品质因数 | $Q_r^{-1}=Q_i^{-1}+Q_c^{-1}$ |
+| $S_{21}$ | 前向传输系数 | 复数，可写成 $I+jQ$ |
+| $P_{\rm abs}$ | 吸收光功率 | 真正进入 absorber 的功率 |
+| $\eta_{\rm pb}$ | 破对效率 | 吸收能量进入准粒子产生链的效率参数 |
+| $\tau_{\rm qp}$ | 准粒子寿命 | 影响稳态响应与时间带宽 |
+| $\sigma_1,\sigma_2$ | 复电导两部分 | 分别主要关联耗散与感性/超流响应 |
+| $R_{\square,n}$ | 正常态方块电阻 | 可用于估算薄膜动能电感 |
+| $Z_s$ | 表面阻抗 | 同时包含损耗与电抗 |
+
+## 几个容易混淆的词
+
+- **quasiparticle（准粒子）**：超导体系的激发态描述；入门时先把它看作会同时改变损耗与动能电感的材料状态变量。
+- **pair breaking（破对）**：打破 Cooper pair 并产生准粒子激发，基本能量阈值为 $2\Delta$。
+- **meander（蛇形线/曲折电感）**：在 LEKID 中常同时承担毫米波吸收与 GHz 电感两种职责。
+- **notch（传输凹口）**：$|S_{21}|$ 扫频曲线的谐振凹陷，不是毫米波“吸收谱”的同义词。
+- **probe tone（读出探针）**：GHz 谐振附近用于询问器件状态的微波，与被探测信号不是同一频段。
+- **responsivity（响应度）**：输入变化引起多大输出变化；响应度大不自动等于 NEP 小。
+- **co-pol / cross-pol（同偏振/交叉偏振）**：目标偏振与正交偏振响应，比较前必须先写清定义。
+- **backshort（背短路反射结构）**：利用反射、干涉与阻抗匹配增强 absorber 吸收；$\lambda/4$ 通常只是起点。
+
+**特别提醒：** $\nu$ 常表示被探测光频率，$f_0$ 表示 GHz 谐振频率，而噪声谱里的 $f$ 常表示 Fourier frequency。三者都叫“频率”，但职责不同。
+
+
 # Part I：先建立 KID 直觉
 
 # 第 0 章：第一次接触 KID，只需要先知道这些
@@ -856,7 +913,7 @@ $$
 
 $\alpha$ 可以理解为**超导材料状态变化进入总谐振器电感的权重**。$L_g$ 太大时，材料变化会被“不敏感的几何电感”稀释。
 
-## 3.9 映射到你的 150 GHz 双偏振 LEKID
+## 3.9 工程例子：150 GHz 双偏振 LEKID
 
 meander 的线宽、总路径长度和膜厚至少同时参与：
 
@@ -1727,7 +1784,7 @@ $$
 
 ## 学习目标
 
-本章把 v0.4 的材料响应真正接到读出：理解 $Q_i,Q_c,Q_r$、linewidth、ring-down、ideal notch、IQ circle、fixed-tone readout 与真实 resonance fitting。
+本章把前文的材料响应真正接到读出：理解 $Q_i,Q_c,Q_r$、linewidth、ring-down、ideal notch、IQ circle、fixed-tone readout 与真实 resonance fitting。
 
 ## 1. 三个 Q
 
@@ -1874,8 +1931,8 @@ raw complex S21
 
 ## 8. 配套 Python
 
-- `examples/v0.6/resonator_basics.py`：理想 notch、IQ circle、频移和 fixed-tone IQ 响应；
-- `examples/v0.6/resonator_fit_demo.py`：加入 complex gain、cable delay、asymmetry 和噪声，拟合回 resonance 参数。
+- `examples/resonator_basics.py`：理想 notch、IQ circle、频移和 fixed-tone IQ 响应；
+- `examples/resonator_fit_demo.py`：加入 complex gain、cable delay、asymmetry 和噪声，拟合回 resonance 参数。
 
 ## 9. 本章最小闭环
 
@@ -1895,7 +1952,7 @@ $$
 > **读完应能回答：** responsivity、PSD/ASD、主要噪声源和 NEP 怎样连接。  
 > **一句话结论：** **NEP 是把输出噪声除以响应度，再折回等效输入光功率噪声。**
 
-本章对应 LaTeX/PDF v0.6 的完整第 7 章。核心链条：
+本章的核心链条是：
 
 $$P_{\rm abs}\to \Gamma_{\rm qp}\to N_{\rm qp}\to (f_0,Q_i)\to I/Q.$$
 
@@ -2245,11 +2302,11 @@ $$
 2. **Optical absorber layer**：$A_{XX},A_{YY},A_{XY},A_{YX}$ 随频率、角度和 backshort 变化；
 3. **Geometry symmetry layer**：hairpin/half-hairpin、wiggle、end-turn、access line 的 current hot spot；
 4. **GHz resonator layer**：Sonnet 提取 $f_0,Q_c$、IDC/coupler sensitivity；
-5. **Detector layer**：把 $P_{\rm abs}$ 接入 v0.6 responsivity / NEP。
+5. **Detector layer**：把 $P_{\rm abs}$ 接入前文的 responsivity / NEP 模型。
 
 因此 B0/B1 backshort 比较可以从“谁吸收率高”升级为“谁在带宽、角度、双偏振对称性、cross-pol 与 end-to-end sensitivity 上更优”。
 
-## 8.18 v0.7 Python 示例
+## 8.18 配套 Python 示例
 
 - `waveguide_modes_demo.py`：计算圆波导 TE11/TM01/TE21 cutoff，默认 D=1.6 mm；
 - `backshort_toy_model.py`：用 sheet + grounded dielectric transmission-line toy model 扫描 backshort thickness 与 sheet impedance。
@@ -2258,8 +2315,8 @@ $$
 
 
 
-- v0.8：把 v0.1–v0.7 理论逐项映射到当前双偏振 150 GHz LEKID，形成 Sonnet/CST/实验验证矩阵；
-- v0.9+：阵列 FDM、resonance collision、readout budget、RFSoC/FPGA/GPU 实时读出与 instrument closure。
+- 工程案例章：把前文理论映射到双偏振 150 GHz LEKID，形成 Sonnet/CST/实验验证矩阵；
+- 后续进阶主题：阵列 FDM、resonance collision、readout budget、RFSoC/FPGA/GPU 实时读出与 instrument closure。
 
 # Part IV：复习与训练
 
@@ -2270,7 +2327,7 @@ $$
 > **读完应能回答：** 能否独立写出九张核心笔记卡、公式阶梯和完整综合链。  
 > **一句话结论：** **真正掌握是能在没有正文提示时重新建立公式之间的因果关系。**
 
-> **本章目标**：不再引入新的核心理论，而是把 v0.1–v0.7 压缩成一套可以手写、闭卷复述、自己推导的知识闭环。建议第一次阅读时遮住第 10 章答案，真的拿一张纸完成空格、推导和综合题。
+> **本章目标**：不再引入新的核心理论，而是把前文内容压缩成一套可以手写、闭卷复述、自己推导的知识闭环。建议第一次阅读时遮住第 10 章答案，真的拿一张纸完成空格、推导和综合题。
 
 ## 9.1 KID 的完整因果链
 
@@ -3497,17 +3554,17 @@ $$
 }
 $$
 
-v0.9 的核心习惯：**先写 claim，再定义 observable；先过 numerical gate，再比较设计；先量 uncertainty，再谈 improvement；最后让实验反过来更新模型。**
+本章的核心习惯：**先写 claim，再定义 observable；先过 numerical gate，再比较设计；先量 uncertainty，再谈 improvement；最后让实验反过来更新模型。**
 
-- v0.9：把 v0.1–v0.8 理论逐项映射到当前双偏振 150 GHz LEKID，形成 Sonnet/CST/加工/低温 S21/光学标定验证矩阵；
+- 工程案例章：把前文理论逐项映射到双偏振 150 GHz LEKID，形成 Sonnet/CST/加工/低温 $S_{21}$/光学标定验证矩阵；
 - v1.0+：阵列 FDM、resonance collision、readout budget、RFSoC/FPGA/GPU 实时读出与 instrument closure。
 
 # 后续版本计划
 
-- v0.6：$Q_i/Q_c/Q_r$、notch resonator、IQ circle、固定 tone 读出与实际 fitting
-- v0.6：optical responsivity、NEP 与 photon / GR / TLS / amplifier noise
-- v0.7：LEKID absorber / IDC / coupling / polarization / backshort 电磁设计
-- v0.8：映射到当前双偏振 150 GHz LEKID 项目与 Sonnet/CST 验证矩阵，并加入 Python 数值练习
+- 第 6 章：$Q_i/Q_c/Q_r$、notch resonator、IQ circle、固定 tone 读出与实际 fitting
+- 第 7 章：optical responsivity、NEP 与 photon / GR / TLS / amplifier noise
+- 第 8 章：LEKID absorber / IDC / coupling / polarization / backshort 电磁设计
+- 复习与工程案例：把理论映射到双偏振 150 GHz LEKID 与 Sonnet/CST 验证矩阵，并配合 Python 数值练习
 
 # 建议参考资料
 
