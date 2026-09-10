@@ -1,0 +1,75 @@
+name: Build v0.10 Step 3-E zero-overfull polish
+
+on:
+  push:
+    branches: [v0.10-step3-editorial]
+    paths:
+      - '.github/workflows/build-v0.10-step3e.yml'
+      - 'editorial/v0.10/step3/step3e_final_layout_transform.py'
+
+permissions:
+  contents: write
+
+jobs:
+  build-step3e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step 3 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.10-step3-editorial
+          fetch-depth: 0
+
+      - name: Apply Step 3-E final layout transform
+        run: python3 editorial/v0.10/step3/step3e_final_layout_transform.py
+
+      - name: Compile and require zero overfull boxes
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd editorial/v0.10/step3
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step3.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step3.tex'
+            test -s 'KID入门讲义_v0.10_step3.pdf'
+
+            python3 - <<'PY'
+            from pathlib import Path
+            import re
+            log = Path('KID入门讲义_v0.10_step3.log').read_text(encoding='utf-8', errors='replace')
+            pages_m = re.findall(r'Output written on .*?\((\d+) pages', log)
+            if not pages_m:
+                raise SystemExit('Could not determine PDF page count')
+            pages = int(pages_m[-1])
+            over = re.findall(r'Overfull \\hbox', log)
+            bookmark_warning = 'Token not allowed in a PDF string' in log
+            audit = [
+                '# v0.10 Step 3-E — Final layout audit', '',
+                f'- PDF pages: **{pages}**',
+                f'- Overfull hbox count: **{len(over)}**',
+                f'- Hyperref math-token bookmark warning: **{"YES" if bookmark_warning else "NO"}**',
+                '',
+                '**Step 3 layout gate:** ' + ('PASS' if not over and not bookmark_warning else 'FAIL'),
+                '',
+            ]
+            Path('STEP3_LAYOUT_AUDIT.md').write_text('\n'.join(audit), encoding='utf-8')
+            if over:
+                raise SystemExit(f'Expected zero Overfull hbox warnings, found {len(over)}')
+            if bookmark_warning:
+                raise SystemExit('PDF bookmark math warning remains')
+            print(f'Zero-overfull gate PASS: {pages} pages')
+            PY
+
+      - name: Commit Step 3-E checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='editorial/v0.10/step3'
+          rm -f "$ROOT"/*.aux "$ROOT"/*.log "$ROOT"/*.out "$ROOT"/*.toc "$ROOT"/*.orig "$ROOT"/*.rej
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ROOT/KID入门讲义_v0.10_step3.tex" "$ROOT/KID入门讲义_v0.10_step3.pdf" "$ROOT/STEP3_NOTES.md" "$ROOT/STEP3_LAYOUT_AUDIT.md"
+          git commit -m 'Finalize v0.10 Step 3 with zero-overfull layout'
+          git push origin HEAD:v0.10-step3-editorial
