@@ -1,0 +1,203 @@
+name: Build v0.10 Step 3 editorial pass
+
+on:
+  push:
+    branches: [v0.10-step3-editorial]
+    paths:
+      - '.github/workflows/build-v0.10-step3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-step3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step 3 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.10-step3-editorial
+          fetch-depth: 0
+
+      - name: Create Step 3 sources and stable examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='editorial/v0.10/step2'
+          OUT='editorial/v0.10/step3'
+          mkdir -p "$OUT" examples
+          cp "$SRC/KID入门讲义_v0.10_step2.tex" "$OUT/KID入门讲义_v0.10_step3.tex"
+          cp "$SRC/KID入门讲义_v0.10_step2.md" "$OUT/KID入门讲义_v0.10_step3.md"
+
+          cp docs/v0.5/examples/resonator_basics.py examples/resonator_basics.py
+          cp docs/v0.5/examples/resonator_fit_demo.py examples/resonator_fit_demo.py
+          cp docs/v0.6/examples/optical_responsivity_demo.py examples/optical_responsivity_demo.py
+          cp docs/v0.6/examples/noise_budget_demo.py examples/noise_budget_demo.py
+          cp docs/v0.7/examples/waveguide_modes_demo.py examples/waveguide_modes_demo.py
+          cp docs/v0.7/examples/backshort_toy_model.py examples/backshort_toy_model.py
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          out = Path('editorial/v0.10/step3')
+          tex_path = out / 'KID入门讲义_v0.10_step3.tex'
+          md_path = out / 'KID入门讲义_v0.10_step3.md'
+
+          tex = tex_path.read_text(encoding='utf-8')
+          md = md_path.read_text(encoding='utf-8')
+
+          # Metadata / reader-facing version label.
+          tex = tex.replace('KID入门讲义 v0.10 Step 2 Preview', 'KID入门讲义 v0.10 Step 3 Editorial Preview')
+          tex = tex.replace('KID 入门讲义 v0.10 Step 2 Preview', 'KID 入门讲义 v0.10 Step 3 Editorial Preview')
+          tex = tex.replace('Version 0.10 Step 2 Preview · 2026-09-09', 'Version 0.10 Step 3 Editorial Preview · 2026-09-10')
+          tex = tex.replace('pdfauthor={KID Intro Guide project; editorial preview}', 'pdfauthor={KID Intro Guide project}')
+          md = md.replace('# KID 入门讲义 v0.10 — Step 2 结构预览', '# KID 入门讲义 v0.10 — Step 3 公开教材化审校预览')
+          md = md.replace('**版本：v0.10 Step 2 Preview · 2026-09-09**', '**版本：v0.10 Step 3 Editorial Preview · 2026-09-10**')
+          md = re.sub(r'> \*\*v0\.10 Step 2 说明：\*\*.*?\n\n', '', md, count=1, flags=re.S)
+
+          # Global case-study box title: retain the real engineering case without assuming the reader is its owner.
+          tex = tex.replace('title=映射到你的 150 GHz LEKID', 'title=工程案例：150 GHz 双偏振 LEKID')
+
+          # Public-textbook tone and development-history cleanup.  These are deliberately
+          # narrow replacements: preserve physics and pedagogical second person where useful,
+          # but remove author/project-specific wording and historical release labels.
+          tex_repl = {
+              r'\section{对你的 LEKID 几何意味着什么？}': r'\section{对 LEKID 几何设计意味着什么？}',
+              '这个几何图景会在 v0.5 的谐振器与 IQ fitting 中正式展开。': '这个几何图景会在后文的谐振器与 IQ 拟合章节中正式展开。',
+              '你的 LEKID 同一块超导 meander 同时参与两种完全不同的电磁过程：': 'LEKID 中同一块超导 meander 同时参与两种完全不同的电磁过程：',
+              '这对你现在的 Sonnet/CST 工作尤其重要：': '这对 Sonnet/CST 联合建模尤其重要：',
+              r'\section{映射到你现在的 LEKID 仿真}': r'\section{从 LEKID 仿真结果回到物理量}',
+              '你目前 Sonnet 里更常看到的是 GHz resonance。下一步可以把仿真结果按三个层级拆开：': '在 Sonnet 平面电磁仿真中，更常直接看到 GHz 谐振响应。可将仿真结果按三个层级拆开：',
+              '因此以后不建议只报“谐振在 2.5 GHz、notch 很深”': '因此不建议只报“谐振在 2.5 GHz、notch 很深”',
+              r'\section{v0.5 配套 Python：从理想 resonance 到带失真的 synthetic VNA}': r'\section{配套 Python：从理想谐振到带失真的合成 VNA 数据}',
+              '本版本仓库新增两个可直接运行的示例：': '本章配套两个可直接运行的示例：',
+              r'\texttt{examples/v0.5/resonator\_basics.py}': r'\texttt{examples/resonator\_basics.py}',
+              r'\texttt{examples/v0.5/resonator\_fit\_demo.py}': r'\texttt{examples/resonator\_fit\_demo.py}',
+              r'\section{映射到你的双偏振 150 GHz LEKID 项目}': r'\section{工程案例：双偏振 150 GHz LEKID}',
+              '对于你当前器件，v0.6 以后可以把“好不好”拆成四层，不再只看 absorption 或 notch：': '对于双偏振 150 GHz LEKID，可把器件性能拆成四层，而不只看 absorption 或 notch：',
+              '这意味着你未来比较 B0 / B1 backshort 时，最终可以问的不只是“谁吸收率高”，还可以问“谁在给定 sky loading 下得到更优、且偏振更对称的 end-to-end responsivity / NEP”。这会比单纯的电磁吸收比较更像一个完整 detector 研究问题。': '因此比较 B0 / B1 backshort 时，最终问题不应只是“谁吸收率高”，还应比较在给定 sky loading 下的端到端响应度、NEP 与双偏振对称性。这样才能从单纯的电磁吸收比较升级为完整的探测器研究问题。',
+              r'\section{v0.6 配套 Python}': r'\section{配套 Python：光学响应与噪声预算}',
+              '本版本增加两个示例：': '本章配套两个示例：',
+              r'\texttt{docs/v0.6/examples/optical\_responsivity\_demo.py}': r'\texttt{examples/optical\_responsivity\_demo.py}',
+              r'\texttt{docs/v0.6/examples/noise\_budget\_demo.py}': r'\texttt{examples/noise\_budget\_demo.py}',
+              r'\section{映射到当前双偏振 150 GHz 项目的验证矩阵}': r'\section{双偏振 150 GHz 工程案例的验证分层}',
+              '把你当前设计拆成以下五层，会非常清晰：': '可将这类双偏振设计拆成以下五层：',
+              '把 optical $P_{\\rm abs}$ 送入 v0.6 的 responsivity / NEP model。': '把 optical $P_{\\rm abs}$ 送入前文的 responsivity / NEP model。',
+              r'\section{v0.7 配套 Python 示例}': r'\section{配套 Python 示例}',
+              r'\texttt{docs/v0.7/examples/waveguide\_modes\_demo.py}': r'\texttt{examples/waveguide\_modes\_demo.py}',
+              r'\texttt{docs/v0.7/examples/backshort\_toy\_model.py}': r'\texttt{examples/backshort\_toy\_model.py}',
+              r'\begin{formula}[title=\bfseries v0.8 的一句话]': r'\begin{formula}[title=\bfseries 全书的一句话]',
+              '如果下面 12 项中有至少 10 项能不翻书讲清楚，可以认为 v0.1--v0.7 的理论主链已经基本串起来：': '如果下面 12 项中有至少 10 项能不翻书讲清楚，可以认为本讲义的理论主链已经基本串起来：',
+              'v0.1--v0.8 已经回答了“为什么 KID 能工作”。本章回答另一个真正决定科研是否可靠的问题：\\textbf{怎样证明你设计的这个 KID 确实按预期工作，而且别人能够复现这个结论？}': '前面的基础与复习章节已经回答了“为什么 KID 能工作”。本章进一步回答一个决定科研是否可靠的问题：\\textbf{怎样证明一个 KID 设计确实按预期工作，而且别人能够复现这个结论？}',
+              '本章把当前双偏振 \\SI{150}{GHz} LEKID 项目拆成一条证据链：': '本章以双偏振 \\SI{150}{GHz} LEKID 为工程案例，将验证过程拆成一条证据链：',
+              '这一步把“材料参数来自文献”升级成“材料参数来自你自己的 wafer”。': '这一步把“材料参数来自文献”升级成“材料参数来自实际加工 wafer 的低温测量”。',
+          }
+          for a, b in tex_repl.items():
+              tex = tex.replace(a, b)
+
+          # One longer geometry paragraph gets generalized while preserving the physical point.
+          old_geom = '你当前几何里 X 是 full hairpin、Y 是两个 half-hairpin 串联，而且必须单层、无 crossover。这样的拓扑天然会让两偏振的 end-turn / access path 不完全等价。因此“几何四重对称”真正要验证的是\\textbf{电流分布和吸收谱是否恢复近似对称}，而不只是 CAD 轮廓看起来对称。'
+          new_geom = '在一种典型的非等价双偏振拓扑中，X 可采用 full hairpin，Y 可采用两个 half-hairpin 串联，并要求单层、无 crossover。这样的拓扑会使两偏振的 end-turn / access path 不完全等价。因此“几何四重对称”真正要验证的是\\textbf{电流分布和吸收谱是否恢复近似对称}，而不只是 CAD 轮廓看起来对称。'
+          tex = tex.replace(old_geom, new_geom)
+
+          md_repl = {
+              '## 3.9 对你的 LEKID 几何意味着什么？': '## 3.9 对 LEKID 几何设计意味着什么？',
+              '这个几何图景会在 v0.5 的谐振器与 IQ fitting 中正式展开。': '这个几何图景会在后文的谐振器与 IQ 拟合章节中正式展开。',
+              '你的 LEKID 同一块超导 meander 同时参与两种完全不同的电磁过程：': 'LEKID 中同一块超导 meander 同时参与两种完全不同的电磁过程：',
+              '这对你现在的 Sonnet/CST 工作尤其重要：': '这对 Sonnet/CST 联合建模尤其重要：',
+              '## 6.12 映射到你现在的 LEKID 仿真': '## 6.12 从 LEKID 仿真结果回到物理量',
+              '你目前 Sonnet 里更常看到的是 GHz resonance。下一步可以把仿真结果按三个层级拆开：': '在 Sonnet 平面电磁仿真中，更常直接看到 GHz 谐振响应。可将仿真结果按三个层级拆开：',
+              '因此以后不建议只报“谐振在 2.5 GHz、notch 很深”': '因此不建议只报“谐振在 2.5 GHz、notch 很深”',
+              '## 6.13 v0.5 配套 Python：从理想 resonance 到带失真的 synthetic VNA': '## 6.13 配套 Python：从理想谐振到带失真的合成 VNA 数据',
+              '本版本仓库新增两个可直接运行的示例：': '本章配套两个可直接运行的示例：',
+              '`examples/v0.5/resonator_basics.py`': '`examples/resonator_basics.py`',
+              '`examples/v0.5/resonator_fit_demo.py`': '`examples/resonator_fit_demo.py`',
+              '## 7.16 映射到你的双偏振 150 GHz LEKID 项目': '## 7.16 工程案例：双偏振 150 GHz LEKID',
+              '对于你当前器件，v0.6 以后可以把“好不好”拆成四层，不再只看 absorption 或 notch：': '对于双偏振 150 GHz LEKID，可把器件性能拆成四层，而不只看 absorption 或 notch：',
+              '这意味着你未来比较 B0 / B1 backshort 时，最终可以问的不只是“谁吸收率高”，还可以问“谁在给定 sky loading 下得到更优、且偏振更对称的 end-to-end responsivity / NEP”。这会比单纯的电磁吸收比较更像一个完整 detector 研究问题。': '因此比较 B0 / B1 backshort 时，最终问题不应只是“谁吸收率高”，还应比较在给定 sky loading 下的端到端响应度、NEP 与双偏振对称性。这样才能从单纯的电磁吸收比较升级为完整的探测器研究问题。',
+              '## 7.17 v0.6 配套 Python': '## 7.17 配套 Python：光学响应与噪声预算',
+              '本版本增加两个示例：': '本章配套两个示例：',
+              '`docs/v0.6/examples/optical_responsivity_demo.py`': '`examples/optical_responsivity_demo.py`',
+              '`docs/v0.6/examples/noise_budget_demo.py`': '`examples/noise_budget_demo.py`',
+              '## 8.17 映射到当前双偏振 150 GHz 项目的验证矩阵': '## 8.17 双偏振 150 GHz 工程案例的验证分层',
+              '把你当前设计拆成以下五层，会非常清晰：': '可将这类双偏振设计拆成以下五层：',
+              '把 optical $P_{\\rm abs}$ 送入 v0.6 的 responsivity / NEP model。': '把 optical $P_{\\rm abs}$ 送入前文的 responsivity / NEP model。',
+              '## 8.18 v0.7 配套 Python 示例': '## 8.18 配套 Python 示例',
+              '`docs/v0.7/examples/waveguide_modes_demo.py`': '`examples/waveguide_modes_demo.py`',
+              '`docs/v0.7/examples/backshort_toy_model.py`': '`examples/backshort_toy_model.py`',
+              '如果下面 12 项中有至少 10 项能不翻书讲清楚，可以认为 v0.1–v0.7 的理论主链已经基本串起来：': '如果下面 12 项中有至少 10 项能不翻书讲清楚，可以认为本讲义的理论主链已经基本串起来：',
+              'v0.1–v0.8 回答“为什么 KID 能工作”。v0.9 进一步回答：**怎样证明当前这个 KID 确实按预期工作，而且结论能够被复查和复现？**': '前面的基础与复习章节回答“为什么 KID 能工作”。本章进一步回答：**怎样证明一个 KID 设计确实按预期工作，而且结论能够被复查和复现？**',
+          }
+          for a, b in md_repl.items():
+              md = md.replace(a, b)
+
+          md = md.replace('你当前几何里 X 是 full hairpin、Y 是两个 half-hairpin 串联，而且必须单层、无 crossover。这样的拓扑天然会让两偏振的 end-turn / access path 不完全等价。因此“几何四重对称”真正要验证的是**电流分布和吸收谱是否恢复近似对称**，而不只是 CAD 轮廓看起来对称。', '在一种典型的非等价双偏振拓扑中，X 可采用 full hairpin，Y 可采用两个 half-hairpin 串联，并要求单层、无 crossover。这样的拓扑会使两偏振的 end-turn / access path 不完全等价。因此“几何四重对称”真正要验证的是**电流分布和吸收谱是否恢复近似对称**，而不只是 CAD 轮廓看起来对称。')
+
+          # Broad path normalization after explicit heading/body cleanup.
+          tex = re.sub(r'\\texttt\{docs/v0\.[0-9]+/examples/', r'\\texttt{examples/', tex)
+          md = re.sub(r'`docs/v0\.[0-9]+/examples/', '`examples/', md)
+
+          tex_path.write_text(tex, encoding='utf-8')
+          md_path.write_text(md, encoding='utf-8')
+
+          strict = [
+              '映射到你的 150 GHz LEKID', '映射到你现在的 LEKID', '你现在的 Sonnet/CST',
+              '你目前 Sonnet', '你当前几何里', '把你当前设计', '对于你当前器件',
+              'v0.5 配套 Python', 'v0.6 配套 Python', 'v0.7 配套 Python',
+              'v0.8 的一句话', 'v0.1--v0.8 已经回答', 'v0.1–v0.8 回答',
+              'examples/v0.5/', 'docs/v0.6/examples/', 'docs/v0.7/examples/'
+          ]
+          bad = []
+          for marker in strict:
+              if marker in tex or marker in md:
+                  bad.append(marker)
+          if bad:
+              raise SystemExit('Strict Step3 cleanup markers remain: ' + ', '.join(bad))
+
+          # Audit remaining release-history and project-personal phrases rather than hiding them.
+          patterns = [r'v0\.[0-9]+', r'你的[^，。；：\n]{0,30}LEKID', r'你当前', r'你现在', r'你未来', r'docs/v0\.', r'examples/v0\.']
+          lines = ['# v0.10 Step 3-A — Editorial residual audit', '', '自动扫描 reader-facing Step 3 源码中仍可能带有版本历史或项目私人化语气的文本。此文件用于下一轮人工审校，不代表所有命中都必须删除。', '']
+          for label, text in [('LaTeX', tex), ('Markdown', md)]:
+              lines += [f'## {label}', '']
+              found = False
+              for i, line in enumerate(text.splitlines(), 1):
+                  if any(re.search(p, line) for p in patterns):
+                      lines.append(f'- L{i}: `{line[:220]}`')
+                      found = True
+              if not found:
+                  lines.append('- 未发现上述扫描模式。')
+              lines.append('')
+          (out / 'STEP3_AUDIT.md').write_text('\n'.join(lines), encoding='utf-8')
+
+          notes = '''# v0.10 Step 3-A — 公开教材化语言审校\n\n本阶段建立在已冻结的 Step 2 架构 checkpoint 上，只处理读者可见语言与稳定引用，不改变核心物理、公式和章节主结构。\n\n## 本轮完成\n\n- 将“你的 150 GHz LEKID”“你现在的 Sonnet/CST”“你当前几何”等项目私人化表述改为公开教材/工程案例语气；\n- 清除正文标题与叙述中的 v0.5/v0.6/v0.7/v0.8/v0.9 开发历史泄漏；\n- 将配套 Python 指针统一到稳定的 `examples/` 路径，并在仓库根目录建立六个 canonical 示例；\n- 将 150 GHz 双偏振 LEKID 保留为真实的进阶工程案例，但不再默认读者就是该项目的研究者；\n- 保留教学性的第二人称（例如“你应该能回答”），避免把教材改成僵硬的论文口吻。\n\n## 明确未处理\n\nStep 3-B 将继续做：术语首次出现时的中英正式定义、缩写表、常用符号表，以及最影响陌生初学者连续阅读的知识跳跃。\n\n后续 Step 4 再统一核心公式的“数学—物理—工程—适用条件”解释层；Step 5 做全书版式、宽表、代码块、参考文献、尾页与 PDF metadata 收尾。\n'''
+          (out / 'STEP3_NOTES.md').write_text(notes, encoding='utf-8')
+          PY
+
+      - name: Compile Step 3 PDF
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd editorial/v0.10/step3
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step3.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step3.tex'
+            test -s 'KID入门讲义_v0.10_step3.pdf'
+            pages=$(grep -Eo 'Output written on .*\([0-9]+ pages' 'KID入门讲义_v0.10_step3.log' | tail -1 | grep -Eo '[0-9]+ pages' | awk '{print $1}')
+            test -n "$pages"
+            test "$pages" -ge 120
+            echo "Compiled Step 3 PDF: $pages pages"
+
+      - name: Commit Step 3-A checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='editorial/v0.10/step3'
+          rm -f "$ROOT"/*.aux "$ROOT"/*.log "$ROOT"/*.out "$ROOT"/*.toc "$ROOT"/*.orig "$ROOT"/*.rej
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ROOT" examples
+          git commit -m 'Add v0.10 Step 3-A public-textbook editorial pass'
+          git push origin HEAD:v0.10-step3-editorial
