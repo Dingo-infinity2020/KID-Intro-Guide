@@ -23,3 +23,8 @@ Step 4-A 已覆盖 7 个基础公式/关系：$E=h\nu$、$h\nu\ge2\Delta$、$\al
 - 强调 notch 是相干路径干涉，不等于“全部功率被吸收”；
 - 第 7 章把 $P_{abs}$、quasiparticle gain、responsivity、dynamic response、PSD/ASD 与 NEP 串成同一条量纲闭合链；
 - 对 photon noise 和 GR noise 明确写出模型边界与 convention 风险。
+
+
+## Step 4-D — LEKID electromagnetic co-design
+
+第 8 章新增 9 组公式四层解释，将 fill factor、absorber volume、backshort matching、quarter-wave、waveguide cutoff、polarization selectivity、coupling Q、power closure 与 band-weighted absorption 从“会写公式”提升到“知道为什么、怎么用、哪里会失效”。同时把 Markdown 中残留的私人项目标题改成公开教材的工程案例标题。

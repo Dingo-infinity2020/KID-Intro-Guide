@@ -24,7 +24,7 @@ def guide_md(a,b,c,d):
 
 
 def norm(s):
-    return s.replace('\\\\','\\').replace('\\n','\n')
+    return s.replace('\\\\','\\')
 
 
 def add_tex(text, scope, anchor, block, key):
@@ -101,7 +101,7 @@ items = [
 ('band-weighted-absorption', r'\\bar A=\\frac{\\int W(\\nu)A(\\nu)d\\nu}{\\int W(\\nu)d\\nu}',
  '这是用权重函数 $W(\\nu)$ 对频率相关吸收做归一化加权平均。',
  '真实仪器接收的是一整个 band，不是中心频率上的一个点；不同频率对最终科学信号的贡献还会被 bandpass、源谱和光学链重新加权。',
- '它把“单点 99.9%”升级成真正可比较的 broadband figure of merit，并可进一步加入 cross-pol、angle 和双偏振 mismatch penalty。',
+ '它把“单点 99.9\%”升级成真正可比较的 broadband figure of merit，并可进一步加入 cross-pol、angle 和双偏振 mismatch penalty。',
  '必须说明 $W(\\nu)$ 代表什么：平坦权重、仪器 bandpass、源谱还是系统 throughput。不同权重下的 $\\bar A$ 不能不加说明直接比较。'),
 ]
 
@@ -112,7 +112,7 @@ md_anchors = {
 'fill-factor': r'R_{\\rm eff}\\sim\\frac{R_\\square}{F}',
 'absorber-volume': r'V\\approx lwt',
 'backshort-match': r'Z_s\\approx Z_0',
-'quarter-wave': r'd_{\\lambda/4}=\\frac{\\lambda_0}{4n}=\\frac{c}{4n\\nu}',
+'quarter-wave': r'd_{\\lambda/4}=\\frac{c}{4n\\nu}',
 'waveguide-cutoff': r'f_c=\\frac{x c}{\\pi D}',
 'polarization-selectivity': r'\\eta_{p,X}=\\frac{A_{XX}-A_{XY}}{A_{XX}+A_{XY}}',
 'coupling-q-scaling': r'Q_c\\propto\\frac{C}{\\omega_0 Z_0 C_c^2}',

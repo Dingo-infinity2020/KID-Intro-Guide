@@ -2308,6 +2308,13 @@ $$
 R_{\rm eff}\sim\frac{R_\square}{F}.
 $$
 
+<!-- STEP4D:fill-factor -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 在这个极粗略均匀化模型里，金属占空比 $F$ 越小，有效电阻尺度约按 $1/F$ 增大。  
+> **物理上：** 电流只能在部分面积的金属条中流动；从更大的光学单元平均来看，稀疏化会抬高沿条带方向看到的有效阻抗。  
+> **工程上：** 它提供线宽/线距对 optical impedance 的第一轮趋势判断，可用来缩小 full-wave 参数扫描范围。  
+> **适用条件：** 只是一维条栅、特定偏振下的均匀化直觉。真实 meander 有各向异性、几何电抗、边缘电流、基底与波导模，不能用它替代 full-wave。
+
 它只用于建立趋势感；真实 meander 是 anisotropic strip grid，最终必须用 full-wave 结果确认。
 
 ## 8.3 absorber volume 与 optical matching 的冲突
@@ -2317,6 +2324,13 @@ $$
 $$
 V\approx lwt.
 $$
+
+<!-- STEP4D:absorber-volume -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 简单条带的 active volume 是长度、宽度和膜厚的乘积。  
+> **物理上：** 同样吸收能量分布到更大的超导体积中，会降低平均 quasiparticle density，但几何改变也会同时改变电流路径和电磁阻抗。  
+> **工程上：** 这个式子提醒设计者：增加 volume 不是独立旋钮，$l,w,t$ 分别会牵动 GHz 电感、sheet impedance、临界电流、cross-pol 和工艺容差。  
+> **适用条件：** 仅适用于把有效 absorber 当作均匀条带体积计数；真正参与响应的 active volume 还可能受电流分布、扩散、材料非均匀和 proximity effect 影响。
 
 增加 $l,w,t$ 都能提高 volume，但副作用不同：
 
@@ -2353,6 +2367,13 @@ $$
 Z_s\approx Z_0,
 $$
 
+<!-- STEP4D:backshort-match -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 在 toy model 的 quarter-wave 条件下，若 absorber 的等效 sheet impedance 匹配前侧波阻抗，反射系数趋近零，而 backshort 又封住透射通道，因此吸收可趋近 1。  
+> **物理上：** 高吸收的核心不是“多反射一次”，而是让前表面看到的复阻抗与入射模匹配，使反射路径发生正确的幅相抵消。  
+> **工程上：** 它给出 backshort + absorber 联合设计的第一性目标：同时调 sheet impedance 与电长度，而不是只追求某一个几何尺寸。  
+> **适用条件：** 这是平面、单模、理想背短路的简化阻抗匹配图景。真实 horn/waveguide、vacuum gap、各向异性 meander、多模和损耗会移动最佳条件。
+
 从而 $\Gamma\approx0$、$A\approx1$。
 
 ## 8.5 为什么 $\lambda/4$ 只是起点
@@ -2362,6 +2383,13 @@ $$
 $$
 d_{\lambda/4}=\frac{c}{4n\nu}.
 $$
+
+<!-- STEP4D:quarter-wave -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 介质中的四分之一波长厚度随频率和折射率均成反比。  
+> **物理上：** 短路面经过约四分之一导波波长的传播后，在 absorber 所在平面被阻抗变换成近似开路，从而改变干涉边界条件。  
+> **工程上：** 它是确定 backshort/substrate thickness 参数扫描中心的快速手算式；随后应围绕该值做 broadband full-wave sweep。  
+> **适用条件：** 使用的是均匀介质中的简单相位速度 $c/n$。实际 guided wavelength 受结构色散、角度、waveguide aperture、gap 与多模传播影响，所以 $\lambda/4$ 不是最终尺寸。
 
 取 $n_{\rm Si}\approx3.4$、$\nu=150$ GHz：
 
@@ -2384,6 +2412,13 @@ $$
 $$
 f_c=\frac{x c}{\pi D}.
 $$
+
+<!-- STEP4D:waveguide-cutoff -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 圆波导各 TE/TM 模的截止频率由相应 Bessel 根 $x$ 和直径 $D$ 决定，并与 $1/D$ 成正比。  
+> **物理上：** 横向场必须在圆形边界中“塞得下”相应本征分布；频率低于 cutoff 时纵向传播常数变成倏逝，高于 cutoff 才能携带远距离功率。  
+> **工程上：** 在设置 CST/HFSS waveguide port 和做 power closure 前，先用该式列出所有传播模，能避免漏算 TM01 等功率通道。  
+> **适用条件：** 理想均匀圆波导公式。真实 corrugation、介质加载、渐变 horn、有限长度和不规则截面会改变模态与截止条件，应以实际 eigenmode/port 求解确认。
 
 前三个常见根：
 
@@ -2448,6 +2483,13 @@ $$
 \eta_{p,X}=\frac{A_{XX}-A_{XY}}{A_{XX}+A_{XY}},
 $$
 
+<!-- STEP4D:polarization-selectivity -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 这个归一化差值在 co-pol 远大于 cross-pol 时趋近 1，两者相等时为 0。  
+> **物理上：** 它比较同一目标偏振通道对期望偏振与正交泄漏的相对偏好，而不是只看绝对吸收有多高。  
+> **工程上：** 可作为双偏振参数扫描的辅助目标，与 co-pol efficiency、bandshape mismatch 和 angle dependence 一起看。  
+> **适用条件：** 偏振指标在文献中定义并不统一；使用前必须声明 $A_{ij}$ 下标、归一化和入射基底。它也不能替代完整 Mueller/Jones 描述。
+
 但不同论文的定义并不统一，比较前必须先看 definition。
 
 双偏振设计至少同时关心：co-pol absorption、cross-pol absorption、两偏振 bandshape mismatch、angle dependence，以及 microwave/optical crosstalk。
@@ -2481,6 +2523,13 @@ $$
 $$
 Q_c\propto\frac{C}{\omega_0 Z_0 C_c^2}.
 $$
+
+<!-- STEP4D:coupling-q-scaling -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 弱电容耦合的简化尺度关系显示 $Q_c$ 对 coupling capacitance 近似按 $1/C_c^2$ 变化。  
+> **物理上：** 耦合电容稍微增大，就能显著提高谐振器与 feedline 的能量交换率，因此外部 $Q$ 会快速下降。  
+> **工程上：** 它解释 coupler finger/gap 为什么需要细致扫参，也能帮助把目标 $Q_c$ 反推到版图灵敏度和加工容差。  
+> **适用条件：** 这里只给 scaling，不是任意拓扑的精确闭式公式。寄生电容、feedline geometry、分布参数效应和强耦合时必须用 EM 仿真或更完整等效电路。
 
 因此
 
@@ -2532,6 +2581,13 @@ $$
 1=P_{\rm refl}+P_{\rm trans}+P_{\rm abs}+P_{\rm other}.
 $$
 
+<!-- STEP4D:power-closure -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 归一化输入功率必须被反射、透射、材料吸收和其他明确通道完整分账。  
+> **物理上：** 这是 Poynting 能量守恒在数值模型里的审计形式；任何“消失的功率”要么进入了未统计通道，要么说明端口/材料/网格/求解设置有问题。  
+> **工程上：** 它应作为所有 full-wave optical 结果的 numerical gate：先证明功率闭合，再比较 B0/B1、偏振或几何优劣。  
+> **适用条件：** 必须统计所有传播端口模、材料耗散、辐射边界等真实通道，并统一 S 参数的功率归一化。倏逝模本身不携带远场净功率但会影响局部场。
+
 封闭 backshort 通常 $P_{\rm trans}\approx0$。若存在多个传播模态：
 
 $$
@@ -2548,9 +2604,16 @@ $$
 \bar A=\frac{\int W(\nu)A(\nu)d\nu}{\int W(\nu)d\nu}.
 $$
 
+<!-- STEP4D:band-weighted-absorption -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 这是用权重函数 $W(\nu)$ 对频率相关吸收做归一化加权平均。  
+> **物理上：** 真实仪器接收的是一整个 band，不是中心频率上的一个点；不同频率对最终科学信号的贡献还会被 bandpass、源谱和光学链重新加权。  
+> **工程上：** 它把“单点 99.9\%”升级成真正可比较的 broadband figure of merit，并可进一步加入 cross-pol、angle 和双偏振 mismatch penalty。  
+> **适用条件：** 必须说明 $W(\nu)$ 代表什么：平坦权重、仪器 bandpass、源谱还是系统 throughput。不同权重下的 $\bar A$ 不能不加说明直接比较。
+
 双偏振设计还应同时惩罚 cross-pol、两偏振 mismatch 与 angle sensitivity，而不是只追求中心频率单点的 99.9% absorption。
 
-## 8.17 映射到当前 150 GHz 双偏振项目
+## 8.17 工程案例：150 GHz 双偏振 LEKID 的五层验证
 
 建议按五层验证：
 
