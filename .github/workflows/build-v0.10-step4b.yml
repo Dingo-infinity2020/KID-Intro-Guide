@@ -19,10 +19,55 @@ jobs:
           ref: v0.10-step4-formulas
           fetch-depth: 0
 
-      - name: Apply Step 4-B formula pedagogy transform
+      - name: Normalize Step 4-B Markdown anchors and apply transform
         shell: bash
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('editorial/v0.10/step4/step4b_formula_transform.py')
+          s = p.read_text(encoding='utf-8')
+
+          # The Markdown chapter uses compact numbered headings rather than the TeX section titles.
+          s = s.replace('"## 5.4 Mattis"', '"## 2. Mattis–Bardeen 在做什么？"')
+          s = s.replace('"## 5.6 从体电导"', '"## 4. 从 $\\\\sigma$ 到表面阻抗"')
+          s = s.replace('"## 5.7 终于闭环"', '"## 5. 从 $\\\\sigma_2$ 到 kinetic inductance"')
+          s = s.replace('"## 5.8 从 $\\\\sigma_1$ 到 $Q_i$"', '"## 6. 从 $\\\\sigma_1$ 到 $Q_i$"')
+
+          # sigma_1 average-power relation is written inline in Markdown, not as its own display.
+          helper = r'''
+          def insert_after_md_literal(text: str, scope: str, anchor: str, addition: str, sentinel: str) -> str:
+              if sentinel in text:
+                  return text
+              s = text.find(scope)
+              if s < 0:
+                  raise SystemExit(f"Missing Markdown literal scope: {scope}")
+              a = text.find(anchor, s)
+              if a < 0:
+                  raise SystemExit(f"Missing Markdown literal anchor after {scope}: {anchor}")
+              end = text.find("\n", a)
+              if end < 0:
+                  end = len(text)
+              return text[:end] + "\n\n" + addition.rstrip() + "\n" + text[end:]
+          '''
+          needle = '\ndef tex_guide('
+          if 'def insert_after_md_literal' not in s:
+              if needle not in s:
+                  raise SystemExit('Could not locate helper insertion point')
+              s = s.replace(needle, '\n' + helper.strip('\n') + needle, 1)
+
+          block_start = s.find('# 8) Average dissipated power density')
+          block_end = s.find('# 9) Mattis--Bardeen pair of integrals', block_start)
+          if block_start < 0 or block_end < 0:
+              raise SystemExit('Could not locate Step 4-B sigma1 Markdown block')
+          block = s[block_start:block_end]
+          block = block.replace('md = insert_after_md_display(', 'md = insert_after_md_literal(', 1)
+          block = block.replace('"### $\\\\sigma_1$：为什么它代表损耗"', '"# 第 5 章：复电导与 Mattis"', 1)
+          s = s[:block_start] + block + s[block_end:]
+
+          p.write_text(s, encoding='utf-8')
+          PY
           python3 editorial/v0.10/step4/step4b_formula_transform.py
 
       - name: Compile and audit Step 4-B PDF
