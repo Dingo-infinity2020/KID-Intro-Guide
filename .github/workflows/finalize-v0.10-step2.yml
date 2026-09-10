@@ -1,3 +1,4 @@
+# Trigger after assembling the complete exact payload.
 name: Finalize v0.10 Step 2 structure
 
 on:
