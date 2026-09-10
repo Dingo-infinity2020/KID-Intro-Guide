@@ -1528,6 +1528,13 @@ Cooper pair 的空间尺度可以远大于晶格常数，许多 pair 彼此高�
 \[
 \boxed{\Delta_0\equiv\Delta(T=0)\approx1.764\,k_B T_c.}
 \]
+% STEP4B:gap-tc
+\formulaexplain
+{在弱耦合 BCS 极限，零温能隙 $\Delta_0$ 与临界温度 $T_c$ 成正比；比例系数约为 $1.764k_B$。}
+{$T_c$ 和 $\Delta$ 都来自同一个配对能量尺度：升到 $T_c$ 附近时配对有序态消失，能隙也随之闭合。}
+{只要先测到薄膜的 $T_c$，就能得到 $\Delta_0$ 的第一轮估计，并进一步估算 pair-breaking threshold $2\Delta_0/h$。这是材料筛选与 science band 匹配最便宜的一步。}
+{$1.764$ 不是所有超导薄膜的普适常数。它对应常规、各向同性、弱耦合 $s$ 波 BCS 的零温极限；强耦合、非常规超导、薄膜无序和 proximity effect 都可能改变 $2\Delta_0/k_BT_c$。}
+
 
 这条关系对 KID 特别重要，因为它把一个容易测量的材料参数 $T_c$ 直接变成能量尺度。
 
@@ -1594,6 +1601,13 @@ E_{\mathbf{k}}=\sqrt{\xi_{\mathbf{k}}^2+\Delta^2},
 \xi_{\mathbf{k}}=\varepsilon_{\mathbf{k}}-E_F.
 }
 \]
+% STEP4B:qp-dispersion
+\formulaexplain
+{准粒子能量是 $\xi_{\mathbf{k}}$ 与 $\Delta$ 的平方和开根号，因此无论 $\xi$ 多接近零，都有 $E_{\mathbf{k}}\ge\Delta$。}
+{超导转变不是把正常态能带简单平移，而是在费米面附近重构低能激发谱并打开能隙。准粒子因此是配对体系的激发，而不是一颗普通电子被单独“抬高”了能量。}
+{这条色散关系解释了为什么热准粒子会被指数压低，也解释了 BCS density of states 和 Mattis--Bardeen 积分为什么在 $E\simeq\Delta$ 附近特别敏感。}
+{这里使用理想、各向同性 $s$ 波 BCS 色散。真实薄膜中的 Dynes broadening、无序、proximity effect、非平衡分布或非常规配对会让理想能隙边缘被展宽或改变。}
+
 因此：
 \[
 E_{\mathbf{k}}\ge\Delta.
@@ -1631,6 +1645,13 @@ n_{\qp}^{\rm th}(T)
 \exp\!\left(-\frac{\Delta}{k_BT}\right)
 }
 \]
+% STEP4B:thermal-qp
+\formulaexplain
+{热平衡准粒子密度由一个缓慢变化的平方根前因子乘上 $\exp[-\Delta/(k_BT)]$；深低温时真正支配数量级的是指数项。}
+{制造热准粒子必须付出跨越能隙的能量。当 $k_BT\ll\Delta$ 时，热浴中具备这份能量的涨落极少，因此准粒子人口被指数压低。}
+{它把制冷指标从“多少 mK”改写成更有意义的 $T/T_c$ 或 $\Delta/k_BT$。可用它估算理想 dark quasiparticle baseline，并判断继续降温是否仍可能带来显著收益。}
+{公式假设热平衡、理想 BCS 态密度且处于低温近似，并依赖 $N_0$ 的明确定义。真实 KID 往往存在 excess/non-equilibrium quasiparticles；此时继续降低 bath temperature 也可能看不到公式预测的指数下降。}
+
 其中 $N_0$ 是 normal-state Fermi level 处的 single-spin density of states（单自旋态密度）。
 
 这个公式最重要的不是前面的平方根，而是：
@@ -1723,6 +1744,13 @@ G_{\rm opt}
 \eta_{\rm pb}\frac{P_{\rm abs}}{\Delta}
 }
 \]
+% STEP4B:optical-generation
+\formulaexplain
+{准粒子产生率的量级等于“每秒真正吸收的能量”除以“形成低能准粒子所需的能量尺度 $\Delta$”，再乘能量转化效率 $\eta_{\rm pb}$。}
+{一个高能光子首先产生高能激发，随后经电子--声子级联把能量重新分配；只有一部分吸收能量最终留在可被 KID 读出的低能准粒子池中。}
+{它是从 optical simulation/光学标定得到的 $P_{\rm abs}$ 走向 responsivity 模型的入口：先把吸收功率转成 quasiparticle generation，再结合寿命得到稳态 $N_{\qp}$。}
+{这是能量守恒的数量级表达，不是精确的微观级联公式。$\eta_{\rm pb}$ 依赖光子能量、材料、膜厚、声子逃逸/陷获等；且这里必须使用吸收功率 $P_{\rm abs}$，不能直接拿入射到系统前端的功率代入。}
+
 其中 $G_{\rm opt}$ 是准粒子 generation rate（产生率）。精确系数与非平衡能量级联、声子逃逸和材料有关。
 
 \section{recombination：为什么准粒子不会一直积累？}
@@ -1740,6 +1768,13 @@ G_{\rm opt}
 G-\mathcal{R}N_{\qp}^2.
 }
 \]
+% STEP4B:gr-rate-equation
+\formulaexplain
+{$G$ 是源项，$\mathcal{R}N_{\qp}^2$ 是二次损失项；两者相等时得到稳态 $N_{\qp,\rm ss}\propto\sqrt{G}$。}
+{两颗准粒子需要相遇才能复合回 Cooper-pair condensate，因此在最简均匀模型里复合事件率随准粒子人口的平方增长。人口越高，复合也越快，系统自然不会无限积累。}
+{这个方程非常适合做第一版负载扫描、稳态估算和时域数值实验，也能直接解释为何 responsivity 与 optical loading 往往不是严格线性的。}
+{这里把体积、材料常数和声子反馈压进一个有效 $\mathcal{R}$。真实器件可能需要 Rothwarf--Taylor 方程，并考虑 phonon trapping、traps、diffusion、空间非均匀和非平衡能量分布。}
+
 这里把几何体积等因素都吸收到有效复合系数 $\mathcal{R}$ 里，因此它只是教学用简化模型。
 
 稳态满足：
@@ -1779,6 +1814,13 @@ N_{\qp}\uparrow
 \delta N_{\qp}(0)e^{-t/\tau_{\qp}}.
 }
 \]
+% STEP4B:qp-lifetime
+\formulaexplain
+{小扰动按 $e^{-t/\tau_{\qp}}$ 衰减；经过一个 $\tau_{\qp}$，扰动剩下初值的 $1/e$。$\tau_{\qp}$ 因而直接定义恢复速度。}
+{这是把非线性的 generation--recombination 动力学在某个稳态附近线性化后的结果：足够小的扰动看到一个局部的一阶恢复率。}
+{从光脉冲、heater pulse 或加载阶跃的时间序列拟合 $\tau_{\qp}$，可以估计 detector bandwidth，并与 resonator ring-down time 比较究竟哪一环更慢。}
+{单指数只在小扰动且存在一个主导时间常数时成立。强脉冲、空间扩散、多个准粒子池、声子陷获或读出链滤波都可能产生多指数或非指数恢复。}
+
 
 对前面的简化模型线性化：
 \[
@@ -2065,6 +2107,13 @@ J=\sigma E,
 \sigma(\omega,T)=\sigma_1(\omega,T)-i\sigma_2(\omega,T)
 }
 \]
+% STEP4B:complex-conductivity
+\formulaexplain
+{$\sigma$ 是复数：$\sigma_1$ 与电场同相的部分承担净耗散，$\sigma_2$ 对应正交的反应性响应。}
+{同一个超导电子系统既能真正吸收微波能量，也能把能量暂存在超流载流子的惯性中再返还给电磁场，所以一个实数电导不足以描述 GHz 响应。}
+{这是从 BCS/准粒子物理进入器件仿真的接口。给定 $\sigma_1,\sigma_2$ 后，可以构造 surface impedance，再计算 $R_s$、$L_k$、$Q_i$ 和 resonance shift；也能明确 PEC 模型到底漏掉了什么。}
+{虚部正负依赖采用 $e^{+i\omega t}$ 还是 $e^{-i\omega t}$ 的相量约定。还默认线性、局域交流响应；强驱动、非局域效应和明显非平衡分布需要更一般的电导模型。}
+
 这里采用工程中常见的 $e^{+i\omega t}$ 时间约定；如果采用 $e^{-i\omega t}$，虚部符号会反过来，但物理结论不变。
 
 \begin{center}
@@ -2101,6 +2150,13 @@ J(t)=\Re\{(\sigma_1-i\sigma_2)E_0e^{i\omega t}\}.
 \langle p\rangle=\frac12\sigma_1|E_0|^2.
 }
 \]
+% STEP4B:sigma1-power
+\formulaexplain
+{周期平均的耗散功率密度只含 $\sigma_1$，并与电场幅度平方成正比；$\sigma_2$ 不贡献净周期平均耗散。}
+{与电场同相的电流分量在一个周期内持续从场中取走净能量，而相差四分之一周期的反应性分量只是先储能、后返还能量。}
+{它给出 $\sigma_1\rightarrow R_s\rightarrow Q_i$ 这条损耗链最直接的物理依据，也提醒读出功率提高时内部耗散通常按场强平方迅速增长。}
+{这里假设线性正弦稳态，并把 $E_0$ 当作峰值复幅度，因此出现 $1/2$。若使用 RMS 相量，前面的数值因子会变化；强非线性或空间非均匀时还需对体积/表面功率积分。}
+
 因此 $\sigma_1$ 越大，单位体积每秒真正转化为热的微波能量越多。
 
 在 $T\ll T_c$ 且读出频率远低于 pair-breaking threshold 时，$\sigma_1$ 主要由已有准粒子承担。于是最重要的直觉是
@@ -2166,6 +2222,13 @@ BCS 告诉我们准粒子能谱、能隙和态密度；但 KID 实验真正需�
 {\sqrt{E^2-\Delta^2}\sqrt{\Delta^2-(E-\hbar\omega)^2}}
 \left[1-2f(E)\right]dE.
 \]
+% STEP4B:mb-integrals
+\formulaexplain
+{两个积分把允许的准粒子跃迁在能量轴上加权求和，输出归一化的 $\sigma_1/\sigma_n$ 与 $\sigma_2/\sigma_n$；$\Delta$、$f(E)$ 和 $\hbar\omega$ 分别控制可用态、占据和跃迁能量。}
+{BCS density of states 与 coherence factor 决定每个能量区间对交流电流的贡献；已有准粒子可以吸收微波产生耗散，而凝聚态/虚跃迁共同产生强反应性响应。MB 做的正是把这些微观过程压缩成复电导。}
+{数值计算 MB 后，可以从测得的 $T_c$、$R_{\Box,n}$ 和工作温度/频率构造超导 surface impedance，并预测温度扫中的 resonance shift 与 quasiparticle loss；反过来也可用低温 $S_{21}$ 数据约束材料参数。}
+{这里展示的是常用的局域、BCS、平衡态且 $\hbar\omega<2\Delta$ 的形式。进入直接 pair-breaking 频段、强非平衡分布、明显 Dynes broadening、非局域/clean-limit 情况时，积分区间和响应模型都需要修改，不能把这两行公式当成万能黑箱。}
+
 
 \begin{intuitionbox}
 第一次学习 MB 时，不要试图背这两个积分。你只需要看懂其中四件事：
@@ -2261,6 +2324,13 @@ Z_{\Box}
 \frac{1}{t\sigma}.
 }
 \]
+% STEP4B:sheet-impedance
+\formulaexplain
+{薄膜每方块的复阻抗近似等于体复电导乘膜厚后的倒数，即 $Z_{\Box}\approx1/(t\sigma)$；实部和虚部分别给出 sheet resistance 与 sheet reactance。}
+{当场和电流在膜厚方向近似均匀时，一个方块的横向几何尺寸会在电压/电流比中相消，只剩材料电导与厚度决定端口看到的复阻抗。}
+{这是把 Mattis--Bardeen 输出喂给 Sonnet/CST/传输线模型的实用接口。相比把超导膜设成 PEC，surface-impedance 模型同时保留 kinetic inductance 与 conductor loss。}
+{要求薄膜极限和近似均匀的厚度方向电流。膜厚与 penetration depth/skin depth 可比、非局域响应明显或多层 proximity structure 时，应使用更一般的有限厚度表面阻抗，而不是机械使用 $1/(t\sigma)$。}
+
 代入 $\sigma=\sigma_1-i\sigma_2$：
 \[
 Z_{\Box}
@@ -2302,6 +2372,13 @@ X_{\Box}\approx\frac{1}{t\sigma_2}.
 \[
 X_{\Box}=\omega L_{k,\Box},
 \]
+% STEP4B:lk-from-sigma2
+\formulaexplain
+{在 $\sigma_2\gg\sigma_1$ 的薄膜极限，sheet reactance 近似为 $1/(t\sigma_2)$；再除以角频率 $\omega$ 就得到每方块动能电感。}
+{$\sigma_2$ 越大，超流越容易建立反应性电流，因此同样电流需要的感性电压越小，等效 $L_k$ 也越小；准粒子增加使 $\sigma_2$ 下降，于是 $L_k$ 上升。}
+{这条式子把 MB 的材料输出直接接回 GHz resonator：计算 $\sigma_2(T,P)$ 后即可更新 $L_{k,\Box}$、$\alpha$ 和 $f_0$，形成材料--器件闭环。}
+{依赖薄膜、线性、局域响应以及 $\sigma_2\gg\sigma_1$。如果损耗不再很小，应从完整复数 $Z_{\Box}=1/(t\sigma)$ 提取 reactance，而不是只保留 $\sigma_2$。}
+
 所以
 \[
 \boxed{
@@ -2378,6 +2455,13 @@ Q_{\rm cond}
 \alpha\frac{\sigma_1}{\sigma_2}.
 }
 \]
+% STEP4B:qi-from-sigma
+\formulaexplain
+{准粒子导体损耗对内部品质因数的贡献近似为 $Q_{i,\qp}^{-1}\approx\alpha\,\sigma_1/\sigma_2$：损耗/储能比再乘 kinetic-inductance participation。}
+{$\sigma_1$ 决定每周期真正耗掉多少能量，$\sigma_2$ 决定反应性储能尺度；而只有总储能中与超导动能相关的那部分以权重 $\alpha$ 强烈感受到这类准粒子损耗。}
+{它允许把材料层的 $\sigma_1/\sigma_2$ 与器件层的 $Q_i$ 对接：做温度扫或光学加载扫时，可预测 quasiparticle loss 的方向和数量级，并与 TLS、radiation、vortex 等其他损耗项区分。}
+{这是简化的薄膜/lumped 近似，默认 quasiparticle conductor loss 可单独定义且几何因子接近这里的形式。真实 $Q_i^{-1}$ 是多种损耗之和；复杂电流分布、有限厚度和界面效应可能引入额外 participation/geometric factor。}
+
 更一般的几何和厚度极限中会出现额外的几何因子，这里先保留最清晰的薄膜直觉。
 
 于是第二条链也闭合：

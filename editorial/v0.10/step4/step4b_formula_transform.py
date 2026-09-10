@@ -42,6 +42,19 @@ def insert_after_md_display(text: str, scope: str, anchor: str, addition: str, s
     return text[:end] + "\n\n" + addition.rstrip() + "\n" + text[end:]
 
 
+def insert_after_md_literal(text: str, scope: str, anchor: str, addition: str, sentinel: str) -> str:
+    if sentinel in text:
+        return text
+    s = text.find(scope)
+    if s < 0:
+        raise SystemExit(f"Missing Markdown literal scope: {scope}")
+    a = text.find(anchor, s)
+    if a < 0:
+        raise SystemExit(f"Missing Markdown literal anchor after {scope}: {anchor}")
+    end = text.find("\n", a)
+    if end < 0:
+        end = len(text)
+    return text[:end] + "\n\n" + addition.rstrip() + "\n" + text[end:]
 def tex_guide(tag: str, math: str, physics: str, engineering: str, limits: str) -> str:
     return textwrap.dedent(rf"""
     % STEP4B:{tag}
@@ -282,10 +295,10 @@ tex = insert_after_tex_display(
     "% STEP4B:sigma1-power",
 )
 
-md = insert_after_md_display(
+md = insert_after_md_literal(
     md,
-    "### $\\sigma_1$：为什么它代表损耗",
-    r"\langle p\rangle=\frac12\sigma_1|E_0|^2",
+    "# 第 5 章：复电导与 Mattis",
+    r"\langle p\rangle=\tfrac12\sigma_1|E_0|^2",
     md_guide(
         "sigma1-power",
         "周期平均耗散功率密度只含 $\\sigma_1$，并与场幅平方成正比；$\\sigma_2$ 不贡献净周期平均耗散。",
@@ -313,7 +326,7 @@ tex = insert_after_tex_display(
 
 md = insert_after_md_display(
     md,
-    "## 5.4 Mattis",
+    "## 2. Mattis–Bardeen 在做什么？",
     r"\frac{\sigma_2}{\sigma_n}",
     md_guide(
         "mb-integrals",
@@ -342,7 +355,7 @@ tex = insert_after_tex_display(
 
 md = insert_after_md_display(
     md,
-    "## 5.6 从体电导",
+    "## 4. 从 $\\sigma$ 到表面阻抗",
     r"Z_{\Box}",
     md_guide(
         "sheet-impedance",
@@ -371,7 +384,7 @@ tex = insert_after_tex_display(
 
 md = insert_after_md_display(
     md,
-    "## 5.7 终于闭环",
+    "## 5. 从 $\\sigma_2$ 到 kinetic inductance",
     r"L_{k,\Box}",
     md_guide(
         "lk-from-sigma2",
@@ -400,7 +413,7 @@ tex = insert_after_tex_display(
 
 md = insert_after_md_display(
     md,
-    "## 5.8 从 $\\sigma_1$ 到 $Q_i$",
+    "## 6. 从 $\\sigma_1$ 到 $Q_i$",
     r"\frac{1}{Q_{i,qp}}",
     md_guide(
         "qi-from-sigma",

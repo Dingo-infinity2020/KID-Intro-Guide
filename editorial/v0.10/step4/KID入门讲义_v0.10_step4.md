@@ -1156,6 +1156,14 @@ $$
 \boxed{\Delta_0\approx1.764k_BT_c.}
 $$
 
+<!-- STEP4B:gap-tc -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 在弱耦合 BCS 极限，零温能隙 $\Delta_0$ 与临界温度 $T_c$ 成正比，比例系数约为 $1.764k_B$。  
+> **物理上：** $T_c$ 和 $\Delta$ 来自同一个配对能量尺度；接近 $T_c$ 时配对有序态消失，能隙也随之闭合。  
+> **工程上：** 测得薄膜 $T_c$ 后即可先估 $\Delta_0$，再估 pair-breaking threshold $2\Delta_0/h$，用于材料和 science band 的第一轮匹配。  
+> **适用条件：** $1.764$ 对应常规、各向同性、弱耦合 $s$ 波 BCS 的零温极限；真实薄膜的强耦合、无序、proximity effect 等都可能改变该比值。
+
+
 当 $T\to T_c$：
 
 $$
@@ -1222,6 +1230,14 @@ E_{\mathbf{k}}=\sqrt{\xi_{\mathbf{k}}^2+\Delta^2}
 }
 $$
 
+<!-- STEP4B:qp-dispersion -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 准粒子能量是 $\xi_{\mathbf{k}}$ 与 $\Delta$ 的平方和开根号，所以总有 $E_{\mathbf{k}}\ge\Delta$。  
+> **物理上：** 超导态在费米面附近重构低能激发谱并打开能隙；准粒子是配对体系的激发，不是普通电子被简单抬高能量。  
+> **工程上：** 它解释 thermal quasiparticle 的指数压低，也解释 BCS 态密度与 Mattis–Bardeen 为什么对 $E\simeq\Delta$ 附近最敏感。  
+> **适用条件：** 这是理想各向同性 $s$ 波 BCS 色散；无序、Dynes broadening、proximity effect、非平衡分布或非常规配对会改变理想图景。
+
+
 所以：
 
 $$
@@ -1263,6 +1279,14 @@ n_{qp}^{\rm th}
 e^{-\Delta/k_BT}
 }
 $$
+
+<!-- STEP4B:thermal-qp -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 热平衡准粒子密度由平方根前因子乘以 $\exp[-\Delta/(k_BT)]$；深低温时数量级主要由指数项决定。  
+> **物理上：** 热激发要付出跨越能隙的能量；当 $k_BT\ll\Delta$，具有足够能量的热涨落极少，因此准粒子人口被指数压低。  
+> **工程上：** 用 $T/T_c$ 或 $\Delta/k_BT$ 而不是单独的 mK 数字判断制冷深度，并估算理想 dark-quasiparticle baseline。  
+> **适用条件：** 假设热平衡、理想 BCS 态密度和低温近似。excess/non-equilibrium quasiparticles 可能让真实器件在继续降温时出现饱和。
+
 
 其中 $N_0$ 是 normal-state Fermi level 处的 single-spin density of states（单自旋态密度）。
 
@@ -1335,6 +1359,14 @@ G_{\rm opt}
 }
 $$
 
+<!-- STEP4B:optical-generation -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 产生率的量级是吸收功率除以准粒子能量尺度 $\Delta$，再乘 pair-breaking efficiency $\eta_{\rm pb}$。  
+> **物理上：** 高能光子经电子–声子级联重新分配能量，只有一部分最终进入可被读出的低能准粒子池。  
+> **工程上：** 把 optical simulation/标定得到的 $P_{\rm abs}$ 转成 quasiparticle generation，是从光学吸收到 responsivity 的入口。  
+> **适用条件：** 这是数量级能量守恒式；$\eta_{\rm pb}$ 随光子能量、材料、膜厚与声子逃逸/陷获而变，而且必须代入吸收功率而不是系统前端的 incident power。
+
+
 精确系数取决于非平衡能量级联、声子逃逸和材料。
 
 ---
@@ -1352,6 +1384,14 @@ $$
 G-\mathcal{R}N_{qp}^2.
 }
 $$
+
+<!-- STEP4B:gr-rate-equation -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** $G$ 是源项，$\mathcal{R}N_{qp}^2$ 是二次损失项；稳态时两者相等，因此 $N_{qp,\rm ss}\propto\sqrt G$。  
+> **物理上：** 两颗准粒子相遇后才能复合回凝聚态，所以最简均匀模型中的复合事件率随准粒子人口平方增加。  
+> **工程上：** 可用于第一版负载扫描、稳态估算和时域数值实验，并解释 responsivity 对 optical loading 为什么常常不是严格线性。  
+> **适用条件：** 这是有效单池模型；真实器件可能需要 Rothwarf–Taylor 方程以及 phonon trapping、traps、diffusion、空间非均匀与非平衡分布。
+
 
 稳态：
 
@@ -1383,6 +1423,14 @@ $$
 \delta N_{qp}(0)e^{-t/\tau_{qp}}.
 }
 $$
+
+<!-- STEP4B:qp-lifetime -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 扰动按 $e^{-t/\tau_{qp}}$ 衰减；一个 $\tau_{qp}$ 后剩下初值的 $1/e$，因此它直接刻画恢复速度。  
+> **物理上：** 它来自在某个稳态附近把 generation–recombination 动力学线性化；小扰动只看到局部的一阶恢复率。  
+> **工程上：** 可从光脉冲、heater pulse 或加载阶跃拟合 $\tau_{qp}$，再与 resonator ring-down time 比较哪一环限制 detector bandwidth。  
+> **适用条件：** 单指数只适用于小扰动和单主导时间常数；强脉冲、扩散、多准粒子池、phonon trapping 或读出滤波都可能导致多指数/非指数响应。
+
 
 对简化模型线性化：
 
@@ -1602,9 +1650,25 @@ $$
 \boxed{\sigma(\omega,T)=\sigma_1(\omega,T)-i\sigma_2(\omega,T)}.
 $$
 
+<!-- STEP4B:complex-conductivity -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** $\sigma$ 是复数：$\sigma_1$ 承担与电场同相的净耗散，$\sigma_2$ 对应正交的反应性响应。  
+> **物理上：** 同一个超导电子系统既会真正吸收微波能量，也会把能量暂存在超流载流子的惯性中再返还，因此实数电导不够描述 GHz 响应。  
+> **工程上：** 由 $\sigma_1,\sigma_2$ 构造 surface impedance，再得到 $R_s$、$L_k$、$Q_i$ 与 resonance shift；这也是判断 PEC 模型漏掉哪层物理的接口。  
+> **适用条件：** 虚部正负取决于相量时间约定；这里还默认线性、局域交流响应，强驱动、非局域和明显非平衡情况需要更一般模型。
+
+
 这里采用 $e^{+i\omega t}$ 约定；换用另一时间约定时虚部符号会改变，但物理不变。
 
 - $\sigma_1$：耗散响应，平均功率密度 $\langle p\rangle=\tfrac12\sigma_1|E_0|^2$；
+
+<!-- STEP4B:sigma1-power -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 周期平均耗散功率密度只含 $\sigma_1$，并与场幅平方成正比；$\sigma_2$ 不贡献净周期平均耗散。  
+> **物理上：** 同相电流分量持续从场中取走净能量；正交的反应性分量只是储能后再把能量返还。  
+> **工程上：** 它是 $\sigma_1\rightarrow R_s\rightarrow Q_i$ 的直接依据，也提醒高 readout field 会迅速增加内部耗散。  
+> **适用条件：** 假设线性正弦稳态，且 $E_0$ 是峰值复幅度，所以有 $1/2$；若采用 RMS 相量或存在强非线性/空间非均匀，表达式需相应调整。
+
 - $\sigma_2$：感性/超流响应，对应 kinetic inductance。
 
 因此通常：
@@ -1644,6 +1708,14 @@ $$
 \frac{E^2+\Delta^2-\hbar\omega E}{\sqrt{E^2-\Delta^2}\sqrt{\Delta^2-(E-\hbar\omega)^2}}
 [1-2f(E)]\,dE.
 $$
+
+<!-- STEP4B:mb-integrals -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 两个积分把允许的准粒子跃迁沿能量轴加权求和，输出 $\sigma_1/\sigma_n$ 和 $\sigma_2/\sigma_n$；$\Delta$、$f(E)$、$\hbar\omega$ 分别控制可用态、占据和跃迁能量。  
+> **物理上：** BCS 态密度与 coherence factor 决定不同能量对交流电流的权重；MB 把微观跃迁统一压缩成可测的复电导。  
+> **工程上：** 可由 $T_c$、$R_{\Box,n}$、温度和读出频率构造 surface impedance，预测温度扫中的 resonance shift 与 quasiparticle loss，也可反向用低温 $S_{21}$ 约束材料参数。  
+> **适用条件：** 这里是常用局域、BCS、平衡态且 $\hbar\omega<2\Delta$ 的形式；直接 pair breaking、强非平衡、Dynes broadening 或非局域/clean-limit 情况需要更一般模型。
+
 
 第一次学习不用背积分。只需看懂：$\Delta$ 定阈值、$f(E)$ 定占据、$\hbar\omega$ 定跃迁能量、BCS 态密度和 coherence factor 定跃迁权重。
 
@@ -1692,6 +1764,14 @@ $$
 \boxed{Z_{\Box}\approx\frac{1}{t\sigma}}.
 $$
 
+<!-- STEP4B:sheet-impedance -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 薄膜每方块复阻抗近似为体复电导乘膜厚后的倒数：$Z_{\Box}\approx1/(t\sigma)$。  
+> **物理上：** 膜厚方向的场和电流近似均匀时，一个方块的横向几何尺度在电压/电流比中相消，剩下材料电导和厚度。  
+> **工程上：** 把 Mattis–Bardeen 的 $\sigma$ 转成 Sonnet/CST 或传输线模型可用的 surface impedance，同时保留 kinetic inductance 和 conductor loss。  
+> **适用条件：** 只适用于薄膜、局域且厚度方向近似均匀的情况；有限厚度、多层 proximity structure 或非局域响应应使用更一般的表面阻抗模型。
+
+
 代入 $\sigma_1-i\sigma_2$ 得
 
 $$
@@ -1711,6 +1791,14 @@ $$
 因为 $X_{\Box}=\omega L_{k,\Box}$：
 
 $$
+
+<!-- STEP4B:lk-from-sigma2 -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 在 $\sigma_2\gg\sigma_1$ 的薄膜极限，sheet reactance 约为 $1/(t\sigma_2)$；除以 $\omega$ 就得到每方块动能电感。  
+> **物理上：** $\sigma_2$ 越大，超流越容易建立反应性电流，因此等效 $L_k$ 越小；准粒子增加使 $\sigma_2$ 下降，于是 $L_k$ 上升。  
+> **工程上：** 由 MB 计算 $\sigma_2(T,P)$ 后可直接更新 $L_{k,\Box}$、$\alpha$ 和 $f_0$，把材料模型接回 GHz resonator。  
+> **适用条件：** 依赖薄膜、线性、局域响应与 $\sigma_2\gg\sigma_1$；损耗较大时应从完整 $Z_{\Box}=1/(t\sigma)$ 提取 reactance。
+
 \boxed{L_{k,\Box}\approx\frac{1}{\omega t\sigma_2}}.
 $$
 
@@ -1741,6 +1829,14 @@ $$
 $$
 \boxed{\frac{1}{Q_{i,qp}}\approx\alpha\frac{\sigma_1}{\sigma_2}}.
 $$
+
+<!-- STEP4B:qi-from-sigma -->
+> **公式怎么读：不要只背等号**  
+> **数学上：** 准粒子导体损耗近似满足 $Q_{i,qp}^{-1}\approx\alpha\,\sigma_1/\sigma_2$：损耗/储能比再乘 kinetic-inductance participation。  
+> **物理上：** $\sigma_1$ 决定每周期耗掉多少能量，$\sigma_2$ 决定反应性储能；$\alpha$ 则表示总储能中有多少权重真正落在对超导态敏感的动能电感上。  
+> **工程上：** 把材料层的 $\sigma_1/\sigma_2$ 与器件层的 $Q_i$ 对接，可在温度扫/光学加载扫中估算 quasiparticle loss，并与 TLS、radiation、vortex 等损耗区分。  
+> **适用条件：** 这是简化薄膜/lumped 近似；真实 $Q_i^{-1}$ 是多种损耗之和，复杂电流分布、有限厚度与界面还可能引入额外 participation/geometric factor。
+
 
 因此
 
