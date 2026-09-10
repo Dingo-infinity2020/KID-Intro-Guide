@@ -32,6 +32,7 @@ jobs:
           new="'quarter-wave': r'd_{\\\\lambda/4}=\\\\frac{c}{4n\\\\nu}',"
           if old not in s: raise SystemExit('Missing targeted Markdown quarter-wave anchor in transform')
           s=s.replace(old,new,1)
+          s=s.replace('单点 99.9%”升级', '单点 99.9\\%”升级')
           p.write_text(s,encoding='utf-8')
           PY
           python3 editorial/v0.10/step4/step4d_formula_transform.py
