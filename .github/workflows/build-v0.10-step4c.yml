@@ -19,8 +19,26 @@ jobs:
           ref: v0.10-step4-formulas
           fetch-depth: 0
 
-      - name: Apply Step 4-C formula pedagogy transform
-        run: python3 editorial/v0.10/step4/step4c_formula_transform.py
+      - name: Normalize anchors and apply Step 4-C transform
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('editorial/v0.10/step4/step4c_formula_transform.py')
+          s = p.read_text(encoding='utf-8')
+          old = "    s = text.find(scope)\n"
+          new = r"""    scope = scope.replace('\\\\', '\\')
+              anchor = anchor.replace('\\\\', '\\')
+              s = text.find(scope)
+          """
+          if "scope = scope.replace" not in s:
+              if s.count(old) != 2:
+                  raise SystemExit(f'Expected two helper scope searches, found {s.count(old)}')
+              s = s.replace(old, new, 2)
+          p.write_text(s, encoding='utf-8')
+          PY
+          python3 editorial/v0.10/step4/step4c_formula_transform.py
 
       - name: Compile and audit Step 4-C PDF
         uses: xu-cheng/texlive-action@v3
