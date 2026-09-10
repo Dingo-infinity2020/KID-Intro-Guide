@@ -28,11 +28,9 @@ jobs:
           MD_OUT="$ROOT/KID入门讲义_v0.10_step2.md"
           MD_BASE='docs/v0.9/KID入门讲义_v0.9.md'
 
-          # TeX: reconstruct the exact locally reviewed source from small, verified chunks.
           cat "$ROOT"/exact_payload_v2/tex_*.b64 \
             | base64 --decode | gzip -dc > "$TEX_OUT"
 
-          # Markdown: reconstruct from the v0.9 base using the already-uploaded Step 2 patch.
           cp "$MD_BASE" "$MD_OUT"
           cat "$ROOT"/bootstrap/md_00.b64 "$ROOT"/bootstrap/md_01.b64 \
             | base64 --decode | gzip -dc > /tmp/step2_md.patch
