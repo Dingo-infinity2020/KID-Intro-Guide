@@ -19,7 +19,7 @@ jobs:
           ref: v0.10-step4-formulas
           fetch-depth: 0
 
-      - name: Normalize transform guard and apply Step 4-A
+      - name: Normalize transform guards and apply Step 4-A
         shell: bash
         run: |
           set -euo pipefail
@@ -31,6 +31,8 @@ jobs:
           for line in lines:
               if 'Unexpected TeX formulaexplain count:' in line:
                   out.append('    raise SystemExit("Unexpected TeX formulaexplain count: " + str(tex.count(r"\\formulaexplain")))')
+              elif line.startswith('marker = """') and 'L_{k,\\\\Box}' in line:
+                  out.append('marker = """\\\\begin{formula}\\n\\\\[\\n\\\\boxed{\\nL_{k,\\\\Box}\\\\equiv\\\\mu_0\\\\frac{\\\\lambda_L^2}{t}\\n}\\n\\\\qquad (t\\\\ll\\\\lambda_L\\\\text{ 的简单 London 极限})\\n\\\\]\\n\\\\end{formula}"""')
               else:
                   out.append(line)
           p.write_text('\n'.join(out) + '\n', encoding='utf-8')
