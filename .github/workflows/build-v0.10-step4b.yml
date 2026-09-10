@@ -64,6 +64,7 @@ jobs:
           block = s[block_start:block_end]
           block = block.replace('md = insert_after_md_display(', 'md = insert_after_md_literal(', 1)
           block = block.replace('"### $\\\\sigma_1$：为什么它代表损耗"', '"# 第 5 章：复电导与 Mattis"', 1)
+          block = block.replace('r"\\langle p\\rangle=\\frac12\\sigma_1|E_0|^2"', 'r"\\langle p\\rangle=\\tfrac12\\sigma_1|E_0|^2"', 1)
           s = s[:block_start] + block + s[block_end:]
 
           p.write_text(s, encoding='utf-8')
