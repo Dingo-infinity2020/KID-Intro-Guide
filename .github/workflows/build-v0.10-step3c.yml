@@ -5,6 +5,7 @@ on:
     branches: [v0.10-step3-editorial]
     paths:
       - '.github/workflows/build-v0.10-step3c.yml'
+      - 'editorial/v0.10/step3/step3c_transform.py'
 
 permissions:
   contents: write
