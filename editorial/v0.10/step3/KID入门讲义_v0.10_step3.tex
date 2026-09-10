@@ -70,7 +70,7 @@
   before skip=0.7em,
   after skip=1.0em]
 \renewcommand{\arraystretch}{1.18}
-\begin{tabularx}{\textwidth}{>{\bfseries\color{KidBlue}}p{3.0cm} X}
+\noindent\begin{tabularx}{\textwidth}{>{\bfseries\color{KidBlue}}p{3.0cm} X}
 为什么要学？ & #1 \\
 阅读前只需要知道 & #2 \\
 读完应能回答 & #3 \\
@@ -182,7 +182,7 @@
 
 \section*{常见缩写}
 \small
-\begin{tabularx}{\textwidth}{>{\bfseries\color{KidBlue}}p{1.8cm} p{5.3cm} X}
+\noindent\begin{tabularx}{\textwidth}{>{\bfseries\color{KidBlue}}p{1.8cm} p{5.3cm} X}
 \toprule
 缩写 & 英文全称 & 本书中的含义 \\
 \midrule
@@ -444,7 +444,7 @@ notch 图强调“频率轴上发生了什么”；IQ 图强调“同一个复�
 
 \section{建议的学习模块}
 \renewcommand{\arraystretch}{1.25}
-\begin{tabularx}{\textwidth}{>{\bfseries}p{1.5cm} p{4.0cm} X p{2.6cm}}
+\noindent\begin{tabularx}{\textwidth}{>{\bfseries}p{1.5cm} p{4.0cm} X p{2.6cm}}
 \toprule
 模块 & 核心主题 & 学完后应该能回答的问题 & 典型产出 \\
 \midrule
@@ -480,7 +480,7 @@ M10 & 研究课题化 & 如何从“能工作的 KID”走向可发表的问题�
 \]
 这使得每一个新公式都有“它为什么值得学”的位置。
 
-\chapter{从一个光子到 $S_{21}$：KID 的第一性物理图景}
+\chapter[从一个光子到 S21：KID 的第一性物理图景]{从一个光子到 $S_{21}$：KID 的第一性物理图景}
 \chapterguide
 {这是全书最重要的第一次“闭环”：先把光子到微波读出的主链走通，后面每章只是在放大其中一段。}
 {第 0--1 章；光子能量 $E=h\nu$ 和 LC 谐振的基本概念即可。}
@@ -915,7 +915,7 @@ h\nu_{\rm signal}>2\Delta,
 \section{Day 1 的 3--4 小时任务}
 如果今天只围绕这一章学习，建议按以下顺序：
 
-\begin{tabularx}{\textwidth}{p{1.8cm} X X}
+\noindent\begin{tabularx}{\textwidth}{p{1.8cm} X X}
 \toprule
 时间 & 任务 & 完成标准 \\
 \midrule
@@ -923,7 +923,7 @@ h\nu_{\rm signal}>2\Delta,
 45 min & 独立重算 Al 在 $T_c=\SI{1.2}{K}$ 时的 $\Delta$、$2\Delta$ 和 $\nu_{\rm pb}$；再算 \SI{150}{GHz} 光子能量 & 能判断某个频率是否满足 pair-breaking 条件 \\
 55 min & 从 $f_0=1/(2\pi\sqrt{LC})$ 推导小信号 $\delta f_0/f_0$，理解 $\alpha$ 的意义 & 推导不用背结果 \\
 60 min & Python 画 notch resonator 的 $|S_{21}|$ 与 IQ 圆；令 $f_0$ 左移并比较固定 probe tone 的 $\Delta I,\Delta Q$ & 得到至少 3 张图 \\
-30 min & 阅读 Day 2003 的摘要/图 1，并回看本章因果链 & 能指出论文实验的“被测量量”在哪里 \\
+30 min & 阅读 Day et al. (2003) 的摘要与图 1，并回看本章因果链 & 能指出论文实验的“被测量量”在哪里 \\
 20 min & 闭卷回答本章 8 道题 & 至少 6 题能完整解释“为什么” \\
 \bottomrule
 \end{tabularx}
@@ -1957,7 +1957,7 @@ S_{21}
 
 
 
-\chapter{复电导与 Mattis--Bardeen：把准粒子真正连接到 $L_k$ 与 $Q_i$}
+\chapter[复电导与 Mattis--Bardeen：把准粒子连接到 Lk 与 Qi]{复电导与 Mattis--Bardeen：把准粒子真正连接到 $L_k$ 与 $Q_i$}
 \chapterguide
 {准粒子数量本身还不是 VNA 可测量量；需要一座桥，把微观激发连接到薄膜的电磁响应和谐振器参数。}
 {Cooper pair、准粒子、能隙，以及动能电感的基本概念。}
@@ -2341,12 +2341,12 @@ Q_i\downarrow.
 \]
 
 \begin{center}
-\begin{tikzpicture}[node distance=8mm and 5mm]
-\node[flowbox,fill=KidGold!18,minimum width=28mm] (n) {$N_{\qp}\uparrow$};
-\node[flowbox,right=of n,minimum width=29mm] (sig) {$\sigma_1\uparrow$\\$\sigma_2\downarrow$};
-\node[flowbox,right=of sig,minimum width=30mm] (z) {$R_s\uparrow$\\$X_s\uparrow$};
-\node[flowbox,right=of z,minimum width=31mm] (res) {$Q_i\downarrow$\\$f_0\downarrow$};
-\node[flowbox,right=of res,minimum width=29mm] (s) {$S_{21}$\\幅度/相位改变};
+\begin{tikzpicture}[node distance=8mm and 3.8mm]
+\node[flowbox,fill=KidGold!18,minimum width=24mm] (n) {$N_{\qp}\uparrow$};
+\node[flowbox,right=of n,minimum width=25mm] (sig) {$\sigma_1\uparrow$\\$\sigma_2\downarrow$};
+\node[flowbox,right=of sig,minimum width=25mm] (z) {$R_s\uparrow$\\$X_s\uparrow$};
+\node[flowbox,right=of z,minimum width=26mm] (res) {$Q_i\downarrow$\\$f_0\downarrow$};
+\node[flowbox,right=of res,minimum width=25mm] (s) {$S_{21}$\\幅度/相位改变};
 \draw[flowarrow] (n.east)--(sig.west);
 \draw[flowarrow] (sig.east)--(z.west);
 \draw[flowarrow] (z.east)--(res.west);
@@ -2381,7 +2381,7 @@ LEKID 中同一块超导 meander 同时参与两种完全不同的电磁过程�
 \end{enumerate}
 
 \begin{center}
-\begin{tikzpicture}[x=0.085cm,y=1cm]
+\begin{tikzpicture}[x=0.072cm,y=1cm]
 \draw[->,draw=KidDark!75] (0,0)--(175,0) node[right,font=\small] {频率 / GHz};
 \draw[very thick,draw=KidBlue] (3,-0.10)--(3,0.10);
 \node[above,font=\scriptsize,align=center,text=KidBlue] at (3,0.13) {GHz readout\\$\sim1$--$5$};
@@ -2537,7 +2537,7 @@ L_{k,\Box}=\frac{X_{\Box}}{\omega}
 \end{formula}
 
 
-\chapter{微波谐振器与 IQ 读出：从 $Q$ 到可拟合的 $S_{21}$}
+\chapter[微波谐振器与 IQ 读出：从 Q 到可拟合的 S21]{微波谐振器与 IQ 读出：从 $Q$ 到可拟合的 $S_{21}$}
 \chapterguide
 {材料变化必须经过谐振器“放大”为可测的频移和复数传输变化，本章就是读出侧的核心语言。}
 {LC 谐振、复数的基本概念，以及前面关于 $L_k$ 和损耗的直觉。}
@@ -2895,12 +2895,12 @@ G(f)e^{-j2\pi f\tau}
 面对一段真实 $S_{21}(f)$，建议按以下层级思考：
 
 \begin{center}
-\begin{tikzpicture}[node distance=7mm and 5mm]
-\node[flowbox,fill=KidGray,minimum width=25mm] (raw) {raw complex\\$S_{21}(f)$};
-\node[flowbox,right=of raw,minimum width=27mm] (delay) {估计/去除\\cable delay};
-\node[flowbox,right=of delay,minimum width=28mm] (base) {complex gain\\baseline normalization};
-\node[flowbox,right=of base,minimum width=27mm] (circle) {circle / line-shape\\fit};
-\node[flowbox,right=of circle,minimum width=28mm] (par) {$f_0,Q_r,Q_c,Q_i$\\+ uncertainty};
+\begin{tikzpicture}[node distance=7mm and 3.8mm]
+\node[flowbox,fill=KidGray,minimum width=24mm] (raw) {raw complex\\$S_{21}(f)$};
+\node[flowbox,right=of raw,minimum width=24mm] (delay) {估计/去除\\cable delay};
+\node[flowbox,right=of delay,minimum width=25mm] (base) {complex gain\\baseline\\normalization};
+\node[flowbox,right=of base,minimum width=24mm] (circle) {circle /\\line-shape fit};
+\node[flowbox,right=of circle,minimum width=25mm] (par) {$f_0,Q_r,Q_c,Q_i$\\+ uncertainty};
 \draw[flowarrow] (raw.east)--(delay.west);
 \draw[flowarrow] (delay.east)--(base.west);
 \draw[flowarrow] (base.east)--(circle.west);
@@ -3034,15 +3034,15 @@ P_{\rm abs}\rightarrow \Gamma_{\rm qp}\rightarrow N_{\rm qp}\rightarrow
 
 \section{先把这一章放回整条 KID 链}
 
-前五个版本主要解决了“材料变化怎样变成 GHz 复数 $S_{21}$”。本章第一次把输入端的光功率和输出端的噪声统一起来：
+前面的章节主要解决了“材料变化怎样变成 GHz 复数 $S_{21}$”。本章第一次把输入端的光功率和输出端的噪声统一起来：
 
 \begin{center}
-\begin{tikzpicture}[node distance=9mm and 7mm]
-\node[flowbox,fill=KidGold!22,minimum width=27mm] (p) {$P_{\rm abs}$\\吸收光功率};
-\node[flowbox,right=of p,minimum width=29mm] (g) {$\Gamma_{\rm qp}$\\准粒子产生率};
-\node[flowbox,right=of g,minimum width=27mm] (n) {$N_{\rm qp}$\\稳态与涨落};
-\node[flowbox,right=of n,minimum width=31mm] (r) {$f_0,Q_i$\\谐振器响应};
-\node[flowbox,right=of r,minimum width=28mm] (iq) {$I,Q$\\数字读出};
+\begin{tikzpicture}[node distance=9mm and 4mm]
+\node[flowbox,fill=KidGold!22,minimum width=23mm] (p) {$P_{\rm abs}$\\吸收光功率};
+\node[flowbox,right=of p,minimum width=24mm] (g) {$\Gamma_{\rm qp}$\\准粒子产生率};
+\node[flowbox,right=of g,minimum width=23mm] (n) {$N_{\rm qp}$\\稳态与涨落};
+\node[flowbox,right=of n,minimum width=25mm] (r) {$f_0,Q_i$\\谐振器响应};
+\node[flowbox,right=of r,minimum width=23mm] (iq) {$I,Q$\\数字读出};
 \draw[goldarrow] (p.east)--(g.west);
 \draw[flowarrow] (g.east)--(n.west);
 \draw[flowarrow] (n.east)--(r.west);
@@ -5324,21 +5324,16 @@ Dark 时固定 tone 正好位于谐振点，$S_{21}=0.333+0j$。光照后 tone �
 本章以双偏振 \SI{150}{GHz} LEKID 为工程案例，将验证过程拆成一条证据链：
 \[
 \boxed{
+\begin{aligned}
 \text{设计参数}
-\rightarrow
-\text{GHz 电磁}
-\rightarrow
-\text{150 GHz 光学电磁}
-\rightarrow
-\text{数值收敛}
-\rightarrow
-\text{加工}
-\rightarrow
-\text{低温 }S_{21}
-\rightarrow
-\text{光学/偏振标定}
-\rightarrow
-\text{端到端结论}
+&\rightarrow \text{GHz 电磁}
+\rightarrow \text{150 GHz 光学电磁}
+\rightarrow \text{数值收敛}\\
+&\rightarrow \text{加工}
+\rightarrow \text{低温 }S_{21}
+\rightarrow \text{光学/偏振标定}
+\rightarrow \text{端到端结论}
+\end{aligned}
 }
 \]
 每一步都必须明确：\textbf{输入是什么、输出是什么、看哪个指标、怎样判断 PASS/FAIL、证据文件存在哪里。}
@@ -5387,7 +5382,7 @@ Dark 时固定 tone 正好位于谐振点，$S_{21}=0.333+0j$。光照后 tone �
 因此最稳妥的做法不是构造一个“无所不能”的 full-wave 模型，而是拆成职责明确的模型层。
 
 \begin{center}
-\begin{tabularx}{\textwidth}{>{\bfseries}p{2.4cm} X X}
+\noindent\begin{tabularx}{\textwidth}{>{\bfseries}p{2.4cm} X X}
 \toprule
 模型层 & 主要问题 & 主要输出 \\
 \midrule
@@ -5476,7 +5471,7 @@ GHz 层的目标不是判断 150 GHz absorption，而是证明每个 LEKID reson
 \end{enumerate}
 
 \begin{center}
-\begin{tabularx}{\textwidth}{p{3.0cm}X X}
+\noindent\begin{tabularx}{\textwidth}{p{3.0cm}X X}
 \toprule
 检查项 & 推荐指标 & 失败时首先怀疑 \\
 \midrule
@@ -5571,7 +5566,7 @@ R_{0X}(f)&=|S_{\mathrm{TM01}\leftarrow\mathrm{TE11X}}|^2.
 当前研究问题的价值不在“B1 看起来更复杂”，而在它能否在不牺牲其他性能的前提下带来可重复的收益。
 
 \begin{center}
-\begin{tabularx}{\textwidth}{p{3.3cm}X X}
+\noindent\begin{tabularx}{\textwidth}{p{3.3cm}X X}
 \toprule
 比较维度 & B0/B1 都要报告 & 关键问题 \\
 \midrule
@@ -5938,7 +5933,7 @@ runs/<run_id>/manifest.yaml
 \section{证据等级：什么结果可以写多强的结论？}
 
 \begin{center}
-\begin{tabularx}{\textwidth}{p{2cm}X X}
+\noindent\begin{tabularx}{\textwidth}{p{2cm}X X}
 \toprule
 等级 & 已拥有证据 & 合理措辞 \\
 \midrule

@@ -39,3 +39,17 @@ Step 3 下一小步转为“知识跳跃审校”：优先检查第 2–5 章是
 - 同时修复 Markdown 中重复的 Part II 标题，并清除“这一版/下一版”两处开发历史式措辞。
 
 这些改动遵循“少改物理、多改解释”，不改变原有核心公式、公式约定或章节编号。
+
+
+## Step 3-D 补充：版式与 PDF outline 清障
+
+根据 Step 3-C 两遍 XeLaTeX 日志，本轮优先处理明确可定位的横向溢出，而不是凭肉眼猜排版：
+
+- 全宽 `tabularx` 显式取消段首缩进，修复约 20–22 pt 的整表右移；
+- 压缩材料响应、resonance fitting、光学响应三张横向流程图的节点间距与最小宽度；
+- 将 GHz/150 GHz 频率示意图横向比例从 0.085 cm/GHz 收紧为 0.072 cm/GHz；
+- 将第 11 章单行验证证据链拆为两行 aligned box，针对日志中约 99 pt 的严重 overfull；
+- 为 3 个含数学符号的章标题增加纯文本 PDF/TOC 标题，消除 hyperref 对 math token 的 outline 警告；
+- 顺手清理“前五个版本”和“Day 2003”两处公开教材不够自然的措辞。
+
+验收方式：Step 3-D workflow 在第二遍 XeLaTeX 后自动解析 log；任何超过 8 pt 的 `Overfull \\hbox` 都视为失败并阻止 checkpoint 提交。
