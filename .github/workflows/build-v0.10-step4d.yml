@@ -19,8 +19,18 @@ jobs:
           ref: v0.10-step4-formulas
           fetch-depth: 0
 
-      - name: Apply Step 4-D transform
-        run: python3 editorial/v0.10/step4/step4d_formula_transform.py
+      - name: Fix anchor normalization and apply Step 4-D transform
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('editorial/v0.10/step4/step4d_formula_transform.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("return s.replace('\\\\\\\\','\\\\').replace('\\\\n','\\n')", "return s.replace('\\\\\\\\','\\\\')")
+          p.write_text(s,encoding='utf-8')
+          PY
+          python3 editorial/v0.10/step4/step4d_formula_transform.py
 
       - name: Compile and audit Step 4-D PDF
         uses: xu-cheng/texlive-action@v3
