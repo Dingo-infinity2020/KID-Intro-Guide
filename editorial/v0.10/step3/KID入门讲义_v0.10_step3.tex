@@ -416,11 +416,11 @@ notch 图强调“频率轴上发生了什么”；IQ 图强调“同一个复�
 对于一个真正能够设计、仿真和读出 KID 的研究者，知识最后应当闭合成下面这条链：
 
 \begin{center}
-\begin{tikzpicture}[node distance=9mm and 6mm]
-\node[flowbox,fill=KidGold!20,minimum width=31mm] (opt) {光场与吸收\\$P_{\rm abs},\nu$};
-\node[flowbox,right=of opt,minimum width=36mm] (mat) {超导态与材料响应\\$\Delta,N_{\qp},\sigma_1,\sigma_2,L_k$};
-\node[flowbox,right=of mat,minimum width=31mm] (res) {GHz 谐振器\\$f_0,Q_i,Q_c$};
-\node[flowbox,right=of res,minimum width=34mm] (read) {读出与灵敏度\\$S_{21},I/Q,$ NEP};
+\begin{tikzpicture}[node distance=9mm and 4mm]
+\node[flowbox,fill=KidGold!20,minimum width=28mm] (opt) {光场与吸收\\$P_{\rm abs},\nu$};
+\node[flowbox,right=of opt,minimum width=32mm] (mat) {超导态与材料响应\\$\Delta,N_{\qp},\sigma_1,\sigma_2,L_k$};
+\node[flowbox,right=of mat,minimum width=28mm] (res) {GHz 谐振器\\$f_0,Q_i,Q_c$};
+\node[flowbox,right=of res,minimum width=30mm] (read) {读出与灵敏度\\$S_{21},I/Q,$ NEP};
 \draw[flowarrow] (opt.east)--(mat.west);
 \draw[flowarrow] (mat.east)--(res.west);
 \draw[flowarrow] (res.east)--(read.west);
@@ -5423,7 +5423,7 @@ Coupler & $C_c$ geometry & coupling finger/gap/overlap；主要控制 $Q_c$ \\
 Substrate & $t_s,\epsilon_r,\tan\delta$ & 厚度、介电常数、损耗；标注频率和温度假设 \\
 Backshort & $d_b$, B0/B1 & 深度与构型；B1 的所有路径长度必须参数化 \\
 Alignment & $\Delta x,\Delta y,\Delta\theta$ & waveguide/pixel/backshort 相对偏移与旋转 \\
-Solver & mesh/modes/ports & 网格、端口模态、边界、adaptive 设置与版本号 \\
+Solver & mesh / modes / ports & 网格、端口模态、边界、adaptive 设置与版本号 \\
 \bottomrule
 \end{longtable}
 
@@ -6000,8 +6000,8 @@ E5 & independent repeat / multi-pixel yield & ``结果具有器件级重复性/�
   \item A. Rothwarf and B. N. Taylor, ``Measurement of Recombination Lifetimes in Superconductors,'' \textit{Physical Review Letters}, 19, 27--30 (1967).
   \item P. J. de Visser et al., ``Generation-Recombination Noise: The Fundamental Sensitivity Limit for Kinetic Inductance Detectors,'' \textit{Journal of Low Temperature Physics}, 167, 335--340 (2012).
   \item D. C. Mattis and J. Bardeen, ``Theory of the Anomalous Skin Effect in Normal and Superconducting Metals,'' \textit{Physical Review}, 111, 412--417 (1958).
-  \item M. S. Khalil et al., ``An analysis method for asymmetric resonator transmission applied to superconducting devices,'' \textit{Journal of Applied Physics}, 111, 054510 (2012), doi:10.1063/1.3692073.
-  \item S. Probst et al., ``Efficient and robust analysis of complex scattering data under noise in microwave resonators,'' \textit{Review of Scientific Instruments}, 86, 024706 (2015), doi:10.1063/1.4907935.
+  \item M. S. Khalil et al., ``An analysis method for asymmetric resonator transmission applied to superconducting devices,'' \textit{Journal of Applied Physics}, 111, 054510 (2012).\\ DOI: \url{https://doi.org/10.1063/1.3692073}.
+  \item S. Probst et al., ``Efficient and robust analysis of complex scattering data under noise in microwave resonators,'' \textit{Review of Scientific Instruments}, 86, 024706 (2015).\\ DOI: \url{https://doi.org/10.1063/1.4907935}.
   \item P. J. de Visser et al., ``Evidence of a Nonequilibrium Distribution of Quasiparticles in the Microwave Response of a Superconducting Aluminum Resonator,'' \textit{Physical Review Letters}, 112, 047004 (2014).
   \item P. K. Day et al. and J. Zmuidzinas review sections on optical responsivity and noise are recommended as cross-checks for PSD/NEP conventions.
   \item J. Hubmayr et al., ``Dual-Polarization-Sensitive Kinetic Inductance Detectors for Balloon-borne Sub-millimeter Polarimetry,'' \textit{Journal of Low Temperature Physics}, 176, 490--496 (2014), doi:10.1007/s10909-014-1160-2.

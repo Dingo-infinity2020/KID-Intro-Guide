@@ -53,3 +53,14 @@ Step 3 下一小步转为“知识跳跃审校”：优先检查第 2–5 章是
 - 顺手清理“前五个版本”和“Day 2003”两处公开教材不够自然的措辞。
 
 验收方式：Step 3-D workflow 在第二遍 XeLaTeX 后自动解析 log；任何超过 8 pt 的 `Overfull \\hbox` 都视为失败并阻止 checkpoint 提交。
+
+
+## Step 3-E 补充：零 overfull 收尾
+
+Step 3-D 已将严重版式问题全部压到 8 pt 以下。本小步继续清理剩余 4 个轻微 overfull：
+
+- 收紧第 1 章总览流程图的顶层节点宽度与间距；
+- 将 `mesh/modes/ports` 改为可自然断行的 `mesh / modes / ports`；
+- 将 Khalil (2012) 与 Probst (2015) 的 DOI 单独换行，并使用 `\\url{}` 提供合法断点。
+
+Step 3-E 的验收门槛提升为：第二遍 XeLaTeX 日志中 `Overfull \\hbox` 数量必须为 0。
