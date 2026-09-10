@@ -22,6 +22,12 @@ jobs:
       - name: Apply Step 4-E consistency transform
         run: python3 editorial/v0.10/step4/step4e_consistency_transform.py
 
+      - name: Install example dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --quiet numpy matplotlib scipy
+
       - name: Syntax-check canonical Python examples
         shell: bash
         run: |
