@@ -1,0 +1,117 @@
+name: Build v0.10 Step 4-E consistency audit
+
+on:
+  push:
+    branches: [v0.10-step4-formulas]
+    paths:
+      - '.github/workflows/build-v0.10-step4e.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-step4e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Step 4 branch
+        uses: actions/checkout@v4
+        with:
+          ref: v0.10-step4-formulas
+          fetch-depth: 0
+
+      - name: Apply Step 4-E consistency transform
+        run: python3 editorial/v0.10/step4/step4e_consistency_transform.py
+
+      - name: Syntax-check canonical Python examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile examples/*.py
+          echo 'All canonical examples pass Python syntax compilation.'
+
+      - name: Execute canonical Python examples headlessly
+        shell: bash
+        env:
+          MPLBACKEND: Agg
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kid-example-runs
+          for f in examples/*.py; do
+            echo "RUN $f"
+            (cd /tmp/kid-example-runs && python3 "$GITHUB_WORKSPACE/$f")
+          done
+          echo 'All canonical examples execute successfully with MPLBACKEND=Agg.'
+
+      - name: Compile and perform strict Step 4-E PDF audit
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd editorial/v0.10/step4
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step4.tex'
+            xelatex -interaction=nonstopmode -halt-on-error 'KID入门讲义_v0.10_step4.tex'
+            test -s 'KID入门讲义_v0.10_step4.pdf'
+
+            python3 - <<'PY'
+            from pathlib import Path
+            import re
+
+            log = Path('KID入门讲义_v0.10_step4.log').read_text(encoding='utf-8', errors='replace')
+            pages_m = re.findall(r'Output written on .*?\((\d+) pages', log)
+            if not pages_m:
+                raise SystemExit('Could not determine PDF page count')
+            pages = int(pages_m[-1])
+            over = len(re.findall(r'Overfull \\hbox', log))
+            bookmark = 'Token not allowed in a PDF string' in log
+            undef_ref = bool(re.search(r'(There were undefined references|Reference .* undefined)', log))
+            undef_cite = bool(re.search(r'Citation .* undefined', log))
+            missing_char = 'Missing character:' in log
+            under = len(re.findall(r'Underfull \\hbox', log))
+
+            audit_path = Path('STEP4E_CONSISTENCY_AUDIT.md')
+            audit = audit_path.read_text(encoding='utf-8')
+            passed = not (over or bookmark or undef_ref or undef_cite or missing_char)
+            audit += (
+                '\n## Compilation / integrity gate\n\n'
+                f'- PDF pages: **{pages}**\n'
+                f'- Overfull hbox count: **{over}**\n'
+                f'- Underfull hbox count (reported, not fatal): **{under}**\n'
+                f'- Hyperref math-token bookmark warning: **{"YES" if bookmark else "NO"}**\n'
+                f'- Undefined references: **{"YES" if undef_ref else "NO"}**\n'
+                f'- Undefined citations: **{"YES" if undef_cite else "NO"}**\n'
+                f'- Missing-character warnings: **{"YES" if missing_char else "NO"}**\n'
+                f'- Step 4-E final formula/editorial gate: **{"PASS" if passed else "FAIL"}**\n'
+                '\n## Canonical examples gate\n\n'
+                '- `python -m py_compile examples/*.py`: **PASS**\n'
+                '- Headless execution of all six canonical examples: **PASS**\n'
+            )
+            audit_path.write_text(audit, encoding='utf-8')
+
+            if pages < 144:
+                raise SystemExit(f'Unexpectedly short PDF: {pages} pages')
+            if over:
+                raise SystemExit(f'{over} Overfull hboxes remain')
+            if bookmark:
+                raise SystemExit('PDF bookmark math warning remains')
+            if undef_ref:
+                raise SystemExit('Undefined cross-reference remains')
+            if undef_cite:
+                raise SystemExit('Undefined citation remains')
+            if missing_char:
+                raise SystemExit('Missing glyph/character warning remains')
+            print(f'Step 4-E strict gate PASS: {pages} pages; underfull={under}')
+            PY
+
+      - name: Commit clean Step 4 checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='editorial/v0.10/step4'
+          rm -f "$ROOT"/*.aux "$ROOT"/*.log "$ROOT"/*.out "$ROOT"/*.toc "$ROOT"/*.orig "$ROOT"/*.rej
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$ROOT"
+          git commit -m 'Finalize v0.10 Step 4 formula pedagogy and consistency'
+          git push origin HEAD:v0.10-step4-formulas
