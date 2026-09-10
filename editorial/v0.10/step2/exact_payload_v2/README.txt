@@ -1,1 +1,0 @@
-Temporary exact-source payload split into <=8,000-character chunks. This supersedes earlier truncated payload files and will be removed after GitHub rebuild verification.

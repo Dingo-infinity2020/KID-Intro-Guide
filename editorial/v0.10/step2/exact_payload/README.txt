@@ -1,1 +1,0 @@
-Exact-source payload for the reviewed v0.10 Step 2 checkpoint. Generated from the locally reviewed 128-page build. Temporary; removed after GitHub verification.
