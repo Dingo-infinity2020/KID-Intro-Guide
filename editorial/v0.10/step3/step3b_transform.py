@@ -1,0 +1,256 @@
+from pathlib import Path
+import re
+import textwrap
+
+ROOT = Path(__file__).resolve().parent
+TEX_PATH = ROOT / "KID入门讲义_v0.10_step3.tex"
+MD_PATH = ROOT / "KID入门讲义_v0.10_step3.md"
+NOTES_PATH = ROOT / "STEP3_NOTES.md"
+AUDIT_PATH = ROOT / "STEP3_AUDIT.md"
+
+tex = TEX_PATH.read_text(encoding="utf-8")
+md = MD_PATH.read_text(encoding="utf-8")
+
+# Step 3-A audit gave us an exact, finite list of remaining development-history
+# and project-private phrases.  Keep pedagogical second person when it genuinely
+# helps the learner; remove wording that assumes the reader owns the example project.
+tex_replacements = {
+    "% --- Flow-chart conventions (v0.2+, retained in v0.3) ---": "% --- Flow-chart conventions ---",
+    "对你的双偏振直接吸收 LEKID，今后每次看一个几何结构都可以问两个问题：": "对于双偏振直接吸收 LEKID，分析一个几何结构时可以先问两个问题：",
+    r"对你当前的 \SI{150}{GHz} 双偏振直接吸收 LEKID，meander 的线宽、总路径长度和膜厚至少同时参与四件事：": r"对于 \SI{150}{GHz} 双偏振直接吸收 LEKID，meander 的线宽、总路径长度和膜厚至少同时参与四件事：",
+    "v0.4 已经把材料链条推进到": "前文已经把材料链条推进到",
+    "例如采用一个与你当前读出频段接近的示例：": "例如采用一个典型 GHz 读出频段的示例：",
+    "对你当前 Sonnet 结果，哪些 $Q$ 可以直接从 $S_{21}$ 得到，哪些解释依赖真实超导材料模型？": "对于 Sonnet 仿真结果，哪些 $Q$ 可以直接从 $S_{21}$ 得到，哪些解释依赖真实超导材料模型？",
+    r"你现在采用 hairpin / half-hairpin + wiggle 的思路，本质上就是在同时优化四件事：\textbf{active volume、毫米波有效阻抗、GHz 电感、偏振纯度}。所以以后不要把“wiggle 长度”只当成机械几何参数；它应该进入 optical + microwave 两套 sweep。": r"hairpin / half-hairpin + wiggle 这类结构，本质上是在同时优化四件事：\textbf{active volume、毫米波有效阻抗、GHz 电感、偏振纯度}。因此不要把“wiggle 长度”只当成机械几何参数；它应同时进入 optical 与 microwave 两套参数扫描。",
+    r"这正好解释你当前 CST 验证中为什么反射/散射能量闭合不能只看 TE$_{11}$ 的两个偏振分量：在 \SI{150}{GHz}、$D=\SI{1.6}{mm}$ 的圆波导里，TM$_{01}$ 已经是传播通道。若忽略它，$|S|^2$ 能量闭合可能看起来“凭空丢失”。": r"这也解释了为什么 full-wave 能量闭合不能只看 TE$_{11}$ 的两个偏振分量：在 \SI{150}{GHz}、$D=\SI{1.6}{mm}$ 的圆波导里，TM$_{01}$ 已经是传播通道。若忽略它，$|S|^2$ 能量闭合可能看起来“凭空丢失”。",
+    r"这一章\textbf{不再引入新的核心理论}。目标是把前面 v0.1--v0.7 中已经出现的概念重新压缩、重排，并训练你在不翻书的情况下完成三件事：": r"这一章\textbf{不再引入新的核心理论}。目标是把前文已经出现的概念重新压缩、重排，并训练读者在不翻书的情况下完成三件事：",
+    r"\section{v0.8 最终闭卷清单}": r"\section{最终闭卷清单}",
+    "如果下面 12 项中有 10 项以上能够不翻书讲清楚，可以认为 v0.1--v0.7 的理论主链已经基本串起来：": "如果下面 12 项中有 10 项以上能够不翻书讲清楚，可以认为本讲义的理论主链已经基本串起来：",
+    r"v0.9 不要求你一开始就拥有完美材料参数，而要求把材料不确定度\textbf{显式化}。例如对 $L_{k,\square}$、film thickness、$R_\square$ 做上下界 sweep，回答：": r"工程验证不要求一开始就拥有完美材料参数，而要求把材料不确定度\textbf{显式化}。例如对 $L_{k,\square}$、film thickness、$R_\square$ 做上下界 sweep，回答：",
+    "下面是 v0.9 最核心的表。以后每做完一个结果，都应能落到其中一行。": "下面是本章最核心的表。每完成一个结果，都应能落到其中一行。",
+    r"\section{v0.9 项目执行顺序：不要并行做所有事情}": r"\section{项目执行顺序：不要并行做所有事情}",
+    r"\section{v0.9 最终总图：把所有东西压回一条科研证据链}": r"\section{最终总图：把所有东西压回一条科研证据链}",
+    r"v0.9 的目标不是让你“多会几个软件”，而是形成一种以后做任何 KID 都能复用的习惯：\textbf{先写 claim，再定义 observable；先过数值 gate，再比较设计；先做 uncertainty，再谈 improvement；最后让实验结果反过来更新模型。}": r"本章的目标不是让读者“多会几个软件”，而是形成一种做 KID 研究时可以复用的习惯：\textbf{先写 claim，再定义 observable；先过数值 gate，再比较设计；先做 uncertainty，再谈 improvement；最后让实验结果反过来更新模型。}",
+}
+for old, new in tex_replacements.items():
+    tex = tex.replace(old, new)
+
+md_replacements = {
+    "## 3.9 映射到你的 150 GHz 双偏振 LEKID": "## 3.9 工程例子：150 GHz 双偏振 LEKID",
+    "本章把 v0.4 的材料响应真正接到读出：理解 $Q_i,Q_c,Q_r$、linewidth、ring-down、ideal notch、IQ circle、fixed-tone readout 与真实 resonance fitting。": "本章把前文的材料响应真正接到读出：理解 $Q_i,Q_c,Q_r$、linewidth、ring-down、ideal notch、IQ circle、fixed-tone readout 与真实 resonance fitting。",
+    "本章对应 LaTeX/PDF v0.6 的完整第 7 章。核心链条：": "本章的核心链条是：",
+    r"5. **Detector layer**：把 $P_{\rm abs}$ 接入 v0.6 responsivity / NEP。": r"5. **Detector layer**：把 $P_{\rm abs}$ 接入前文的 responsivity / NEP 模型。",
+    "## 8.18 v0.7 Python 示例": "## 8.18 配套 Python 示例",
+    "- v0.8：把 v0.1–v0.7 理论逐项映射到当前双偏振 150 GHz LEKID，形成 Sonnet/CST/实验验证矩阵；": "- 工程案例章：把前文理论映射到双偏振 150 GHz LEKID，形成 Sonnet/CST/实验验证矩阵；",
+    "- v0.9+：阵列 FDM、resonance collision、readout budget、RFSoC/FPGA/GPU 实时读出与 instrument closure。": "- 后续进阶主题：阵列 FDM、resonance collision、readout budget、RFSoC/FPGA/GPU 实时读出与 instrument closure。",
+    "> **本章目标**：不再引入新的核心理论，而是把 v0.1–v0.7 压缩成一套可以手写、闭卷复述、自己推导的知识闭环。建议第一次阅读时遮住第 10 章答案，真的拿一张纸完成空格、推导和综合题。": "> **本章目标**：不再引入新的核心理论，而是把前文内容压缩成一套可以手写、闭卷复述、自己推导的知识闭环。建议第一次阅读时遮住第 10 章答案，真的拿一张纸完成空格、推导和综合题。",
+    "v0.9 的核心习惯：**先写 claim，再定义 observable；先过 numerical gate，再比较设计；先量 uncertainty，再谈 improvement；最后让实验反过来更新模型。**": "本章的核心习惯：**先写 claim，再定义 observable；先过 numerical gate，再比较设计；先量 uncertainty，再谈 improvement；最后让实验反过来更新模型。**",
+    "- v0.9：把 v0.1–v0.8 理论逐项映射到当前双偏振 150 GHz LEKID，形成 Sonnet/CST/加工/低温 S21/光学标定验证矩阵；": "- 工程案例章：把前文理论逐项映射到双偏振 150 GHz LEKID，形成 Sonnet/CST/加工/低温 $S_{21}$/光学标定验证矩阵；",
+    "- v0.6：$Q_i/Q_c/Q_r$、notch resonator、IQ circle、固定 tone 读出与实际 fitting": "- 第 6 章：$Q_i/Q_c/Q_r$、notch resonator、IQ circle、固定 tone 读出与实际 fitting",
+    "- v0.6：optical responsivity、NEP 与 photon / GR / TLS / amplifier noise": "- 第 7 章：optical responsivity、NEP 与 photon / GR / TLS / amplifier noise",
+    "- v0.7：LEKID absorber / IDC / coupling / polarization / backshort 电磁设计": "- 第 8 章：LEKID absorber / IDC / coupling / polarization / backshort 电磁设计",
+    "- v0.8：映射到当前双偏振 150 GHz LEKID 项目与 Sonnet/CST 验证矩阵，并加入 Python 数值练习": "- 复习与工程案例：把理论映射到双偏振 150 GHz LEKID 与 Sonnet/CST 验证矩阵，并配合 Python 数值练习",
+}
+for old, new in md_replacements.items():
+    md = md.replace(old, new)
+md = re.sub(r"`examples/v0\.[0-9]+/", "`examples/", md)
+
+# Beginner-facing front matter.  This is a lookup page, not a pre-reading exam.
+glossary_tex = textwrap.dedent(r"""
+
+\chapter*{符号、缩写与术语速查}
+\addcontentsline{toc}{chapter}{符号、缩写与术语速查}
+
+这一节不是要求读者在开始前背诵。它更像一张“路标”：第一次遇到陌生缩写或符号时先来这里查，理解它在整条因果链中的位置，再回正文继续阅读。
+
+\begin{intuitionbox}
+本书会保留一些 KID 论文、微波测量和电磁仿真中极常见的英文词，例如 meander、notch、feedline、backshort 和 probe tone。第一次出现时给出中文含义，后文可能直接沿用英文，目的是让教材中的词与论文、VNA/EM 软件界面能够一一对应，而不是要求读者同时记两套术语。
+\end{intuitionbox}
+
+\section*{常见缩写}
+\small
+\begin{tabularx}{\textwidth}{>{\bfseries\color{KidBlue}}p{1.8cm} p{5.3cm} X}
+\toprule
+缩写 & 英文全称 & 本书中的含义 \\
+\midrule
+KID & kinetic inductance detector & 动能电感探测器；利用超导材料的动能电感与损耗变化实现探测。 \\
+LEKID & lumped-element kinetic inductance detector & 集总元件 KID；常用 meander 提供吸收/电感、IDC 提供电容。 \\
+VNA & vector network analyzer & 矢量网络分析仪；扫频测量复数 $S$ 参数。 \\
+ADC & analog-to-digital converter & 模数转换器；把模拟微波读出链的信号变为数字采样。 \\
+DDC & digital down conversion & 数字下变频；把每个读出 tone 搬到低速复基带得到 $I(t),Q(t)$。 \\
+FDM & frequency-division multiplexing & 频分复用；让大量不同 $f_0$ 的 KID 共用一条读出线。 \\
+NEP & noise-equivalent power & 噪声等效功率；把输出噪声折算回输入光功率后的灵敏度指标。 \\
+PSD & power spectral density & 功率谱密度，单位通常含 $/\mathrm{Hz}$。 \\
+ASD & amplitude spectral density & 幅度谱密度，等于 PSD 的平方根。 \\
+TLS & two-level system & 两能级系统；常用于描述介质缺陷引起的一类低频频率噪声。 \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\section*{最常用符号}
+\small
+\begin{longtable}{>{\bfseries\color{KidBlue}}p{2.2cm} p{4.6cm} p{8.0cm}}
+\toprule
+符号 & 名称 & 先记住什么 \\
+\midrule
+\endfirsthead
+\toprule
+符号 & 名称 & 先记住什么 \\
+\midrule
+\endhead
+$\nu$ & 信号光频率 & 毫米波/亚毫米波光子的频率；光子能量为 $h\nu$。 \\
+$h$ & Planck 常数 & 把“频率”连接到“单个光子的能量”。 \\
+$T_c$ & 超导临界温度 & 粗略决定能隙尺度；弱耦合 BCS 下 $\Delta(0)\simeq1.764k_BT_c$。 \\
+$\Delta$ & 超导能隙 & 本书取单准粒子能隙；最基本的 pair-breaking 阈值是 $h\nu\ge2\Delta$。 \\
+$N_{\rm qp}$ & 准粒子数 & 吸收功率增加后通常会上升，是“光”到“材料状态”之间的关键中间量。 \\
+$n_s$ & 超流载流子密度 & 越低通常意味着动能电感越大。 \\
+$L_g$ & 几何电感 & 主要对应导体周围磁场储能。 \\
+$L_k$ & 动能电感 & 来自超导载流子的惯性，是 KID 对材料状态敏感的核心。 \\
+$\alpha$ & 动能电感占比 & $\alpha=L_k/(L_g+L_k)$；表示总电感中有多少来自敏感的 $L_k$。 \\
+$C$ & 电容 & 与总电感共同决定谐振频率。 \\
+$f_0$ & 谐振频率 & $f_0=1/(2\pi\sqrt{LC})$；KID 最重要的可测状态量之一。 \\
+$Q_i$ & internal quality factor & 内部品质因数，描述器件内部损耗。 \\
+$Q_c$ & coupling quality factor & 耦合品质因数，描述谐振器与 feedline 的耦合。 \\
+$Q_r$ & loaded/resonator quality factor & 实际读到的总品质因数，满足 $Q_r^{-1}=Q_i^{-1}+Q_c^{-1}$。 \\
+$S_{21}$ & 前向传输系数 & 一个复数；可同时看幅度/相位，也可写成 $I+jQ$。 \\
+$I,Q$ & 复基带两分量 & $S_{21}=I+jQ$ 的实部与虚部坐标，不是两个独立探测器。 \\
+$P_{\rm abs}$ & 吸收光功率 & 真正进入 absorber 并转化为探测器激发的功率。 \\
+$\eta_{\rm pb}$ & pair-breaking efficiency & 吸收能量中有效进入准粒子产生链条的比例参数。 \\
+$\tau_{\rm qp}$ & 准粒子寿命 & 决定稳态准粒子数与一部分时间响应带宽。 \\
+$\sigma_1,\sigma_2$ & 复电导两部分 & $\sigma_1$ 主要关联耗散，$\sigma_2$ 主要关联感性/超流响应。 \\
+$R_{\square,n}$ & 正常态方块电阻 & 薄膜工艺中常用的每方块电阻，可用于估算低温 $L_{k,\square}$。 \\
+$Z_s=R_s+jX_s$ & 表面阻抗 & 把有限损耗与感性响应放在同一个复数材料参数里。 \\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\section*{几个容易混淆的词}
+\begin{itemize}
+  \item \textbf{quasiparticle（准粒子）：}不是“普通电子数量”的简单同义词，而是超导体系的激发态描述；入门阶段先把它看成会同时改变损耗与动能电感的材料状态变量。
+  \item \textbf{pair breaking（破对）：}打破 Cooper pair 并产生准粒子激发；最基本能量阈值是 $2\Delta$，不是 $\Delta$。
+  \item \textbf{meander（蛇形线/曲折电感）：}在 LEKID 中常同时承担毫米波吸收与 GHz 电感两种职责。
+  \item \textbf{notch（传输凹口）：}谐振器从 feedline 抽取/重分配能量后，在 $|S_{21}|$ 扫频曲线上出现的凹陷；它不是“吸收谱”的同义词。
+  \item \textbf{probe tone（读出探针）：}放在 GHz 谐振附近、用来询问谐振器状态的微波信号；它与被探测的毫米波/亚毫米波信号不是同一频段。
+  \item \textbf{responsivity（响应度）：}输入变化引起多大输出变化，例如 $dx/dP_{\rm abs}$；响应度大不自动等于 NEP 小，还必须同时看噪声。
+  \item \textbf{co-pol / cross-pol（同偏振/交叉偏振）：}分别描述目标偏振和正交偏振的响应，必须先写清楚定义和归一化方式再比较数值。
+  \item \textbf{backshort（背短路反射结构）：}放在 absorber 后方的反射/匹配结构，用干涉与阻抗匹配提高目标频带吸收；“$\lambda/4$”通常只是设计起点。
+\end{itemize}
+
+\begin{checkpointbox}
+三个特别值得从一开始就区分的量：\textbf{$\nu$ 是被探测光的频率，$f_0$ 是 GHz 谐振器的谐振频率，$f$ 在噪声谱章节里还会表示 Fourier frequency。} 它们都叫“频率”，但在物理链条中的职责完全不同。
+\end{checkpointbox}
+""")
+
+tex_marker = "\\end{checkpointbox}\n\n\\part{先建立 KID 直觉}"
+if "\\chapter*{符号、缩写与术语速查}" not in tex:
+    if tex_marker not in tex:
+        raise SystemExit("Could not locate TeX front-matter insertion point")
+    tex = tex.replace(tex_marker, "\\end{checkpointbox}" + glossary_tex + "\n\\part{先建立 KID 直觉}", 1)
+
+glossary_md = textwrap.dedent(r"""
+
+# 符号、缩写与术语速查
+
+这一节不是要求在开始前背诵，而是一张随手查的“路标”。第一次遇到陌生缩写或符号时，先确认它在“光 → 材料状态 → 谐振器 → 微波读出”链条中的位置，再回正文继续读。
+
+> 本书会保留一些 KID 论文、微波测量和电磁仿真中极常见的英文词，例如 meander、notch、feedline、backshort 和 probe tone。第一次出现时给出中文含义，后文可能直接沿用英文，目的是让教材术语与论文和软件界面能够对应。
+
+## 常见缩写
+
+| 缩写 | 英文全称 | 本书中的含义 |
+|---|---|---|
+| KID | kinetic inductance detector | 动能电感探测器 |
+| LEKID | lumped-element kinetic inductance detector | 集总元件 KID |
+| VNA | vector network analyzer | 矢量网络分析仪，扫频测复数 $S$ 参数 |
+| ADC | analog-to-digital converter | 模数转换器 |
+| DDC | digital down conversion | 数字下变频，得到低速 $I(t),Q(t)$ |
+| FDM | frequency-division multiplexing | 频分复用 |
+| NEP | noise-equivalent power | 噪声等效功率 |
+| PSD | power spectral density | 功率谱密度 |
+| ASD | amplitude spectral density | 幅度谱密度，等于 PSD 的平方根 |
+| TLS | two-level system | 两能级系统，一类常见低频频率噪声来源 |
+
+## 最常用符号
+
+| 符号 | 名称 | 先记住什么 |
+|---|---|---|
+| $\nu$ | 信号光频率 | 光子能量为 $h\nu$ |
+| $T_c$ | 超导临界温度 | 决定超导能隙的典型尺度 |
+| $\Delta$ | 超导能隙 | pair breaking 的基本阈值是 $h\nu\ge2\Delta$ |
+| $N_{\rm qp}$ | 准粒子数 | 光到材料状态之间的关键中间量 |
+| $L_g,L_k$ | 几何/动能电感 | $L_k$ 对超导状态敏感 |
+| $\alpha$ | 动能电感占比 | $L_k/(L_g+L_k)$ |
+| $f_0$ | 谐振频率 | KID 最重要的可测状态量之一 |
+| $Q_i,Q_c,Q_r$ | 内部/耦合/总品质因数 | $Q_r^{-1}=Q_i^{-1}+Q_c^{-1}$ |
+| $S_{21}$ | 前向传输系数 | 复数，可写成 $I+jQ$ |
+| $P_{\rm abs}$ | 吸收光功率 | 真正进入 absorber 的功率 |
+| $\eta_{\rm pb}$ | 破对效率 | 吸收能量进入准粒子产生链的效率参数 |
+| $\tau_{\rm qp}$ | 准粒子寿命 | 影响稳态响应与时间带宽 |
+| $\sigma_1,\sigma_2$ | 复电导两部分 | 分别主要关联耗散与感性/超流响应 |
+| $R_{\square,n}$ | 正常态方块电阻 | 可用于估算薄膜动能电感 |
+| $Z_s$ | 表面阻抗 | 同时包含损耗与电抗 |
+
+## 几个容易混淆的词
+
+- **quasiparticle（准粒子）**：超导体系的激发态描述；入门时先把它看作会同时改变损耗与动能电感的材料状态变量。
+- **pair breaking（破对）**：打破 Cooper pair 并产生准粒子激发，基本能量阈值为 $2\Delta$。
+- **meander（蛇形线/曲折电感）**：在 LEKID 中常同时承担毫米波吸收与 GHz 电感两种职责。
+- **notch（传输凹口）**：$|S_{21}|$ 扫频曲线的谐振凹陷，不是毫米波“吸收谱”的同义词。
+- **probe tone（读出探针）**：GHz 谐振附近用于询问器件状态的微波，与被探测信号不是同一频段。
+- **responsivity（响应度）**：输入变化引起多大输出变化；响应度大不自动等于 NEP 小。
+- **co-pol / cross-pol（同偏振/交叉偏振）**：目标偏振与正交偏振响应，比较前必须先写清定义。
+- **backshort（背短路反射结构）**：利用反射、干涉与阻抗匹配增强 absorber 吸收；$\lambda/4$ 通常只是起点。
+
+**特别提醒：** $\nu$ 常表示被探测光频率，$f_0$ 表示 GHz 谐振频率，而噪声谱里的 $f$ 常表示 Fourier frequency。三者都叫“频率”，但职责不同。
+""")
+
+if "# 符号、缩写与术语速查" not in md:
+    part_marker = "# Part I：先建立 KID 直觉"
+    if part_marker not in md:
+        raise SystemExit("Could not locate Markdown front-matter insertion point")
+    md = md.replace(part_marker, glossary_md + "\n\n" + part_marker, 1)
+
+TEX_PATH.write_text(tex, encoding="utf-8")
+MD_PATH.write_text(md, encoding="utf-8")
+
+# Hard gate: historical release labels should no longer be present in reader-facing
+# body. Current v0.10 metadata is intentionally allowed.
+residual = []
+for label, text in (("LaTeX", tex), ("Markdown", md)):
+    for lineno, line in enumerate(text.splitlines(), 1):
+        if re.search(r"v0\.(?!10\b)[0-9]+", line):
+            residual.append(f"{label} L{lineno}: {line[:200]}")
+for marker in ("你当前", "你现在", "你未来", "映射到你的", "对你的双偏振", "与你当前读出频段"):
+    if marker in tex or marker in md:
+        residual.append("private marker: " + marker)
+if residual:
+    raise SystemExit("Step 3-B residual cleanup failed:\n" + "\n".join(residual))
+
+AUDIT_PATH.write_text(textwrap.dedent("""
+# v0.10 Step 3-B — Terminology / residual audit
+
+- 历史 v0.1–v0.9 版本标签：reader-facing TeX/Markdown 中已清零（v0.10 当前版本 metadata 除外）。
+- 已知项目私人化 marker：已清零。
+- 已增加“符号、缩写与术语速查”前置章节。
+- 稳定代码入口：仓库根目录 `examples/`。
+
+下一轮人工重点不再是“删版本号”，而是逐章检查：术语是否在第一次真正需要时有足够直觉解释，以及是否存在知识跳跃。
+""").lstrip(), encoding="utf-8")
+
+notes = NOTES_PATH.read_text(encoding="utf-8")
+if "## Step 3-B 补充" not in notes:
+    notes += textwrap.dedent(r"""
+
+## Step 3-B 补充
+
+- 根据 Step 3-A 自动审计逐项清除了剩余私人项目口吻和历史版本标签；
+- 新增“符号、缩写与术语速查”前置章节，覆盖 KID/LEKID/VNA/ADC/DDC/FDM/NEP/PSD/ASD/TLS 与核心符号；
+- 明确 $\nu$（信号光频率）、$f_0$（GHz 谐振频率）和 noise PSD 中 Fourier frequency 的区别；
+- 统一说明 quasiparticle、pair breaking、meander、notch、probe tone、responsivity、co/cross-pol、backshort 的中文口径；
+- reader-facing 正文中 v0.1–v0.9 历史版本标签已作为硬门禁清零。
+
+Step 3 下一小步转为“知识跳跃审校”：优先检查第 2–5 章是否对完全没有超导背景的读者过快，并补桥接段，而不是继续机械替换措辞。
+""")
+    NOTES_PATH.write_text(notes, encoding="utf-8")
+
+print("Step 3-B transform complete")
