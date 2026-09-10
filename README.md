@@ -6,16 +6,16 @@
 
 **光场与吸收 → Cooper pair / 准粒子 → 动能电感与复电导 → GHz 谐振器 → S21 / I-Q 读出 → 光学响应 → 噪声与 NEP → LEKID 电磁设计 → 理论闭环复习 → 仿真/实验闭环。**
 
-> 当前版本：**v0.9（2026-09-08）** · 121 页
+> 当前版本：**v0.10（2026-09-10）** · 144 页
 
 ## 最新版本
 
-- [PDF 阅读版](docs/v0.9/KID入门讲义_v0.9.pdf)
-- [LaTeX 权威排版源文件](docs/v0.9/KID入门讲义_v0.9.tex)
-- [Markdown 内容源文件](docs/v0.9/KID入门讲义_v0.9.md)
-- [v0.9 修改记录](docs/v0.9/CHANGELOG.md)
-- [v0.9 Python 示例](docs/v0.9/examples/)
-- [v0.9 项目验证模板](docs/v0.9/templates/)
+- [PDF 阅读版](docs/v0.10/KID入门讲义_v0.10.pdf)
+- [LaTeX 权威排版源文件](docs/v0.10/KID入门讲义_v0.10.tex)
+- [Markdown 内容源文件](docs/v0.10/KID入门讲义_v0.10.md)
+- [v0.10 修改记录](docs/v0.10/CHANGELOG.md)
+- [v0.10 Python 示例](docs/v0.10/examples/)
+- [v0.10 项目验证模板](docs/v0.10/templates/)
 
 ## 当前已经打通的主链
 
@@ -35,6 +35,13 @@
 - 建立 `Claim–Observable–Method–Acceptance–Evidence` traceability；
 - 增加 B0/B1 FOM、modal closure、convergence、material/tolerance、run manifest 与 evidence level；
 - 增加 fabrication checklist、validation matrix 和三个项目验证 Python 示例。
+
+### v0.10
+- 以完全新手可读为目标重整全书入口、章节导航和术语速查，不再假设读者已经熟悉 KID/超导专用语言；
+- 对核心关系增加 43 组“数学上—物理上—工程上—适用条件”公式解读，把公式从结论改造成可理解、可检查的因果链；
+- 强化超导基础、Mattis–Bardeen、谐振器/IQ、responsivity/NEP 与 LEKID 电磁设计之间的跨章连接；
+- 统一 $N_{\rm qp}$ / $n_{\rm qp}$、$\Delta$ / $\Delta\nu$、$P_{\rm inc}$ / $P_{\rm abs}$ / $P_{\rm read}$、复数单位与 PSD/ASD 等易混符号；
+- 发布前执行严格 XeLaTeX、交叉引用、缺字、Python 示例和 PDF 渲染/字体嵌入门禁。
 
 ## 总体学习路线
 
