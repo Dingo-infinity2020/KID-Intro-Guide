@@ -29,7 +29,7 @@ jobs:
           s = p.read_text(encoding='utf-8')
           old = "    s = text.find(scope)\n"
           new = r"""    scope = scope.replace('\\\\', '\\')
-              anchor = anchor.replace('\\\\', '\\')
+              anchor = anchor.replace('\\\\', '\\').replace('\\n', '\n')
               s = text.find(scope)
           """
           if "scope = scope.replace" not in s:
