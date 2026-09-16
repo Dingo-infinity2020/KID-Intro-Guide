@@ -1,0 +1,27 @@
+\chapter{超导薄膜：从沉积参数到 $L_k$ 与 $Q_i$}
+
+\begin{chaptergoal}
+把“沉一层 Al”拆成可测的材料量：厚度 $t$、方阻 $R_\square$、$T_c$、均匀性、粗糙度、应力与界面；理解它们为什么会进入 KID 的谐振频率和损耗。
+\end{chaptergoal}
+
+\section{先学会区分设备名和物理量}
+
+蒸发、溅射等是形成薄膜的手段；KID 真正“看到”的却是最后得到的材料状态。即使目标厚度相同，不同沉积历史也可能给出不同的 $R_\square$、$T_c$、晶粒/缺陷和界面状态。因此工艺记录不能只写“Al, 40 nm”，而应把 run 与后续表征绑定起来。
+
+\section{第一条必须建立的量化链}
+
+对足够薄、近似均匀的膜，可以先用
+\[
+R_\square = \frac{\rho}{t}
+\]
+建立最基本直觉：厚度和电阻率共同决定方阻。对超导薄膜，$R_\square$、$T_c$ 与材料模型又会进一步影响 sheet kinetic inductance。真正的定量关系要结合材料状态与适用近似，本册后续会把它与第一册的 $L_{k,\square}$ 接起来。
+
+\processchain{$t,\rho,T_c,\text{disorder/interface}$ $\rightarrow$ $R_\square,L_{k,\square}$ 与损耗 $\rightarrow$ $L_k,Q_i$ $\rightarrow$ $f_0$, linewidth, responsivity}
+
+\section{均匀性为什么对阵列格外重要}
+
+单个谐振器的频率偏一点也许还能测；数百个频分复用谐振器如果出现相关的材料梯度，就可能让 frequency map 整体扭曲并增加 collision。阵列时代，wafer map 比“中心点膜厚是多少”更重要。
+
+\begin{measurebox}
+薄膜学习阶段至少建立：目标厚度与实际厚度、多个位置的均匀性、室温方阻、可行时的 $T_c$、沉积 base pressure / rate 等设备读回量、见证片编号，以及后续低温 resonance map。
+\end{measurebox}

@@ -1,0 +1,15 @@
+\chapter{光刻：GDS 并不等于最终几何}
+
+\begin{chaptergoal}
+理解 resist、曝光、显影和设备分辨率如何把版图变成带有 CD bias、圆角和轮廓的真实图形；学会从 KID 参数反推哪些几何最敏感。
+\end{chaptergoal}
+
+\section{最关键的概念：critical dimension}
+
+对于 KID，meander linewidth、gap、IDC finger/gap、coupler 间隙往往比“大图形轮廓好不好看”更重要。设计阶段应先标出真正的 critical dimensions（CD），加工后再针对这些位置测量，而不是随机拍几张显微照片。
+
+\processchain{曝光/显影偏差 $\rightarrow$ linewidth 与 gap 偏差 $\rightarrow$ $L_g,L_k,C,C_c$ 改变 $\rightarrow$ $f_0,Q_c$ 与吸收几何改变}
+
+\section{为什么要测 bias}
+
+如果版图上画 $2.0\,\mu\mathrm{m}$，实际稳定得到的是 $2.2\,\mu\mathrm{m}$，这不是一句“设备误差”就结束了。它应成为可量化的 process bias，并反馈到下一版 mask/GDS。DfM 的核心之一，就是把这类稳定偏差从“事故”变成“模型参数”。

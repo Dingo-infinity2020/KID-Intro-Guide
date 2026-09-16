@@ -1,0 +1,15 @@
+\chapter{低温测量如何反推工艺}
+
+\begin{chaptergoal}
+把低温 $S_{21}$ 从“最终成绩”变成工艺诊断工具：先看 resonance map，再看 $Q_i/Q_c$、功率与温度依赖，最后才讨论更深层噪声。
+\end{chaptergoal}
+
+\section{第一轮冷却先回答简单问题}
+
+第一轮 cooldown 的优先级通常不是立刻做极限 NEP，而是确认：有多少设计 resonance 被找到？频率整体偏向哪里？频率散布是否有空间相关性？$Q_c$ 是否接近设计？$Q_i$ 是否整体受限？是否出现 spurious modes 或异常 baseline？
+
+\processchain{低温 observables $\rightarrow$ 与设计/室温 metrology 对照 $\rightarrow$ 缩小 design / material / fabrication / package / readout 的责任范围}
+
+\section{几个典型诊断方向}
+
+如果 $Q_c$ 系统性偏离而 $Q_i$ 尚可，应优先检查 coupler 实际几何和电磁模型；如果整片 $f_0$ 发生相关漂移，应把膜厚/方阻/CD wafer map 纳入对照；如果 $Q_i$ 极低且器件间差异大，则更需要检查局部缺陷、界面、封装与污染证据。这里强调“优先级”，而不是把任何单一症状与某个工艺原因机械一一对应。

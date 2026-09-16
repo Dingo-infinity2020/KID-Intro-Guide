@@ -1,0 +1,15 @@
+\chapter{切片、封装与 Wire Bond：加工并没有在晶圆上结束}
+
+\begin{chaptergoal}
+理解 dicing、芯片固定、接地、wire bond、封装腔体和连接器都会改变器件的机械与电磁边界；避免把封装问题误判成薄膜问题。
+\end{chaptergoal}
+
+\section{从 wafer 到 package}
+
+切片可能带来边缘崩裂、颗粒和机械应力；封装决定芯片与 ground 的连接、腔体模式和寄生耦合；wire bond 既是电连接，也是高频回流路径的一部分。
+
+\processchain{package / bond / ground $\rightarrow$ 寄生电感电容与腔体边界 $\rightarrow$ feedline / resonator 环境改变 $\rightarrow$ $S_{21}$ baseline、spurious modes、$Q$ 与串扰}
+
+\begin{measurebox}
+封装也需要版本号。至少记录 package 图纸版本、芯片方向、固定方式、bond 数量与大致位置、连接器/PCB/转接结构，以及任何返工。
+\end{measurebox}

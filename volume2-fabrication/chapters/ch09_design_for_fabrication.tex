@@ -1,0 +1,23 @@
+\chapter{Design for Fabrication：不要只设计一个“仿真里能工作的 KID”}
+
+\begin{chaptergoal}
+把 fabrication tolerance、process bias、test structures 和 array yield 纳入设计；让下一版 GDS 能主动吸收加工平台的真实能力。
+\end{chaptergoal}
+
+\section{从 nominal design 走向 process window}
+
+工程设计不只问 nominal geometry 下性能是否最好，还要问在 $\pm\Delta w$、$\pm\Delta g$、$\pm\Delta t$、材料批次变化和封装偏差下，性能是否仍然可接受。对大阵列，frequency collision 往往让这种 tolerance 比单像素峰值性能更重要。
+
+\processchain{工艺能力分布 $\rightarrow$ geometry/material distribution $\rightarrow$ $f_0,Q_i,Q_c$ distribution $\rightarrow$ collision / yield $\rightarrow$ mask 与版图修正}
+
+\section{建议从第一版就放入的 test structures}
+
+可以考虑独立的 linewidth/gap monitor、方阻/连续性结构、不同 coupler 强度、不同 meander CD、不同 IDC bias，以及用于测量 etch/膜厚的见证区域。具体结构应服务于“下一次设计要修正什么”，而不是为了填满版图空白。
+
+\section{第二册最终要形成的闭环}
+
+\begin{center}
+\textbf{设计假设 $\rightarrow$ 工艺记录 $\rightarrow$ 室温表征 $\rightarrow$ 低温结果 $\rightarrow$ 参数反演 $\rightarrow$ 下一版设计}
+\end{center}
+
+当这个闭环可以重复运行时，加工就不再是外包给洁净室的黑箱，而成为 KID 设计模型的一部分。

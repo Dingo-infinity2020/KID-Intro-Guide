@@ -1,0 +1,84 @@
+name: Build KID Volume 2
+
+on:
+  push:
+    branches:
+      - 'volume2-*'
+    paths:
+      - 'volume2-fabrication/**'
+      - '.github/workflows/build-volume2.yml'
+  pull_request:
+    paths:
+      - 'volume2-fabrication/**'
+      - '.github/workflows/build-volume2.yml'
+  workflow_dispatch:
+
+jobs:
+  preview:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Build only changed chapters on development pushes
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd volume2-fabrication
+            mkdir -p build
+            changed=$(git -C .. diff --name-only HEAD^ HEAD || true)
+            structural=0
+            if echo "$changed" | grep -Eq '^volume2-fabrication/(main|preamble|chapter-preview)\.tex$'; then
+              structural=1
+            fi
+            if [ "$structural" -eq 1 ]; then
+              make full
+              exit 0
+            fi
+            chapters=$(echo "$changed" | sed -n 's#^volume2-fabrication/chapters/\(.*\)\.tex$#\1#p' | sort -u)
+            if [ -z "$chapters" ]; then
+              echo 'No TeX chapter changed; skipping PDF build.'
+              exit 0
+            fi
+            for ch in $chapters; do
+              echo "Building preview for $ch"
+              make chapter CH="$ch"
+            done
+
+      - name: Upload preview PDFs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: KID-Volume2-preview
+          path: volume2-fabrication/build/*.pdf
+          if-no-files-found: ignore
+
+  full:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build complete Volume 2
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd volume2-fabrication
+            make full
+            test -s build/main.pdf
+
+      - name: Upload complete PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: KID-Volume2-full
+          path: volume2-fabrication/build/main.pdf

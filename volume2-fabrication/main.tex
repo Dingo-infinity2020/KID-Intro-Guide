@@ -1,0 +1,39 @@
+\input{preamble.tex}
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{2.0cm}
+{\fontsize{30}{38}\selectfont\bfseries\color{KidDark} KID 器件加工与实验入门}\par
+\vspace{0.5cm}
+{\Large\color{KidBlue} 从版图到可测芯片}\par
+\vspace{1.0cm}
+{\large Volume 2 · v0.1 Architecture Draft}\par
+\vfill
+\begin{tcolorbox}[width=0.9\textwidth,colback=KidGray,colframe=KidBlue!55,arc=3mm]
+\centering\large
+本册不试图把读者训练成微纳工艺工程师。\\[0.4em]
+它只做一件事：把每一道工艺步骤重新接回 KID 的可测参数，建立\\[0.4em]
+\textbf{工艺 → 材料/几何 → 电磁参数 → 谐振器 → 低温测量}\\[0.4em]
+这一条可诊断、可追溯的工程链。
+\end{tcolorbox}
+\vfill
+{\large 适合：第一次进入微纳平台前预习、加工记录、低温测试后回溯}\par
+\end{titlepage}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+\clearpage
+
+\include{chapters/ch00_overview}
+\include{chapters/ch01_cleanroom}
+\include{chapters/ch02_substrate_surface}
+\include{chapters/ch03_superconducting_film}
+\include{chapters/ch04_lithography}
+\include{chapters/ch05_pattern_transfer}
+\include{chapters/ch06_dicing_packaging}
+\include{chapters/ch07_metrology}
+\include{chapters/ch08_cryogenic_feedback}
+\include{chapters/ch09_design_for_fabrication}
+
+\end{document}

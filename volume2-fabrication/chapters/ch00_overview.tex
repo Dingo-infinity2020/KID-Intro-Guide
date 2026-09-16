@@ -1,0 +1,42 @@
+\chapter{一块 KID 芯片是怎样“出生”的}
+
+\begin{chaptergoal}
+读完本章，你应该能把版图、薄膜、光刻、图形转移、切片封装、室温表征和低温测量串成一条完整流程，并知道每一阶段至少应留下什么证据。
+\end{chaptergoal}
+
+第一册从光子出发，最终走到 $S_{21}$。这一册把方向反过来：从一张 GDS 版图出发，追踪它如何变成低温系统里的一条 resonance。真正的器件不会严格等于版图：膜厚会偏、线宽会偏、表面会被污染、刻蚀会产生侧壁与残留，封装还会引入额外的电磁边界。加工学习的核心不是记住设备名字，而是建立“偏差从哪里来、最后在哪里看见”的因果链。
+
+\section{全册主链}
+
+\processchain{
+\centering
+设计几何 $\rightarrow$ 实际几何 $\rightarrow$ 材料参数 $\rightarrow$ $L,C,R$ 与表面阻抗 $\rightarrow$ $f_0,Q_i,Q_c$ $\rightarrow$ 阵列 yield / noise
+}
+
+这条链中有三类信息必须始终一起保存：
+
+\begin{enumerate}
+  \item \textbf{设计值}：GDS 中的 linewidth、gap、IDC、coupler、absorber、test coupon；
+  \item \textbf{过程值}：wafer、清洗、沉积 run、膜厚、recipe 名、光刻批次、刻蚀批次、dicing 与封装记录；
+  \item \textbf{测量值}：$R_\square$、$T_c$、厚度、CD、表面/侧壁图像、室温连续性、低温 $f_0$、$Q_i$、$Q_c$、noise。
+\end{enumerate}
+
+如果只有最后的 $S_{21}$，你能知道“器件不对”；如果三类证据都有，才有机会知道“是哪一步不对”。
+
+\section{为什么要用 witness sample 和 test coupon}
+
+主器件本身往往不适合被破坏性测量。加工时应尽可能让同批次的见证片或测试结构承担膜厚、方阻、线宽、接触、刻蚀深度等表征任务。它们的价值不是“多做几块小图形”，而是为主芯片保留过程证据。
+
+\begin{measurebox}
+每一次 run 至少记录：日期、wafer/片号、材料与目标厚度、设备与 recipe 标识、关键设定值、实际读回值、异常事件、对应 GDS/掩膜版本、操作者，以及后续表征结果。不要只在聊天记录或记忆里保存这些信息。
+\end{measurebox}
+
+\section{本册不会给你的东西}
+
+\begin{warningbox}
+本册不会提供可以绕过设备培训的“照抄 recipe”。旋涂、曝光、显影、真空沉积、等离子体、湿法化学、高压和高温设备均应遵循所在平台 SOP。我们关心的是每个旋钮代表什么、它改变什么、应记录什么，以及异常如何传播到 KID 指标。
+\end{warningbox}
+
+\begin{checkpointbox}
+如果某批器件的 $f_0$ 整体偏低，你现在至少应想到三类可能：实际几何改变了 $L$ 或 $C$；材料导致 $L_k$ 改变；封装/环境改变了有效电磁边界。后面的章节就是逐步学会把这三类继续拆开。
+\end{checkpointbox}
