@@ -10,10 +10,10 @@
 
 - v0.1 development milestone：**PASS**
 - v0.1 整册：58 页，第 0–9 章第一轮正文完成
-- v0.2：**in progress**，开始进入平台实测约束、定量案例和数据闭环
+- v0.2：**in progress**，进入平台实测约束、定量案例和数据闭环
 - v0.2 整册首个结构检查点：64 页，严格 CI / 全页视觉 QA 已通过
 - v0.2 新增第 10 章：`wafer metrology -> resonance residual -> collision -> next-GDS correction`
-- v0.2 已加入 template-compatible synthetic generator 和 measured-data adapter
+- v0.2 已加入 template-compatible synthetic generator、measured-data adapter、四张标准诊断图和跨 batch repeatability report
 - 第一原则：不写成泛微纳加工教材，所有知识都要回答“它怎样影响 KID 的 `f0`、`Qi`、`Qc`、`Lk`、吸收、噪声、frequency collision 或 yield？”
 - 完整 v0.1 QA：见 `V0.1_MILESTONE_AUDIT.md`
 
@@ -25,7 +25,7 @@
 - `notes/`：知识地图、工艺—器件参数矩阵、设备学习清单与数据约定
 - `references/`：文献与设备/SOP 证据入口
 - `templates/`：process traveler、run manifest、film batch card、wafer metrology map、resonator map、first-cooldown report
-- `examples/`：可运行的 quantitative demo 与 measured-data adapter
+- `examples/`：synthetic generator、measured-data adapter、diagnostic plotter、cross-batch comparator
 - `figures/`：图件
 - `Makefile`：本地快速构建
 
@@ -100,7 +100,30 @@ python3 examples/analyze_fabrication_feedback.py \
   --collision-margin-linewidths 5
 ```
 
-adapter 会生成 `joined_feedback.csv`、`next_design.csv` 与 `analysis_summary.txt`，但不会偷偷从同一批数据拟合 sensitivity。示例中的 sensitivity、spatial variation 和 collision margin 都是教学参数，不是任何真实加工平台的 specification。详见 `examples/README.md` 和第 10 章。
+adapter 会生成 `joined_feedback.csv`、`next_design.csv` 与 `analysis_summary.txt`，但不会偷偷从同一批数据拟合 sensitivity。
+
+随后可以直接生成四张标准诊断图：
+
+```bash
+python3 examples/plot_fabrication_feedback.py \
+  --joined build/example-feedback-analysis/joined_feedback.csv \
+  --out build/example-feedback-plots
+```
+
+输出包括 wafer `Rsq` map、measured frequency-error map、predictor-vs-measurement、residual map，以及把四张 SVG 集中到一起的 `diagnostic_report.html`。整个绘图层仍只依赖 Python 标准库，因此实验室机器和 CI 不需要额外安装 Matplotlib。
+
+当至少有两批独立数据后，再使用：
+
+```bash
+python3 examples/compare_fabrication_batches.py \
+  --joined batch_A=path/to/A/joined_feedback.csv \
+  --joined batch_B=path/to/B/joined_feedback.csv \
+  --out build/cross-batch
+```
+
+它会输出 `batch_summary.csv` 和 `repeatability_report.md`，检查同一套 predictor 的方向、尺度、残差和跨 batch 一致性，但不会替项目规定一个虚假的“通用 PASS 阈值”。
+
+示例中的 sensitivity、spatial variation 和 collision margin 都是教学参数，不是任何真实加工平台的 specification。详见 `examples/README.md` 和第 10 章。
 
 ## 写作约定
 
