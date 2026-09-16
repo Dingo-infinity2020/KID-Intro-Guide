@@ -22,9 +22,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
-      - name: Build only changed chapters on development pushes
+      - name: Detect TeX work before starting TeX Live
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed="$(git diff-tree --no-commit-id --name-only -r HEAD || true)"
+          printf '%s\n' "$changed"
+
+          structural=false
+          if printf '%s\n' "$changed" | grep -Eq '^volume2-fabrication/(main|preamble|chapter-preview)\.tex$|^volume2-fabrication/Makefile$|^\.github/workflows/build-volume2\.yml$'; then
+            structural=true
+          fi
+
+          chapters="$(printf '%s\n' "$changed" | sed -n 's#^volume2-fabrication/chapters/\(.*\)\.tex$#\1#p' | sort -u | tr '\n' ' ')"
+          need_tex=false
+          if [ "$structural" = true ] || [ -n "${chapters// }" ]; then
+            need_tex=true
+          fi
+
+          echo "structural=$structural" >> "$GITHUB_OUTPUT"
+          echo "chapters=$chapters" >> "$GITHUB_OUTPUT"
+          echo "need_tex=$need_tex" >> "$GITHUB_OUTPUT"
+
+      - name: Build only required Volume 2 PDFs
+        if: steps.detect.outputs.need_tex == 'true'
         uses: xu-cheng/texlive-action@v3
         with:
           os: debian
@@ -34,40 +58,22 @@ jobs:
             cd volume2-fabrication
             mkdir -p build/chapters
 
-            # Development pushes should not rebuild the whole book unless a
-            # structural file changed. For the first commit on a branch, or if
-            # history is unavailable for any reason, fall back to one full build.
-            structural=0
-            if git -C .. rev-parse HEAD^ >/dev/null 2>&1; then
-              changed=$(git -C .. diff --name-only HEAD^ HEAD)
-            else
-              changed=''
-              structural=1
-            fi
-
-            if echo "$changed" | grep -Eq '^volume2-fabrication/(main|preamble|chapter-preview)\.tex$|^\.github/workflows/build-volume2\.yml$'; then
-              structural=1
-            fi
-
-            if [ "$structural" -eq 1 ]; then
+            if [ "${{ steps.detect.outputs.structural }}" = "true" ]; then
               echo 'Structural change detected; running one full Volume 2 build.'
               make full
-              exit 0
+            else
+              for ch in ${{ steps.detect.outputs.chapters }}; do
+                echo "Building preview for $ch"
+                make chapter CH="$ch"
+              done
             fi
 
-            chapters=$(echo "$changed" | sed -n 's#^volume2-fabrication/chapters/\(.*\)\.tex$#\1#p' | sort -u)
-            if [ -z "$chapters" ]; then
-              echo 'No TeX chapter changed; skipping PDF build.'
-              exit 0
-            fi
-
-            for ch in $chapters; do
-              echo "Building preview for $ch"
-              make chapter CH="$ch"
-            done
+      - name: Skip note for non-TeX changes
+        if: steps.detect.outputs.need_tex != 'true'
+        run: echo 'No TeX source changed; TeX Live was not started.'
 
       - name: Upload preview PDFs
-        if: always()
+        if: steps.detect.outputs.need_tex == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: KID-Volume2-preview

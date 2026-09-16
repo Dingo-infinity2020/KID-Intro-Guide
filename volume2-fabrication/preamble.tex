@@ -26,6 +26,9 @@
 \setstretch{1.15}
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0.25em}
+% Bilingual technical prose can contain long English compounds. Give TeX a
+% controlled last-resort stretch before it creates an overfull line.
+\setlength{\emergencystretch}{4em}
 \setlist[itemize]{leftmargin=2em,itemsep=0.25em,topsep=0.4em}
 \setlist[enumerate]{leftmargin=2em,itemsep=0.25em,topsep=0.4em}
 
