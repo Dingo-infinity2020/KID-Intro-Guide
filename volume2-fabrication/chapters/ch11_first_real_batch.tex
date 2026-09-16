@@ -1,0 +1,265 @@
+\chapter{第一次真实数据怎么接进来：从原始表格到跨批次验证}
+
+\begin{chaptergoal}
+把第 10 章的定量闭环变成一套第一次拿到真实 wafer / cooldown 数据就能照着执行的 runbook：先保护原始数据与身份映射，再运行 adapter，自动生成四张诊断图，最后用独立 batch 检查 predictor 是否具有 repeatability；明确哪些结果只是分析输出，哪些证据足够进入下一版 GDS review。
+\end{chaptergoal}
+
+第 10 章解决的是“\textbf{应该怎样建模}”。这一章解决更实际的问题：
+
+\begin{quote}
+第一批真实 KID 数据到手以后，我到底先打开哪个文件、先检查什么、运行什么脚本，最后哪些结果可以拿去讨论下一版版图？
+\end{quote}
+
+这一步看起来偏数据管理，但它其实决定了 fabrication learning 能不能积累。如果第一批 wafer 的 metrology、版图、低温 notch 和 package 信息从一开始就彼此脱节，后面再复杂的 regression 也只是给混乱加一层数学外壳。
+
+\processchain{raw metrology / raw resonance map $\rightarrow$ ID audit $\rightarrow$ stated-model analysis $\rightarrow$ four diagnostic views $\rightarrow$ independent-batch comparison $\rightarrow$ next-GDS review}
+
+\section{第一条规则：raw data 一旦进入正式分析，就不要原地改写}
+
+建议每一批数据一开始就分成三层：
+
+\begin{verbatim}
+BATCH_2026_001/
+  raw/
+  derived/
+  figures/
+  provenance/
+\end{verbatim}
+
+其中：
+
+\begin{itemize}
+  \item \texttt{raw/}：原始 metrology / resonance mapping 表；
+  \item \texttt{derived/}：join、predictor、residual、next-design proposal；
+  \item \texttt{figures/}：自动生成的诊断图；
+  \item \texttt{provenance/}：模型系数来源、Git commit、分析日期和必要说明。
+\end{itemize}
+
+这个分层的目的不是“目录更整齐”，而是避免一个很常见的问题：为了让某次分析脚本顺利运行，手工改了原始 CSV，几周后已经说不清哪一列是仪器直接测到的、哪一列是后来推出来的。
+
+\begin{warningbox}
+\textbf{raw 不等于绝对正确。} 如果发现原始表格确实有错误，应保留原版本，并通过 revision / correction log 生成新版本；不要悄悄覆盖旧文件。
+\end{warningbox}
+
+\section{先检查身份映射，再检查数值是否“漂亮”}
+
+对准备进入 feedback loop 的每个 resonator，至少应该能够追溯：
+
+\[
+\texttt{resonator\_id}
+\rightarrow
+\texttt{die\_id}
+\rightarrow
+(x,y)
+\rightarrow
+f_0^{\mathrm{design}}
+\rightarrow
+f_0^{\mathrm{meas}}.
+\]
+
+以下任何一种情况，都应该先处理 mapping，而不是继续做 regression：
+
+\begin{itemize}
+  \item 同一个 \texttt{resonator\_id} 在同一张表里重复；
+  \item notch 与 design resonator 无法唯一对应；
+  \item die 翻转/旋转后坐标约定不清楚；
+  \item blanket-film witness 被错误当成某个 resonator 的局部直接测量；
+  \item frequency collision 让两个 resonance 的身份本身不确定。
+\end{itemize}
+
+v0.2 的 adapter 因此故意很保守：默认按非空 \texttt{resonator\_id} 做一对一 join，不自动用最近坐标“猜”匹配。
+
+\section{模型系数必须像实验数据一样有出处}
+
+当前最小 adapter 需要显式输入：
+
+\begin{itemize}
+  \item kinetic-inductance fraction proxy：$\alpha_k$；
+  \item sheet-resistance reference：$R_{\square,0}$；
+  \item linewidth sensitivity：$s_w$；
+  \item collision margin：$m$。
+\end{itemize}
+
+建议每一次正式分析同时保存：
+
+\begin{verbatim}
+alpha_k_source = ...
+rsq_reference_source = ...
+linewidth_sensitivity_source = ...
+collision_margin_source = ...
+analysis_git_commit = ...
+analysis_date = ...
+\end{verbatim}
+
+这里最关键的是 \texttt{source}。一个数字来自 EM sweep、解析近似、独立 calibration batch，还是当前 batch 自己的 regression，统计意义完全不同。
+
+如果 $s_w$ 就是从 Batch A 自己拟合出来的，那么“Batch A 的 residual 明显变小”只能说明模型有描述能力，不能算独立验证。
+
+\section{运行 measured-data adapter}
+
+真实数据与 synthetic demo 使用相同的输入契约：
+
+\begin{verbatim}
+python3 examples/analyze_fabrication_feedback.py \
+  --metrology BATCH_2026_001/raw/wafer_metrology_map.csv \
+  --resonators BATCH_2026_001/raw/resonator_map.csv \
+  --out BATCH_2026_001/derived \
+  --alpha-k <value> \
+  --rsq-reference-ohm-sq <value> \
+  --linewidth-sensitivity <value> \
+  --collision-margin-linewidths <value>
+\end{verbatim}
+
+第一眼不要先看 correlation，而先看 \texttt{analysis\_summary.txt} 的数据完整性：
+
+\begin{itemize}
+  \item \texttt{joined\_resonators}；
+  \item \texttt{excluded\_incomplete}；
+  \item \texttt{unmatched\_metrology}；
+  \item \texttt{unmatched\_resonators}。
+\end{itemize}
+
+如果本来设计了 64 个 resonator，最后只有 37 个成功 join，那么当前最重要的问题通常不是 predictor 的 $R^2$，而是另外 27 个器件为什么没有进入可解释的数据链。
+
+\section{四张标准诊断图现在已经可以自动生成}
+
+第 10 章提出的四张图在 v0.2 已经落实为 \texttt{examples/plot\_fabrication\_feedback.py}。运行：
+
+\begin{verbatim}
+python3 examples/plot_fabrication_feedback.py \
+  --joined BATCH_2026_001/derived/joined_feedback.csv \
+  --out BATCH_2026_001/figures
+\end{verbatim}
+
+脚本只使用 Python 标准库，并生成：
+
+\begin{enumerate}
+  \item \texttt{wafer\_rsq\_map.svg}：$R_\square$ 的 wafer-coordinate map；
+  \item \texttt{frequency\_error\_map.svg}：measured frequency error 的空间图；
+  \item \texttt{predictor\_vs\_measurement.svg}：$\hat{\epsilon}$ 对 $\epsilon$；
+  \item \texttt{residual\_map.svg}：$r_i$ 的空间图；
+  \item \texttt{diagnostic\_report.html}：把四张 SVG 放在一页里查看。
+\end{enumerate}
+
+这里最值得强调的是第四张图。一个 predictor 即使把全局标准差从 800 ppm 压到 200 ppm，如果 residual map 仍然保留非常清晰的中心到边缘梯度，就意味着模型仍漏掉了一个系统变量。
+
+因此“residual 变小”不是终点，\textbf{residual 是否还具有结构}往往更有诊断价值。
+
+\section{怎么看 predictor-vs-measurement 图}
+
+理想情况下，点云应该靠近
+\[
+y=x
+\]
+这条线，但真实数据不会完美落在线上。
+
+可以分别观察：
+
+\begin{itemize}
+  \item \textbf{整体斜率明显小于 1：} predictor 可能把 systematic amplitude 估得过大；
+  \item \textbf{整体斜率明显大于 1：} predictor 可能低估了 sensitivity；
+  \item \textbf{明显非零截距：} 可能还存在没有写进模型的 global offset；
+  \item \textbf{出现两簇：} 检查是否混入不同 die / package / process split；
+  \item \textbf{相关性看起来不错，但 residual 有空间梯度：} predictor 抓住一部分趋势，但 root-cause model 仍不完整。
+\end{itemize}
+
+这些都只是 hypothesis generator，不应该单凭一张散点图直接宣布某个工艺变量就是原因。
+
+\section{从第二批开始，不再只看单批“拟合得好不好”}
+
+仓库中的 \texttt{examples/compare\_fabrication\_batches.py} 接受两个或更多已经分析完成的 \texttt{joined\_feedback.csv}：
+
+\begin{verbatim}
+python3 examples/compare_fabrication_batches.py \
+  --joined batch_A=BATCH_2026_001/derived/joined_feedback.csv \
+  --joined batch_B=BATCH_2026_002/derived/joined_feedback.csv \
+  --out CROSS_BATCH_2026_001_002
+\end{verbatim}
+
+它输出：
+
+\begin{itemize}
+  \item \texttt{batch\_summary.csv}；
+  \item \texttt{repeatability\_report.md}。
+\end{itemize}
+
+比较量包括 measured scatter、predicted scatter、residual scatter、predictor--measurement correlation、linear scale 和 residual mean。
+
+这里\textbf{故意没有}内置一个通用 PASS/FAIL 数字，因为不同 KID architecture、readout spacing 和 fabrication maturity 对“足够好”的定义并不相同。
+
+真正应该比较的是：
+
+\begin{enumerate}
+  \item predictor 的符号是否在独立 batch 中仍然正确；
+  \item amplitude / slope 是否仍在相近尺度；
+  \item residual mean 是否持续出现同方向 offset；
+  \item residual scatter 是否稳定低于 raw measured scatter；
+  \item residual map 的空间结构是否重复出现。
+\end{enumerate}
+
+如果一个模型只解释 Batch A，到了 Batch B 就完全失效，那么它更像 batch-specific description，而不是已经沉淀成设计规则的 process knowledge。
+
+\section{什么时候 \texttt{next\_design.csv} 才能进入 GDS review}
+
+脚本生成 correction 很容易，真正困难的是判断 correction 是否值得相信。
+
+建议至少满足以下证据链，再把它带进下一版版图讨论：
+
+\begin{itemize}
+  \item 输入数据的 ID / coordinate mapping 已经可靠；
+  \item predictor 中每个系数都能说明 provenance；
+  \item systematic component 在独立 batch 或 controlled split 上有 repeatability；
+  \item correction 主要针对 systematic bias，而不是不可重复 random scatter；
+  \item correction 后的 frequency ordering、spacing 和 collision risk 已重新检查；
+  \item 下一批之前没有发生足以使模型失效的重大 material / process / tool revision。
+\end{itemize}
+
+\begin{warningbox}
+\texttt{next\_design.csv} 是 \textbf{review proposal}，不是自动 tapeout 指令。真实项目中不建议让分析脚本直接改 GDS，更不建议让一个未经跨批验证的 regression 自动闭环到 mask generation。
+\end{warningbox}
+
+\section{第一次真实 batch 的最小归档}
+
+一次完整的 fabrication-feedback run 建议至少留下：
+
+\begin{verbatim}
+raw/wafer_metrology_map.csv
+raw/resonator_map.csv
+derived/joined_feedback.csv
+derived/next_design.csv
+derived/analysis_summary.txt
+figures/wafer_rsq_map.svg
+figures/frequency_error_map.svg
+figures/predictor_vs_measurement.svg
+figures/residual_map.svg
+figures/diagnostic_report.html
+provenance/model_inputs.txt
+run_manifest.yaml
+first_cooldown_report.md
+\end{verbatim}
+
+这份列表的真正验收问题只有一个：
+
+\begin{quote}
+半年以后，能不能明确回答“这次 design correction 是依据哪一批 wafer、哪一组 metrology、哪一次 cooldown、哪一版脚本和哪一组 sensitivity 做出的？”
+\end{quote}
+
+如果答案是“可以”，那么 fabrication learning 已经从一次性的调试，开始变成可以积累的工程知识。
+
+\begin{measurebox}
+\textbf{First Real Batch 最小工作流：}
+复制模板并冻结 raw；检查 resonator ID / coordinate；记录 sensitivity provenance；运行 measured-data adapter；检查 join coverage；生成四张标准图；只把 \texttt{next\_design.csv} 当 proposal；第二批开始固定做 cross-batch comparison。
+\end{measurebox}
+
+\begin{checkpointbox}
+如果第一次真实 wafer 的数据并不完整，不要为了“把 pipeline 跑完”而伪造缺失字段。保留空值、报告 unmatched / incomplete，并把缺失数据本身变成下一轮实验流程需要补上的项目。一个诚实的不完整 data contract，比一个看起来完整但身份错误的数据集更有价值。
+\end{checkpointbox}
+
+\section*{配套文件}
+
+\begin{itemize}
+  \item \texttt{notes/FIRST\_REAL\_BATCH\_RUNBOOK.md}：同一套流程的命令行版 checklist；
+  \item \texttt{examples/analyze\_fabrication\_feedback.py}：measured-data adapter；
+  \item \texttt{examples/plot\_fabrication\_feedback.py}：四张标准诊断图；
+  \item \texttt{examples/compare\_fabrication\_batches.py}：跨 batch repeatability report。
+\end{itemize}
