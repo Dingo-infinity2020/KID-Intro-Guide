@@ -1,8 +1,8 @@
 # Volume 2 Status
 
-## v0.1 milestone candidate
+## v0.1 development milestone — PASS
 
-第二册已经从“架构验证”推进到第一轮完整正文：第 0–9 章都已经有可连续阅读的内容，并继续保持独立分册、单章快速编译和与第一册 v0.10 解耦的维护方式。
+第二册已经完成第一轮完整正文与 milestone QA：第 0–9 章可以连续阅读，并继续保持独立分册、单章快速编译和与第一册 v0.10 解耦的维护方式。
 
 ### 已建立
 
@@ -17,7 +17,10 @@
 - fabrication process traveler；
 - 每章 must-answer / exit-competency contract；
 - 独立 GitHub Actions workflow；
-- 普通章节 push 的增量编译，以及 Markdown/模板修改的 TeXLive 跳过逻辑。
+- 普通章节 push 的增量编译；
+- Markdown/模板修改的 TeXLive 跳过逻辑；
+- full build 严格日志门禁；
+- 58 页整册 CI PDF 与全页视觉 QA。
 
 ### 第 0–9 章第一版正文
 
@@ -36,16 +39,36 @@
 
 `process variable -> real material/geometry -> electromagnetic/superconducting parameter -> f0/Qi/Qc/noise/yield -> next fabrication decision`
 
+### v0.1 QA 摘要
+
+最终审计基准：`014457073b13a775a5eda40676913ccde9adc954`
+
+GitHub Actions run：`35085673096`
+
+- 58 pages；
+- Overfull 0；
+- bookmark/math-token warning 0；
+- undefined refs/citations 0；
+- missing characters 0；
+- Underfull hbox 12（非致命）；
+- fonts embedded PASS；
+- `pdftotext` replacement chars 0；
+- 58/58 pages rendered；
+- visual QA PASS。
+
+完整记录见 `V0.1_MILESTONE_AUDIT.md`。
+
 ### 当前维护策略
 
-开发分支普通 push 只编译本次修改的章节；只改 Markdown/模板时应直接跳过 TeXLive。整册编译保留给结构变更、手工 milestone，以及 PR 从 draft 切换到 ready-for-review 等检查点。
+开发分支普通 push 只编译本次修改的章节；只改 Markdown/模板时直接跳过 TeXLive。整册编译用于结构变更、手工 milestone，以及 PR 从 draft 切换到 ready-for-review 等检查点。full build 同时执行严格 TeX 日志审计。
 
-这样继续扩一章时，不需要反复重新编译第一册 144 页，也不需要每次都完整重编第二册。
+### 下一阶段
 
-### v0.1 milestone 尚需完成
+v0.1 之后不再把主要工作定义成“补齐章节”，而转向：
 
-1. 验证 Markdown-only push 确实不启动 TeXLive；
-2. 对最新整册执行编译日志审计：页数、Overfull、bookmark/math-token、undefined refs/citations、missing characters；
-3. 下载 CI PDF，逐页渲染并做视觉 QA；
-4. 将最终审计结果写入仓库，并同步 Draft PR #6 描述；
-5. 实际进入目标微纳平台培训后，再依据 material policy / tool capability / SOP 编号修正平台相关内容；公开讲义仍不复制危险化学或设备操作 recipe。
+1. 实际进入目标微纳平台培训后，依据 material policy / tool capability / SOP 编号修正平台相关内容；
+2. 加入真实或公开数据驱动的定量案例：film/CD wafer map、resonance map、collision/yield、first-cooldown diagnosis；
+3. 把 traveler、batch card、metrology report、cooldown report 与 resonator mapping 做成更可直接复用的数据模板；
+4. 逐步建立 design tolerance -> fabrication statistics -> low-temperature feedback -> next GDS 的可计算闭环。
+
+公开讲义仍不复制危险化学或设备操作 recipe，实际工艺条件以目标平台培训和 SOP 为准。
