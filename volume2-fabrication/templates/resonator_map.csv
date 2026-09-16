@@ -1,0 +1,1 @@
+project_id,batch_id,wafer_id,die_id,resonator_id,gds_revision,package_id,cooldown_id,x_mm,y_mm,design_f0_Hz,measured_f0_Hz,delta_f_Hz,delta_f_frac,Qr,Qi,Qc,fit_status,mapping_status,collision_status,readout_power_dBm,stage_temperature_K,notes

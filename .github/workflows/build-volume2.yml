@@ -1,0 +1,163 @@
+name: Build KID Volume 2
+
+on:
+  push:
+    branches:
+      - 'volume2-*'
+    paths:
+      - 'volume2-fabrication/**'
+      - '.github/workflows/build-volume2.yml'
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+    paths:
+      - 'volume2-fabrication/**'
+      - '.github/workflows/build-volume2.yml'
+  workflow_dispatch:
+
+jobs:
+  preview:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect TeX work before starting TeX Live
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          changed="$(git diff-tree --no-commit-id --name-only -r HEAD || true)"
+          printf '%s\n' "$changed"
+
+          structural=false
+          if printf '%s\n' "$changed" | grep -Eq '^volume2-fabrication/(main|preamble|chapter-preview)\.tex$|^volume2-fabrication/Makefile$|^\.github/workflows/build-volume2\.yml$'; then
+            structural=true
+          fi
+
+          chapters="$(printf '%s\n' "$changed" | sed -n 's#^volume2-fabrication/chapters/\(.*\)\.tex$#\1#p' | sort -u | tr '\n' ' ')"
+          need_tex=false
+          if [ "$structural" = true ] || [ -n "${chapters// }" ]; then
+            need_tex=true
+          fi
+
+          echo "structural=$structural" >> "$GITHUB_OUTPUT"
+          echo "chapters=$chapters" >> "$GITHUB_OUTPUT"
+          echo "need_tex=$need_tex" >> "$GITHUB_OUTPUT"
+
+      - name: Build only required Volume 2 PDFs
+        if: steps.detect.outputs.need_tex == 'true'
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd volume2-fabrication
+            mkdir -p build/chapters
+
+            audit_full_log() {
+              log=build/main.log
+              test -s build/main.pdf
+              test -s "$log"
+
+              if grep -Fq 'Overfull \hbox' "$log"; then
+                echo 'ERROR: Overfull hbox found in full-book build.'
+                grep -F 'Overfull \hbox' "$log" || true
+                exit 1
+              fi
+              if grep -Fq 'Token not allowed in a PDF string' "$log"; then
+                echo 'ERROR: hyperref PDF-string warning found.'
+                grep -F 'Token not allowed in a PDF string' "$log" || true
+                exit 1
+              fi
+              if grep -Eqi 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' "$log"; then
+                echo 'ERROR: undefined reference or citation found.'
+                grep -Ei 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' "$log" || true
+                exit 1
+              fi
+              if grep -Fq 'Missing character:' "$log"; then
+                echo 'ERROR: missing glyph found.'
+                grep -F 'Missing character:' "$log" || true
+                exit 1
+              fi
+
+              underfull=$(grep -Fc 'Underfull \hbox' "$log" || true)
+              pages=$(grep -oE 'Output written on build/main\.pdf \([0-9]+ pages\)' "$log" | tail -1 || true)
+              echo "FULL_BUILD_AUDIT_PASS underfull_hbox=${underfull} ${pages}"
+            }
+
+            if [ "${{ steps.detect.outputs.structural }}" = "true" ]; then
+              echo 'Structural change detected; running one full Volume 2 build.'
+              make full
+              audit_full_log
+            else
+              for ch in ${{ steps.detect.outputs.chapters }}; do
+                echo "Building preview for $ch"
+                make chapter CH="$ch"
+              done
+            fi
+
+      - name: Skip note for non-TeX changes
+        if: steps.detect.outputs.need_tex != 'true'
+        run: echo 'No TeX source changed; TeX Live was not started.'
+
+      - name: Upload preview PDFs
+        if: steps.detect.outputs.need_tex == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: KID-Volume2-preview
+          path: volume2-fabrication/build/*.pdf
+          if-no-files-found: ignore
+
+  full:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and audit complete Volume 2
+        uses: xu-cheng/texlive-action@v3
+        with:
+          os: debian
+          scheme: full
+          run: |
+            set -euo pipefail
+            cd volume2-fabrication
+            make full
+            test -s build/main.pdf
+            test -s build/main.log
+
+            if grep -Fq 'Overfull \hbox' build/main.log; then
+              echo 'ERROR: Overfull hbox found in full-book build.'
+              grep -F 'Overfull \hbox' build/main.log || true
+              exit 1
+            fi
+            if grep -Fq 'Token not allowed in a PDF string' build/main.log; then
+              echo 'ERROR: hyperref PDF-string warning found.'
+              grep -F 'Token not allowed in a PDF string' build/main.log || true
+              exit 1
+            fi
+            if grep -Eqi 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' build/main.log; then
+              echo 'ERROR: undefined reference or citation found.'
+              grep -Ei 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' build/main.log || true
+              exit 1
+            fi
+            if grep -Fq 'Missing character:' build/main.log; then
+              echo 'ERROR: missing glyph found.'
+              grep -F 'Missing character:' build/main.log || true
+              exit 1
+            fi
+
+            underfull=$(grep -Fc 'Underfull \hbox' build/main.log || true)
+            pages=$(grep -oE 'Output written on build/main\.pdf \([0-9]+ pages\)' build/main.log | tail -1 || true)
+            echo "FULL_BUILD_AUDIT_PASS underfull_hbox=${underfull} ${pages}"
+
+      - name: Upload complete PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: KID-Volume2-full
+          path: volume2-fabrication/build/main.pdf

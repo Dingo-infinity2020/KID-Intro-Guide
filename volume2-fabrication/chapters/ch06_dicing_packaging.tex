@@ -1,0 +1,161 @@
+\chapter{切片、封装与 Wire Bond：加工并没有在晶圆上结束}
+
+\begin{chaptergoal}
+理解 dicing、die handling、芯片固定、接地、wire bond、封装腔体、连接器和光学背腔都会改变器件的机械与电磁边界；建立 package revision 与 bond map 的记录习惯；学会区分“裸芯片本身的问题”和“装进盒子以后才出现的问题”。
+\end{chaptergoal}
+
+很多器件在 wafer 上是好的，装进 package 后却出现 baseline ripple、spurious resonance、$Q_i$ 下降或 feedline transmission 异常。原因并不神秘：\textbf{封装本身就是 microwave circuit 的一部分。}
+
+\processchain{dicing / die attach / package / bond / connector $\rightarrow$ ground return、寄生 $L/C$、腔体与缝隙边界、光学位置 $\rightarrow$ feedline / resonator 环境改变 $\rightarrow$ $S_{21}$ baseline、spurious modes、$Q_i/Q_c$、串扰与 optical coupling}
+
+\section{Dicing：从 wafer 变成 die 的第一道风险}
+
+切片不是“把晶圆切小”这么简单。对 KID 来说，需要关心至少四类后果：
+
+\begin{itemize}
+  \item edge chipping / crack 是否侵入有效器件区；
+  \item 颗粒、切削残留或保护材料是否污染金属和 gap；
+  \item die 尺寸公差是否影响 package fit、背短路间距或 optical alignment；
+  \item die handling 是否增加划伤、静电或局部机械应力风险。
+\end{itemize}
+
+因此 GDS 阶段就应定义 dicing street / keep-out，而不是 wafer 做完后再临时寻找下刀位置。
+
+\begin{warningbox}
+实际 dicing 参数、保护层、清洗和机械操作必须由目标平台 SOP 与设备管理员决定。本章不提供可直接执行的 blade / speed / coolant 等 recipe，只讨论 KID 需要验收哪些结果。
+\end{warningbox}
+
+\section{Die attach：固定方式也会进入电磁边界}
+
+芯片需要被固定、热化并保持目标位置。任何 adhesive、clamp、metal contact 或 backside support 都可能同时影响：
+
+\begin{itemize}
+  \item thermal path：芯片是否可靠热化到冷台；
+  \item mechanical stress：降温收缩后是否产生应力；
+  \item microwave boundary：substrate backside 周围是否出现额外电场/电流路径；
+  \item optical geometry：背短路、horn、lens 或 absorber-to-backshort spacing 是否保持设计值。
+\end{itemize}
+
+所以“同一片芯片换一个盒子”并不是严格意义上的同一实验。如果 package geometry 或 die attach 改了，应当作为新的 package revision 记录。
+
+\section{Wire bond 不只是直流连接}
+
+一根 bond wire 在 GHz 下具有明显电感，它不是理想零阻抗短路。大量 ground bonds 的作用也不只是“接地”，而是帮助芯片 ground 与 package ground 在微波频段保持接近等势，并抑制某些 slotline / common-mode 激励。
+
+如果 ground plane 两侧被 feedline gap 分开，却没有足够的跨接或 package return path，就可能出现设计中没有的奇模或寄生传播路径。
+
+已有 superconducting microwave chip-mount 研究直接展示了 wirebond arrangement、chip-to-box capacitance 与 cavity / slotline / crosstalk mode 之间的关系。这说明在 KID module 中，bond map 应该像 GDS 一样有版本，而不是“现场看着多打几根”。
+
+\subsection{Signal bond 与 ground bond 要分开思考}
+
+signal bond 需要保持 feedline transition 的阻抗连续性；ground bond 更关心回流路径和地平面等势。两类 bond 的失败模式不同：
+
+\begin{itemize}
+  \item signal bond 异常更容易直接表现为 transmission 很差或断路；
+  \item ground return 不好可能仍然“有信号”，但 baseline、spurious modes、crosstalk 或 resonance line shape 会变差。
+\end{itemize}
+
+\section{Package cavity 与 seam：盒子也会谐振}
+
+任何有限尺寸的导电腔体都存在 electromagnetic modes。package、lid、chip、PCB、connector 和空隙共同决定这些 mode 的频率与耦合强弱。
+
+如果 package mode 靠近 KID readout band，它可能表现为：
+
+\begin{itemize}
+  \item 很宽或很深、与单个 resonator 不同的 $S_{21}$ 结构；
+  \item 大范围 baseline ripple；
+  \item 多个 resonator 同时受到影响；
+  \item 换 package/lid/bond 后频率或形状明显变化。
+\end{itemize}
+
+更微妙的是 package conductor / seam loss：即使没有明显 spurious resonance，电磁场或感应电流如果参与了有损 package 区域，也可能限制可达到的 $Q_i$。近年来的 superconducting resonator experiments 已经能通过专门几何把 surface、bulk 和 package loss 分离出来。
+
+因此，看到 $Q_i$ 不高时，不应自动把责任全部推给超导膜。
+
+\section{150 GHz LEKID 还多了一层：光学封装}
+
+对于 horn-coupled 或 backshort-coupled LEKID，module 同时有两套电磁问题：
+
+\begin{enumerate}
+  \item GHz readout：feedline、bond、ground、connector、package modes；
+  \item 150 GHz optical path：waveguide/horn、substrate、absorber positioning、backshort 与缝隙。
+\end{enumerate}
+
+这两套系统可能共用同一块金属盒，但容差关注点完全不同。某个 mechanical spacer 在 GHz 看起来只是结构件，在 150 GHz 可能已经是重要的 electrical length。
+
+因此 module drawing 中应明确区分：
+
+\begin{itemize}
+  \item microwave critical dimensions；
+  \item optical critical dimensions；
+  \item purely mechanical clearances。
+\end{itemize}
+
+\section{Package revision 必须和 chip revision 解耦}
+
+建议从第一批器件就使用两套版本号：
+
+\begin{center}
+\texttt{Chip GDS Rev C03} \qquad + \qquad \texttt{Package Rev P02}
+\end{center}
+
+一次 cooldown 的 sample identity 至少应能追溯到：
+
+\[
+\text{wafer/die ID}
++\text{GDS rev}
++\text{film batch}
++\text{package rev}
++\text{bond map rev}.
+\]
+
+否则半年后看到“C03 的 $Q_i$ 很差”，你可能根本不知道那次测试用的是哪个 package。
+
+\section{建立 Bond Map，而不是只拍一张照片}
+
+bond map 可以非常简单：在 package drawing 或高分辨率装配照片上标出每根或每组 bond 的功能和位置，例如 signal-in、signal-out、ground stitching、跨 feedline ground bridge 等。
+
+返工时也要更新。因为“断了一根又补了两根”对 GHz 电路并不是完全无关的小修。
+
+\begin{measurebox}
+\textbf{Package / Bond Card 最小字段：}
+package revision；die ID 与 orientation；die attach 方法/材料 ID；关键 spacer/backshort dimension；connector / PCB / transition revision；signal bond 数量与位置；ground bond map；装配照片；返工记录；continuity test；对应 cooldown ID。
+\end{measurebox}
+
+\section{室温先做哪些 package sanity check}
+
+在送进低温系统前，可以先做不昂贵的检查来避免浪费一次 cooldown：
+
+\begin{itemize}
+  \item die 是否坐平、方向是否正确；
+  \item 芯片边缘是否有明显崩裂或压伤；
+  \item wire bond 是否有明显脱落、互碰、跨错 pad；
+  \item signal path continuity 是否合理；
+  \item connector / transition 是否固定；
+  \item optical stack 的关键 spacer / lid / backshort 是否装对 revision；
+  \item 拍摄可追溯的最终装配照片。
+\end{itemize}
+
+对可在室温进行的 VNA / continuity 预检，应把它当作“找灾难性错误”的 gate，而不是期待看到低温 superconducting resonance。
+
+\section{如何区分 chip problem 和 package problem}
+
+一个很有用的思路是做 package swap 或 reference structure。
+
+如果同一 die 在不同 package 中表现显著不同，或者多个不同 die 在同一个 package 中都出现相似 baseline/spurious features，那么 package hypothesis 的优先级会上升。
+
+反过来，如果异常随着 die / wafer 走，而 package 保持不变，则更应回查 film / lithography / etch。
+
+这仍然不是数学证明，但它是一种非常便宜的 controlled experiment。
+
+\begin{checkpointbox}
+当你看到一条难看的 $S_{21}$ baseline 时，现在应该先问：这是单个 resonator 的问题，还是整个 feedline/package 的问题？换 lid、bond、connector 或 package 后是否跟着变？如果没有 package revision 和 bond map，这个问题往往根本无法回答。
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item J. Wenner et al., wirebond crosstalk and cavity/slotline modes in superconducting chip mounts, \href{https://arxiv.org/abs/1011.4982}{arXiv:1011.4982}.
+  \item Y. Huang et al., conducting package losses limiting superconducting resonator $Q_i$, \href{https://arxiv.org/abs/2304.08629}{arXiv:2304.08629}.
+  \item \textit{Surpassing millisecond coherence in on-chip superconducting quantum memories...}, multimode separation of surface, bulk and package losses, \href{https://www.nature.com/articles/s41467-024-47857-6}{Nature Communications 15, 2024}.
+\end{itemize}

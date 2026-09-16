@@ -1,0 +1,177 @@
+\chapter{一块 KID 芯片是怎样“出生”的}
+
+\begin{chaptergoal}
+读完本章，你应该能把版图、薄膜、光刻、图形转移、切片封装、室温表征和低温测量串成一条完整流程；能解释为什么 GDS 不等于真实器件；并开始用 Batch ID、process traveler、witness sample 和 test coupon 为每一批器件保留可追溯证据。
+\end{chaptergoal}
+
+第一册从光子出发，最终走到 $S_{21}$。这一册把方向反过来：从一张 GDS 版图出发，追踪它怎样变成低温系统里的一条 resonance。
+
+一个很容易产生的错觉是：\textbf{只要版图画对了，加工就是把图形“复印”到晶圆上。}真实情况不是这样。薄膜厚度会偏，材料参数会随位置变化；光刻会有 critical-dimension（CD）bias；刻蚀会改变边缘和侧壁；残胶、污染、切片和封装会继续改变器件。最终测到的 $f_0$、$Q_i$、$Q_c$ 和噪声，是整条制造链共同作用后的结果。
+
+因此，加工学习的核心不是先背设备名和 recipe，而是建立一句始终不丢的主线：
+
+\begin{processbox}
+\centering
+\textbf{工艺变量}
+$\rightarrow$
+\textbf{材料/真实几何}
+$\rightarrow$
+\textbf{电磁与超导参数}
+$\rightarrow$
+\textbf{谐振器可观测量}
+$\rightarrow$
+\textbf{阵列 yield 与科学可用性}
+\end{processbox}
+
+\section{先把“设计器件”和“真实器件”分开}
+
+仿真中的器件通常由一组确定参数定义，例如：
+
+\[
+\{w,g,t,\epsilon_r,T_c,R_\square,\ldots\}_{\rm design}.
+\]
+
+加工之后，这些量变成具有偏差和分布的实际参数：
+
+\[
+\{w+\delta w,\;g+\delta g,\;t+\delta t,\;R_\square+\delta R_\square,\ldots\}_{\rm fabricated}.
+\]
+
+这里最重要的不是“误差总是存在”这句废话，而是进一步问三件事：
+
+\begin{enumerate}
+  \item 偏差是\textbf{系统性的}还是\textbf{随机的}？例如整片线宽都宽 $0.2\,\mu\mathrm{m}$，和少数位置随机缺口，处理方式完全不同。
+  \item 偏差是\textbf{局部的}还是\textbf{wafer-scale 的}？膜厚从晶圆中心向边缘平滑变化，可能让整片 resonance map 发生有空间结构的扭曲。
+  \item 偏差能不能\textbf{被测出来}？如果没有 CD、膜厚、方阻或见证片数据，低温以后只能猜。
+\end{enumerate}
+
+\section{一块单层 Al LEKID 的最小制造链}
+
+作为第二册的主案例，我们先考虑结构相对清楚的单层 Al LEKID。不同平台的具体流程会不同，但逻辑上可以拆成下面几个阶段：
+
+\begin{enumerate}
+  \item \textbf{版图冻结：}确认 GDS/mask 版本、关键线宽/间距、测试结构和芯片编号。
+  \item \textbf{基底与表面：}确认 substrate 批次、厚度、表面状态和预处理历史。
+  \item \textbf{超导薄膜：}形成 Al 薄膜，并用见证片保留膜厚、$R_\square$、$T_c$ 等材料证据。
+  \item \textbf{光刻：}把 mask/GDS 信息转移到 resist，产生真实的 CD 与边缘轮廓。
+  \item \textbf{图形转移：}通过刻蚀或 lift-off 得到实际金属图形，并检查 residue、fence、过刻/欠刻等问题。
+  \item \textbf{后处理与切片：}去胶、清洁、dicing，把 wafer 变成 die。
+  \item \textbf{封装与 wire bond：}建立 feedline、ground 和 package 电磁边界。
+  \item \textbf{室温/材料表征：}尽量在进入低温系统之前排除断线、短路、膜厚和明显 CD 问题。
+  \item \textbf{第一轮 cooldown：}先做 resonance census 和基本 $f_0,Q_i,Q_c$ 统计，再进入更深的 optical/noise 测试。
+\end{enumerate}
+
+2014 年 McCarrick 等人的 150 GHz horn-coupled Al LEKID 原型就是一个很适合入门的参照：薄 Al 膜沉积在 Si wafer 上，再用标准光刻形成器件。它提醒我们，LEKID 可以拥有相对简洁的加工层数，但“层数少”并不等于“工艺变量不重要”。
+
+\section{为什么每一步都必须留下证据}
+
+建议从一开始就把信息分成三类。
+
+\subsection{设计证据}
+
+至少包括：
+
+\begin{itemize}
+  \item GDS / mask 版本和 commit/hash；
+  \item resonator ID 与设计 $f_0$；
+  \item meander linewidth/gap、IDC、coupler 等关键尺寸；
+  \item test coupon / witness area 的位置；
+  \item package 与 chip orientation 的设计版本。
+\end{itemize}
+
+\subsection{过程证据}
+
+至少包括：
+
+\begin{itemize}
+  \item wafer/die/Batch ID；
+  \item 每一步设备、SOP/recipe 标识和 run ID；
+  \item 关键设定值与设备实际 readback；
+  \item 时间、操作者、异常、返工；
+  \item witness sample 与主器件的对应关系。
+\end{itemize}
+
+\subsection{测量证据}
+
+至少逐步建立：
+
+\begin{itemize}
+  \item 膜厚与 wafer map；
+  \item $R_\square$ 与可行时的 $T_c$；
+  \item 关键 CD；
+  \item 光学/SEM 等 inspection 图片；
+  \item package/bond 图片；
+  \item 低温 resonance map、$Q_i/Q_c$ 与后续 noise/optical 数据。
+\end{itemize}
+
+\begin{measurebox}
+如果一个低温数据文件不能反查到具体 Batch ID、die ID、GDS 版本、薄膜 run 和封装版本，那么这批数据即使“看起来很好”，对下一版设计的工程价值也已经打了折扣。
+\end{measurebox}
+
+\section{Witness sample 和 test coupon 到底有什么用}
+
+这两个词容易被混在一起。
+
+\textbf{Witness sample（见证片）}通常跟随主样品经历某个材料或工艺步骤，用来做不方便直接在主芯片上完成的表征。例如同一次 Al deposition 中放一小块 witness sample，后续测膜厚、$R_\square$ 或 $T_c$。
+
+\textbf{Test coupon / test structure（测试结构）}通常在版图中主动设计，用来测量某个加工或电学问题，例如 linewidth/gap monitor、连续性结构、不同耦合强度、不同 CD 的蛇形线等。
+
+一个偏向“证明这一批材料是什么”，另一个偏向“证明这个工艺把几何做成了什么”。两者都不是浪费面积，而是把加工从黑箱变成可测系统。
+
+\section{一个诊断例子：为什么谐振频率整体偏低？}
+
+假设第一轮低温测试发现大部分 resonance 都存在，但 $f_0$ 普遍比设计值低。不要马上得出“电容画大了”这样的单因果结论。
+
+因为
+\[
+f_0=\frac{1}{2\pi\sqrt{LC}},
+\]
+所以频率偏低至少意味着有效 $L$、有效 $C$ 或两者的组合比模型中更大。进一步可能来自：
+
+\begin{itemize}
+  \item 材料：$R_\square$、$T_c$ 或膜厚变化导致 $L_k$ 改变；
+  \item 几何：meander / IDC 的 CD bias 改变 $L$ 或 $C$；
+  \item 电磁环境：substrate / package 与仿真假设不同；
+  \item 识别问题：测到的模式与设计 resonator 对应关系错误。
+\end{itemize}
+
+正确做法不是“选一个最像的原因”，而是优先调用已经保存的证据：膜厚和 $R_\square$ map、CD 抽样、resonance 的空间分布、package 版本。后面每一章都会把这棵诊断树继续拆细。
+
+大阵列文献已经显示，这种思路不是洁癖：Shu 等人对 4-inch kilo-pixel LEKID 阵列的研究表明，实测 resonator 尺寸和 film thickness 可以解释相当一部分 resonance-frequency deviation；而 fabrication-induced frequency deviation 会进一步造成 frequency collision 并降低阵列 yield。
+
+\section{本册的边界：学习“参数意义”，不是复制 recipe}
+
+\begin{warningbox}
+本册不会提供可以绕过设备培训的照抄 recipe。旋涂、曝光、显影、真空沉积、等离子体、湿法化学、高压和高温设备均应遵循所在平台 SOP 与设备管理员要求。这里要学的是：每个参数意味着什么、它改变什么、必须记录什么，以及异常如何传播到 KID 指标。
+\end{warningbox}
+
+\section{本章结束时，你应该能画出的图}
+
+请自己画一条：
+
+\[
+\text{GDS}
+\rightarrow
+\text{film/process}
+\rightarrow
+\text{real geometry/material}
+\rightarrow
+\{L,C,R,Z_s\}
+\rightarrow
+\{f_0,Q_i,Q_c\}
+\rightarrow
+\text{yield/noise}.
+\]
+
+然后在每一根箭头旁边写出“我准备靠什么测量来验证它”。如果有一根箭头完全没有证据，这就是当前 fabrication plan 中最值得补的地方。
+
+\begin{checkpointbox}
+加工工程的目标不是让每个器件都与设计值一模一样，而是让偏差\textbf{可测、可解释、可预测、可反馈}。真正成熟的器件流程，最终会把“工艺误差”变成下一版仿真和版图的输入分布。
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item H. McCarrick et al., ``Horn-Coupled, Commercially-Fabricated Aluminum Lumped-Element Kinetic Inductance Detectors for Millimeter Wavelengths,'' 2014, \href{https://arxiv.org/abs/1407.7749}{arXiv:1407.7749}.
+  \item S. Shu et al., ``Understanding and minimizing resonance frequency deviations on a 4-inch kilo-pixel kinetic inductance detector array,'' 2021, \href{https://arxiv.org/abs/2105.14046}{arXiv:2105.14046}.
+\end{itemize}

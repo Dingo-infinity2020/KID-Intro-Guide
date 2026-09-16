@@ -1,0 +1,184 @@
+\chapter{工艺表征：在进冰箱之前尽量多知道一点}
+
+\begin{chaptergoal}
+建立“测什么—为什么测—它能排除什么”的表征思路，而不是把 profilometer、SEM、四探针等设备当成独立知识点；形成一套第一次 Al LEKID wafer 在 room temperature 就能执行的 acceptance gate，让昂贵的 cooldown 尽量用于回答低温问题，而不是发现最基本的加工错误。
+\end{chaptergoal}
+
+工艺表征的目标不是把所有仪器都用一遍，而是尽量在低温之前回答这些问题：
+
+\begin{itemize}
+  \item 膜在不在、厚度和方阻是否大致符合预期？
+  \item 图形有没有 open / short / bridging？
+  \item 关键 linewidth / gap / coupler 是否偏得太多？
+  \item wafer 上有没有明显的空间梯度或局部坏区？
+  \item package 是否存在可以在室温就发现的装配错误？
+\end{itemize}
+
+\processchain{room-temperature metrology $\rightarrow$ 材料/几何/连接性/空间分布证据 $\rightarrow$ 排除灾难性 fabrication failure $\rightarrow$ 更有信息量的 first cooldown}
+
+\section{先建立“问题—测量”对应关系}
+
+\begin{center}
+\begin{tabularx}{0.97\textwidth}{>{\bfseries}p{3.0cm} X X}
+\toprule
+手段 & 主要得到什么 & 对 KID 的用途 \\
+\midrule
+光学显微镜 & 大尺度图形、断线/短路、颗粒、dicing 缺陷 & 快速 yield 筛查、定位明显坏区 \\
+膜厚/台阶测量 & thickness、step height & $t$、etch depth、run uniformity \\
+四探针/方阻 & $R_\square$ 与空间分布 & 材料一致性、$L_{k,\square}$ 先验 \\
+SEM & CD、edge、sidewall、residue 的局部细节 & linewidth/gap bias、缺陷定位 \\
+AFM（如需要） & roughness、局部形貌 & surface/process comparison 的证据 \\
+$T_c$ 测量 & superconducting transition & material batch 与 gap/model input \\
+Continuity coupon & open / short / gross resistance & 避免把灾难性连接错误带进低温 \\
+装配照片/检查 & bond、die orientation、connector、spacer & package revision 与返工追溯 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+注意，表中的每种仪器都只回答一部分问题。SEM 看见的局部边缘很好，不代表整片 wafer 的 CD uniformity 好；四探针方阻正常，也不代表低温 $Q_i$ 一定高。
+
+\section{Measurement uncertainty：先知道自己测得有多准}
+
+如果你要用 metrology 解释 resonance shift，就必须知道测量本身的 uncertainty。
+
+例如 linewidth 设计差异只有 $0.1\,\mu$m，而你的 optical measurement repeatability 已经接近这个量级，那么用这组数据做精细相关分析就很危险。此时更合理的是换更适合的 metrology，或者承认当前只能做 pass/fail 而不能做高精度模型拟合。
+
+同理，film thickness monitor 的显示分辨率不等于 absolute accuracy；profilometer 的单点测量也不等于 wafer uniformity。
+
+\begin{center}
+\textbf{任何进入模型的测量值，都应至少知道“量值 + 位置 + 方法 + 不确定度/重复性”。}
+\end{center}
+
+\section{Wafer map：把位置也当成数据}
+
+对阵列 KID，很多 fabrication variation 不是随机白噪声，而是随着 wafer position 平滑变化。film thickness、$R_\square$、CD、etch depth 都可能有 center-to-edge 或方向性趋势。
+
+因此同一个平均值可能掩盖完全不同的工艺状态：
+
+\begin{itemize}
+  \item Case A：整片都在目标附近，spread 小；
+  \item Case B：中心偏低、边缘偏高，平均值恰好“正确”；
+  \item Case C：大部分正常，但一个局部区域明显异常。
+\end{itemize}
+
+对 multiplexed resonator array，B 和 C 都可能比 A 更容易造成 frequency collision 或局部 yield loss。
+
+第二册建议所有可空间采样的数据尽量保留 $(x,y)$ 或 die/pixel coordinate，而不是只写进一列 CSV。
+
+\section{从第一批 wafer 开始做最小 acceptance gate}
+
+第一次 Al LEKID run 不需要一上来建立半导体工厂级 SPC，但至少应该有一个“是否值得进入 cooldown”的明确 gate。
+
+\subsection{Gate A：Identity 完整}
+
+必须能回答：wafer/die ID、GDS revision、film batch、lithography/pattern-transfer batch、package revision 各是什么。
+
+如果 sample identity 都不完整，后续即使低温数据很好，也很难复现。
+
+\subsection{Gate B：Gross visual PASS}
+
+无明显大面积脱膜、严重划伤、dicing crack 侵入器件区、成片 resist residue、错位安装或 bond 灾难。
+
+\subsection{Gate C：Material sanity PASS}
+
+至少有 thickness / $R_\square$ 中的一组可靠记录，最好能和 film witness 对应；如果已经建立 $T_c$ measurement，则归入同一 film batch card。
+
+这里不是要求每一项都“等于设计值”，而是要求异常被看见、被记录、被解释。
+
+\subsection{Gate D：Critical geometry PASS}
+
+固定位置抽样的 linewidth / gap / coupler 没有超出预先定义的 fabrication tolerance；若存在 systematic CD bias，应在 metrology report 中明确标记。
+
+\subsection{Gate E：Connectivity / package sanity PASS}
+
+feedline / coupon 没有明显 open-short；package / bond map 与 revision 一致；没有肉眼可见的装配错误。
+
+\begin{warningbox}
+Acceptance gate 的数值阈值不应由本讲义凭空规定。它们必须来自实际设计 sensitivity、目标 multiplexing spacing、平台 repeatability 和前几批数据。v0.1 阶段先把“需要定义阈值的量”固定下来，比随便写一个百分比更重要。
+\end{warningbox}
+
+\section{哪些 test coupon 最值得占一点版图面积}
+
+如果只做完整像素，很多失败会缺少诊断手段。对第一批工艺学习 wafer，下列 coupon 通常很值：
+
+\begin{itemize}
+  \item linewidth / gap ladder；
+  \item dense / isolated pattern 对照；
+  \item open-short / continuity structures；
+  \item large-area film witness region，便于 thickness / sheet-resistance measurement；
+  \item etch-depth / step-height measurement region；
+  \item 若版图允许，一组简单 microwave resonator test structures。
+\end{itemize}
+
+这些结构不一定全部出现在最终 science wafer 上，但在工艺学习阶段，它们提供的解释能力往往比多放几个正式 pixel 更有价值。
+
+\section{表征结果应该怎样存}
+
+不要让信息散落在聊天截图、显微镜电脑桌面和纸质本子里。建议每个 fabrication batch 至少形成一个目录：
+
+\begin{verbatim}
+BATCH_2026_XXX/
+  traveler.yaml
+  wafer_map.csv
+  film/
+  lithography/
+  pattern_transfer/
+  microscopy/
+  package/
+  cooldown/
+\end{verbatim}
+
+其中每张图片都应至少能知道 sample ID、location、magnification / scale 与 acquisition date。真正重要的不是目录长得多漂亮，而是以后能把一张 SEM 图和某个 resonator 的 $f_0$ 对上。
+
+\section{Room-temperature data 如何为低温模型提供先验}
+
+最有价值的几组先验通常包括：
+
+\begin{itemize}
+  \item $R_\square$ + $T_c$：为 $L_{k,\square}$ / superconducting model 提供材料起点；
+  \item measured CD：为 Sonnet/CST/LC model 提供 as-fabricated geometry；
+  \item thickness map：帮助解释 across-wafer kinetic-inductance variation；
+  \item package / bond revision：帮助解释 baseline 和 spurious mode；
+  \item defect map：帮助判断 missing resonator 是否与局部 fabrication defect 重合。
+\end{itemize}
+
+当这些先验存在时，低温测量就不再是“看到一堆 notch 然后猜”。
+
+\section{一个推荐的 First Wafer Metrology Report}
+
+一份不超过几页但非常有用的报告可以固定成下面几部分：
+
+\begin{enumerate}
+  \item sample identity 与 process traveler summary；
+  \item film thickness / $R_\square$ summary + map；
+  \item CD summary + center/edge comparison；
+  \item defect / microscopy map；
+  \item package / bond photo；
+  \item acceptance gate：PASS / CONDITIONAL / HOLD；
+  \item 进入 cooldown 前最想验证的 3 个 hypothesis。
+\end{enumerate}
+
+最后一项尤其重要。每次 cooldown 都应该带着问题进去，而不是“先降温看看”。
+
+\begin{measurebox}
+\textbf{第一次 Al LEKID room-temperature 最小交付物：}
+process traveler；film batch card；wafer/die map；$R_\square$ / thickness 至少一项的空间抽样；关键 CD 表；gross defect map；open-short/continuity result；package + bond photo；cooldown hypothesis list。
+\end{measurebox}
+
+\section{表征不是越多越好}
+
+真正高价值的是能关闭假设空间的测量。例如阵列 $f_0$ 系统性偏移时，wafer-map 方阻/膜厚和关键 CD 往往比再拍一张漂亮的器件全景图更有诊断价值。
+
+同样，如果 $Q_i$ 很差，而你只有 20 张 SEM，没有 power sweep、temperature sweep、surface-process split 或 package comparison，那么“看起来边缘有点粗糙”仍然不能构成原因证明。
+
+\begin{checkpointbox}
+决定是否做一次 metrology 时，先问一句：这个测量结果会让我排除哪个 hypothesis？如果答案只是“看看长什么样”，它可以是探索性测量，但不应该冒充工艺结论。
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item C. R. H. McRae et al., using superconducting microwave resonators to characterize materials and interface loss, \href{https://www.nist.gov/publications/materials-loss-measurements-using-superconducting-microwave-resonators}{NIST / Rev. Sci. Instrum. 91, 091101}.
+  \item C. M. McKenney et al., wafer-scale material variation and resonator spacing statistics, \href{https://www.nist.gov/publications/tile-and-trim-micro-resonator-array-fabrication-optimized-high-multiplexing-factors}{NIST / Rev. Sci. Instrum. 90, 023908}.
+  \item S. Shu et al., measured geometry and film thickness correlated with KID resonance-frequency deviations, \href{https://arxiv.org/abs/2105.14046}{arXiv:2105.14046}.
+\end{itemize}

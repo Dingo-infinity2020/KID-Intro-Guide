@@ -1,0 +1,126 @@
+\chapter{洁净室、污染与工艺纪律}
+
+\begin{chaptergoal}
+理解洁净室不是“更干净的房间”，而是一套控制颗粒、化学污染、材料交叉污染、静电和流程可重复性的工程系统；学会区分几类常见污染及其可能的 KID 后果；建立进入加工平台前最重要的记录与边界意识。
+\end{chaptergoal}
+
+第一次进入微纳平台，最容易被各种设备吸引：电子束曝光、蒸发、溅射、ICP、RIE、SEM……但真正决定第一批样品是否可复现的，往往不是你有没有用到最先进的设备，而是有没有遵守材料兼容、样品处理、编号和记录规则。
+
+\section{“脏”至少有四种不同含义}
+
+对 KID 来说，不能把所有 contamination 都叫“脏”。至少应先区分下面四类。
+
+\subsection{颗粒（particle）}
+
+颗粒可能直接挡住曝光、让金属图形断开、跨过窄 gap，或者在薄膜/胶层中形成局部台阶。它最典型的后果往往是局部、离散和显微镜可见的：open、short、局部缺口、lift-off failure 等。
+
+\subsection{有机残留（organic residue）}
+
+光刻胶、溶剂或其他有机残留未必造成肉眼可见的短路，却可能改变后续薄膜 adhesion、刻蚀、界面状态和局部介质损耗。对于微波谐振器，强电场区域附近的界面尤其值得谨慎对待。
+
+\subsection{金属/材料交叉污染（cross-contamination）}
+
+沉积和刻蚀设备往往有严格 material policy。原因不是管理员“保守”，而是 chamber history、残余材料和再沉积可能改变下一位用户的膜纯度、工艺速率或设备状态。超导器件对材料性质敏感，因此不能默认“只要最后元素分析看起来像 Al 就够了”。
+
+\subsection{水汽、氧化与表面历史}
+
+Al 会形成表面氧化层，Si 表面也有自己的原生氧化和吸附历史。第二册不会把所有氧化都当作坏事，而是强调：\textbf{表面历史本身就是一个工艺变量。}从清洗结束到进真空腔的暴露时间、是否经历额外烘烤、是否在不同环境暂存，都应该能追溯。
+
+\begin{processbox}
+颗粒 / 残留 / 交叉污染 / 表面历史
+$\rightarrow$
+局部缺陷或界面改变
+$\rightarrow$
+几何、电流路径、介质/表面损耗改变
+$\rightarrow$
+open/short、$Q_i$、frequency scatter、yield 或 noise 异常
+\end{processbox}
+
+注意，这是一条\textbf{可能的传播链}，不是“看到低 $Q_i$ 就说明有污染”的反向定律。低 $Q_i$ 还可能来自材料本身、辐射损耗、封装、电磁模式、readout power 等许多原因。
+
+\section{洁净室等级不是器件质量分数}
+
+洁净室等级描述的是受控空气中颗粒浓度等环境能力，而不是某个器件的 $Q_i$ 保证值。一个更高等级的洁净环境可以降低某些颗粒风险，却不能替代：
+
+\begin{itemize}
+  \item 正确的材料分区；
+  \item 合适的样品夹持和工具；
+  \item 已校准的工艺与表征；
+  \item 可追溯的 recipe/run log；
+  \item 合理的版图工艺窗口。
+\end{itemize}
+
+因此“这个器件是在百级洁净室做的”并不是完整的 fabrication evidence。
+
+\section{进入设备培训时，先学五件事}
+
+\subsection{1. 设备允许什么材料}
+
+要问清：允许哪些 substrate、金属、胶和化学体系？是否有明确禁止材料？是否区分专用 chamber / holder / tool？这直接决定一条论文中的 recipe 能否在本地复制。
+
+\subsection{2. 哪些参数能改，哪些不能改}
+
+有的平台只允许使用管理员维护的固定 recipe；有的平台允许用户在范围内调整。初学时不要把“能输入一个数字”误解为“有权限、有依据去改这个数字”。
+
+\subsection{3. 设定值和实际 readback 有什么区别}
+
+例如目标沉积厚度、名义功率、腔体压力设定和设备实际记录值不是同一种证据。成熟的 traveler 应优先保留能反映真实 run 的 readback/log。
+
+\subsection{4. 异常时该做什么}
+
+什么时候应停止 run？什么时候必须联系管理员？样品掉落、真空异常、等离子体异常、化学品泼洒等情况不能靠“自己试试能不能恢复”。这首先是安全要求，其次也是保护设备和其他用户工艺稳定性的要求。
+
+\subsection{5. 数据和 recipe 在哪里}
+
+一台设备如果完成一次 run 后只留下你手机里的一张照片，基本等于没有建立可复现实验记录。要知道日志如何导出、recipe 名如何记录、设备校准/维护状态在哪里查询。
+
+\section{样品编号：最便宜也最容易被忽略的质量控制}
+
+建议 Batch ID 至少把“这一批”固定下来，die ID 再描述同批中的具体芯片。不要把样品永久叫作“那块好的”“昨天切的第二片”或“Al40nm”。
+
+一个简洁编号可以像：
+
+\begin{center}
+\texttt{KID-A01-W01-D03}
+\end{center}
+
+这里具体命名规则并不重要，重要的是它在 GDS、traveler、显微镜照片、$R_\square$ 数据、封装照片和低温文件名中始终指向同一个实体。
+
+\begin{measurebox}
+每一步至少记录：输入样品 ID、输出样品 ID、设备、SOP/recipe ID、开始/结束时间、关键 readback、操作者、异常、返工和下一步是否放行。\textbf{不要让聊天记录成为唯一 process log。}
+\end{measurebox}
+
+\section{为什么 KID 特别需要“工艺纪律”}
+
+KID 同时把很多微小变化放大成容易测到的 microwave observable：
+
+\begin{itemize}
+  \item 电感/电容变化会移动 $f_0$；
+  \item 损耗变化会改变 $Q_i$；
+  \item coupler 几何变化会改变 $Q_c$；
+  \item 阵列中的小频率误差会积累成 collision 与 yield 损失；
+  \item 界面和材料缺陷还可能进入低频 noise。
+\end{itemize}
+
+这也是 KID 加工有趣的地方：器件本身就是一只非常灵敏的“工艺传感器”。如果过程记录足够好，低温 measurement 可以反过来帮助我们理解 fabrication。
+
+\section{现场学习时不要只抄 recipe}
+
+第一次去加工平台，建议每台设备都围绕下面四个问题做笔记：
+
+\begin{enumerate}
+  \item \textbf{输入是什么？}样品在进入设备前必须是什么状态？
+  \item \textbf{输出是什么？}这一步究竟想改变哪一个材料/几何量？
+  \item \textbf{最常见的不可逆失败是什么？}哪些失败无法靠下一步“补救”？
+  \item \textbf{证据是什么？}完成后靠哪个 log、witness sample 或 metrology 知道它真的做对了？
+\end{enumerate}
+
+这四个问题比孤立地记录“转速是多少、功率是多少、时间是多少”更适合第一次建立加工知识框架。recipe 数值以后可以在平台许可下填进去，但因果链应先建立。
+
+\begin{warningbox}
+任何涉及化学品、真空、高温、高压、激光、电子束、等离子体、切割和 wire bonder 的实际操作，都以本地 EHS、SOP 与设备培训为准。本册不替代上机资格，也不建议根据论文或网络参数自行试机。
+\end{warningbox}
+
+\begin{checkpointbox}
+如果同一版 GDS 在两次 fabrication run 中表现不同，先不要问“哪次做坏了”，而要问：两个 Batch 的 substrate、surface history、deposition run、lithography、pattern transfer、package 和 metrology 证据有哪些可比较项？能比较，才有资格谈归因。
+\end{checkpointbox}

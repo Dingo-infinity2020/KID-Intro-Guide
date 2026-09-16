@@ -1,0 +1,186 @@
+\chapter{光刻：GDS 并不等于最终几何}
+
+\begin{chaptergoal}
+理解 resist、曝光、显影和设备分辨率怎样把版图转成具有 CD bias、圆角、线边粗糙和位置误差的真实图形；学会把 KID 的 linewidth、gap、IDC、coupler 等关键几何定义成可测的 critical dimensions，并把 lithography variation 接回 $f_0$、$Q_c$、frequency collision 和 yield。
+\end{chaptergoal}
+
+光刻最容易制造一种错觉：版图已经画得很精确，因此芯片也会很精确。实际上，GDS 只是\textbf{目标几何}。真正进入电磁器件的是 exposure + resist + develop + pattern transfer 共同作用之后的\textbf{as-fabricated geometry}。
+
+\processchain{GDS / exposure / resist / develop $\rightarrow$ linewidth、gap、corner、overlay 与 profile $\rightarrow$ $L_g,L_k,C,C_c$ 改变 $\rightarrow$ $f_0,Q_c$、frequency spacing、absorption geometry 与 yield}
+
+\section{先分清三层“尺寸”}
+
+一个标称为 $w=2.0\,\mu\mathrm{m}$ 的线宽，至少有三种不同含义：
+
+\begin{enumerate}
+  \item \textbf{drawn CD}：GDS 里画了多少；
+  \item \textbf{resist CD}：曝光和显影后胶上的图形是多少；
+  \item \textbf{final CD}：刻蚀或 lift-off 完成后金属真正是多少。
+\end{enumerate}
+
+只有第三个尺寸直接进入最终器件。前两个则帮助我们定位偏差究竟来自 lithography 还是后续 pattern transfer。
+
+因此，“设备分辨率 1 $\mu$m”不能直接推出“器件线宽误差就是 1 $\mu$m”。resolution、repeatability、CD bias、line-edge roughness 和 across-wafer uniformity 是不同概念。
+
+\section{critical dimension：不是所有尺寸都同样重要}
+
+KID 版图中，下面几类尺寸通常值得优先定义为 CD：
+
+\begin{itemize}
+  \item absorber / meander linewidth 与相邻 gap；
+  \item IDC finger width、finger gap、有效 finger length；
+  \item resonator-to-feedline / coupler gap 与 overlap；
+  \item feedline width/gap；
+  \item 对双偏振结构，两个 polarization 几何的对称性和中心定位；
+  \item 任何接近工艺最小 feature 的 neck、turn、slot 或 narrow gap。
+\end{itemize}
+
+“大轮廓看起来像设计图”只能证明版图大体转移成功，不能证明关键电磁参数在容差内。
+
+\section{为什么线宽偏差会移动谐振频率}
+
+第一册和第 3 章都用过
+
+\[
+f_0=\frac{1}{2\pi\sqrt{LC}},
+\qquad
+\frac{\delta f_0}{f_0}\approx
+-\frac{1}{2}\left(\frac{\delta L}{L}+\frac{\delta C}{C}\right).
+\]
+
+光刻误差的作用，就是通过真实几何改变 $L$ 和 $C$。
+
+对窄 superconducting strip，linewidth 改变会同时影响 geometric inductance 和 kinetic-inductance contribution per unit length；对 IDC，finger/gap/length 改变会影响 capacitance；对 coupling region，几何变化会改变外部耦合，因此 $Q_c$ 往往比 $f_0$ 对某些局部尺寸更敏感。
+
+这就是为什么阵列 frequency scatter 不一定全是 film thickness variation。已有 superconducting resonator array 工作直接观察到 inductor linewidth variation 与 resonance-frequency shift 之间的系统关联；当目标频率间隔本来就很窄时，几何误差最终会变成 collision 问题。
+
+\section{CD bias：稳定偏差比随机误差更容易利用}
+
+假设版图上画 $2.0\,\mu\mathrm{m}$，一批 wafer 上稳定得到约 $2.2\,\mu\mathrm{m}$。这不是一句“设备不准”就结束了。
+
+定义
+
+\[
+b_w=w_{\mathrm{final}}-w_{\mathrm{drawn}},
+\]
+
+那么 $b_w$ 就是一个最简单的 linewidth bias。对 gap 也可以定义类似量。
+
+如果 bias 在相同 process window 内可重复，就可以在下一版 GDS 里做 bias compensation；如果 bias 在 wafer 上有空间梯度，就应该画 CD map；如果 batch-to-batch 波动很大，则说明 process control 还不足以把它当作固定补偿量。
+
+\begin{center}
+\textbf{DfM 的目标不是消灭一切偏差，而是把可重复偏差变成可建模参数。}
+\end{center}
+
+\section{positive / negative resist 先理解“逻辑”，不要背 recipe}
+
+初学阶段最重要的是理解 resist 在做什么：它把 exposure pattern 变成后续 etch mask 或 deposition opening。
+
+不同 resist/process tone 会决定“曝光区域最后保留还是去掉”，并影响 profile、厚度、分辨率、抗刻蚀能力和 lift-off 是否容易形成干净断面。对 KID 来说，这些选择的最终评价标准不是胶图漂亮，而是：
+
+\begin{itemize}
+  \item final metal CD 是否稳定；
+  \item narrow gap 是否干净；
+  \item resist residue 是否受控；
+  \item 与后续 etch 或 deposition 是否兼容；
+  \item wafer-scale uniformity 是否足够支撑目标 multiplexing density。
+\end{itemize}
+
+\begin{warningbox}
+本章不提供曝光剂量、烘烤温度、显影时间或化学配方。它们高度依赖 resist、设备、膜系和本地 SOP，错误照抄比不知道更危险。这里重点学习如何评价一套 lithography process 是否适合 KID。
+\end{warningbox}
+
+\section{接触光刻、激光直写与 EBL 应该怎么比较}
+
+对第二册的 single-layer Al LEKID 主线，真正的问题不是“哪台设备最高级”，而是 feature size 与 throughput 是否匹配。
+
+\subsection{Contact / projection photolithography}
+
+适合 wafer-scale、重复图形和相对较高 throughput。对几微米级结构，如果工艺窗口成熟，它往往比逐点写入更实用。需要重点关心 mask quality、focus/contact condition、across-wafer CD uniformity 和颗粒造成的局部缺陷。
+
+\subsection{Direct-write laser lithography}
+
+优点是无需实体 mask、迭代快，适合原型和 test coupon。需要实际确认最小稳定 feature、地址网格、write strategy 和大面积 pattern 的时间/均匀性，而不能只看宣传页上的“minimum feature”。
+
+\subsection{Electron-beam lithography}
+
+EBL 可以提供更小 feature 和灵活的 proximity correction，但 throughput、field stitching、charging、resist/process complexity 也会进入问题。若我们的 LEKID 关键结构本来是几微米级，就不应因为 EBL 分辨率高而默认它一定更优。
+
+\section{线边粗糙、圆角和 proximity：为什么 CAD 里的直线会变形}
+
+实际图形边缘不是数学直线。exposure blur、resist chemistry、development、写入网格以及后续 etch 都可能造成 line-edge roughness、corner rounding 或局部 necking。
+
+对大多数微米级 LEKID，不需要把每个纳米级边缘起伏都当成灾难，但应特别警惕两种情形：
+
+\begin{enumerate}
+  \item roughness / rounding 的尺度已经接近关键 linewidth 或 gap；
+  \item 误差系统性地发生在高电流密度、高电场或最窄耦合区域。
+\end{enumerate}
+
+这时问题就不再只是“SEM 看起来不漂亮”，而可能成为 $L,C,Q_i,Q_c$ 或局部可靠性变化。
+
+\section{单层器件为什么仍然需要 alignment 思维}
+
+即使第一批 Al LEKID 只有一层金属，也仍应建立 alignment / coordinate discipline：wafer flat/notch、die coordinate、pixel ID、test coupon ID 和 metrology coordinate 必须能互相转换。
+
+否则未来你会遇到一个很尴尬的问题：VNA 告诉你第 37 个 resonator 偏了 80 MHz，但你不知道它在 wafer 上对应哪个物理位置，也就没法和 CD map / film map 对齐。
+
+所以从第一批器件开始就建议建立：
+
+\begin{center}
+\texttt{resonator ID $\leftrightarrow$ GDS coordinate $\leftrightarrow$ wafer/die coordinate $\leftrightarrow$ measured $f_0$}
+\end{center}
+
+\section{不要随机拍照：建立 CD metrology plan}
+
+一份有用的 optical microscope / SEM 计划应该在 fabrication 前就定义抽样位置。
+
+例如，对一个阵列 wafer，可以选择：center / mid-radius / edge 三类区域，并在每个区域固定测量：
+
+\begin{itemize}
+  \item 一段 absorber/meander line 与 gap；
+  \item 一组 IDC finger/gap；
+  \item 一个 coupling region；
+  \item 一个 deliberately designed CD coupon。
+\end{itemize}
+
+然后至少计算
+
+\[
+\bar b=\frac{1}{N}\sum_i(CD_{\mathrm{final},i}-CD_{\mathrm{drawn},i})
+\]
+
+以及 across-wafer spread。这样 lithography 的结果才会成为可比较的 batch statistic。
+
+\begin{measurebox}
+\textbf{Lithography / CD Card 最小字段：}
+mask / GDS revision；lithography tool；resist/process ID；wafer orientation；write/exposure job ID；异常；CD coupon location；drawn CD；resist CD（若测）；final CD；center/edge bias；明显 rounding/bridging/open defect；与后续 pattern-transfer batch 的对应关系。
+\end{measurebox}
+
+\section{如何把 CD 数据反馈进下一版设计}
+
+光刻反馈至少有三个层次。
+
+\subsection{Level 1：能不能做出来}
+
+先回答 minimum line/gap、open/short、完整性和 yield。这一层没过，不要急着做高精度 EM correlation。
+
+\subsection{Level 2：能不能稳定重复}
+
+看 wafer-scale / batch-scale bias 与 spread。如果几何偏差不可重复，就无法放心提高 resonator packing density。
+
+\subsection{Level 3：能不能预测器件参数}
+
+把 measured geometry 放回 Sonnet/CST/解析模型，预测 $f_0$ 或 $Q_c$，再和 cooldown 数据比较。如果预测和实测开始闭合，lithography 就从“制造步骤”升级成了模型的一部分。
+
+\begin{checkpointbox}
+当某批 resonator 的 $f_0$ 全部偏高时，不要第一时间只改 IDC。先问：film map 是否变了？meander linewidth 是否偏了？IDC gap 是否偏了？substrate/etch 是否改变了有效电容？只有把这些证据排起来，频率补偿才不会变成盲调。
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item J. Li et al., inductor linewidth fluctuation as a source of superconducting-resonator frequency scatter, \href{https://arxiv.org/abs/2203.17244}{arXiv:2203.17244}.
+  \item S. Shu et al., measured resonator geometry / film thickness and frequency deviations in a kilo-pixel KID array, \href{https://arxiv.org/abs/2105.14046}{arXiv:2105.14046}.
+  \item X. Liu et al., lithographic frequency trimming and collision-yield improvement, \href{https://arxiv.org/abs/1711.07914}{arXiv:1711.07914}.
+\end{itemize}
