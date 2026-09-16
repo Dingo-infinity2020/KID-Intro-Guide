@@ -58,9 +58,41 @@ jobs:
             cd volume2-fabrication
             mkdir -p build/chapters
 
+            audit_full_log() {
+              log=build/main.log
+              test -s build/main.pdf
+              test -s "$log"
+
+              if grep -Fq 'Overfull \hbox' "$log"; then
+                echo 'ERROR: Overfull hbox found in full-book build.'
+                grep -F 'Overfull \hbox' "$log" || true
+                exit 1
+              fi
+              if grep -Fq 'Token not allowed in a PDF string' "$log"; then
+                echo 'ERROR: hyperref PDF-string warning found.'
+                grep -F 'Token not allowed in a PDF string' "$log" || true
+                exit 1
+              fi
+              if grep -Eqi 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' "$log"; then
+                echo 'ERROR: undefined reference or citation found.'
+                grep -Ei 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' "$log" || true
+                exit 1
+              fi
+              if grep -Fq 'Missing character:' "$log"; then
+                echo 'ERROR: missing glyph found.'
+                grep -F 'Missing character:' "$log" || true
+                exit 1
+              fi
+
+              underfull=$(grep -Fc 'Underfull \hbox' "$log" || true)
+              pages=$(grep -oE 'Output written on build/main\.pdf \([0-9]+ pages\)' "$log" | tail -1 || true)
+              echo "FULL_BUILD_AUDIT_PASS underfull_hbox=${underfull} ${pages}"
+            }
+
             if [ "${{ steps.detect.outputs.structural }}" = "true" ]; then
               echo 'Structural change detected; running one full Volume 2 build.'
               make full
+              audit_full_log
             else
               for ch in ${{ steps.detect.outputs.chapters }}; do
                 echo "Building preview for $ch"
@@ -87,7 +119,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build complete Volume 2
+      - name: Build and audit complete Volume 2
         uses: xu-cheng/texlive-action@v3
         with:
           os: debian
@@ -97,6 +129,32 @@ jobs:
             cd volume2-fabrication
             make full
             test -s build/main.pdf
+            test -s build/main.log
+
+            if grep -Fq 'Overfull \hbox' build/main.log; then
+              echo 'ERROR: Overfull hbox found in full-book build.'
+              grep -F 'Overfull \hbox' build/main.log || true
+              exit 1
+            fi
+            if grep -Fq 'Token not allowed in a PDF string' build/main.log; then
+              echo 'ERROR: hyperref PDF-string warning found.'
+              grep -F 'Token not allowed in a PDF string' build/main.log || true
+              exit 1
+            fi
+            if grep -Eqi 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' build/main.log; then
+              echo 'ERROR: undefined reference or citation found.'
+              grep -Ei 'There were undefined references|There were undefined citations|Reference .* undefined|Citation .* undefined' build/main.log || true
+              exit 1
+            fi
+            if grep -Fq 'Missing character:' build/main.log; then
+              echo 'ERROR: missing glyph found.'
+              grep -F 'Missing character:' build/main.log || true
+              exit 1
+            fi
+
+            underfull=$(grep -Fc 'Underfull \hbox' build/main.log || true)
+            pages=$(grep -oE 'Output written on build/main\.pdf \([0-9]+ pages\)' build/main.log | tail -1 || true)
+            echo "FULL_BUILD_AUDIT_PASS underfull_hbox=${underfull} ${pages}"
 
       - name: Upload complete PDF
         uses: actions/upload-artifact@v4
