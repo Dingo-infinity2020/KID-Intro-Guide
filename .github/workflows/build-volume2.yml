@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Detect TeX work before starting TeX Live
+      - name: Detect changed work
         id: detect
         shell: bash
         run: |
@@ -43,9 +43,27 @@ jobs:
             need_tex=true
           fi
 
+          need_examples=false
+          if printf '%s\n' "$changed" | grep -Eq '^volume2-fabrication/examples/.*\.py$|^\.github/workflows/build-volume2\.yml$'; then
+            need_examples=true
+          fi
+
           echo "structural=$structural" >> "$GITHUB_OUTPUT"
           echo "chapters=$chapters" >> "$GITHUB_OUTPUT"
           echo "need_tex=$need_tex" >> "$GITHUB_OUTPUT"
+          echo "need_examples=$need_examples" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke-test quantitative examples
+        if: steps.detect.outputs.need_examples == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/kid-volume2-example
+          python3 volume2-fabrication/examples/wafer_to_resonance_demo.py --out /tmp/kid-volume2-example
+          test -s /tmp/kid-volume2-example/wafer_metrology_map.csv
+          test -s /tmp/kid-volume2-example/resonator_map.csv
+          test -s /tmp/kid-volume2-example/summary.txt
+          grep -Fq 'collision_pairs=0' /tmp/kid-volume2-example/summary.txt
 
       - name: Build only required Volume 2 PDFs
         if: steps.detect.outputs.need_tex == 'true'
@@ -118,6 +136,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Smoke-test quantitative examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/kid-volume2-example
+          python3 volume2-fabrication/examples/wafer_to_resonance_demo.py --out /tmp/kid-volume2-example
+          test -s /tmp/kid-volume2-example/wafer_metrology_map.csv
+          test -s /tmp/kid-volume2-example/resonator_map.csv
+          grep -Fq 'collision_pairs=0' /tmp/kid-volume2-example/summary.txt
 
       - name: Build and audit complete Volume 2
         uses: xu-cheng/texlive-action@v3

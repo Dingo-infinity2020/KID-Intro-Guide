@@ -10,7 +10,8 @@
 
 - v0.1 development milestone：**PASS**
 - v0.1 整册：58 页，第 0–9 章第一轮正文完成
-- v0.2：开始进入平台实测约束、定量案例和数据闭环
+- v0.2：**in progress**，开始进入平台实测约束、定量案例和数据闭环
+- v0.2 新增第 10 章：`wafer metrology -> resonance residual -> collision -> next-GDS correction`
 - 第一原则：不写成泛微纳加工教材，所有知识都要回答“它怎样影响 KID 的 `f0`、`Qi`、`Qc`、`Lk`、吸收、噪声、frequency collision 或 yield？”
 - 完整 v0.1 QA：见 `V0.1_MILESTONE_AUDIT.md`
 
@@ -22,6 +23,7 @@
 - `notes/`：知识地图、工艺—器件参数矩阵、设备学习清单与数据约定
 - `references/`：文献与设备/SOP 证据入口
 - `templates/`：process traveler、run manifest、film batch card、wafer metrology map、resonator map、first-cooldown report
+- `examples/`：可运行的定量 toy model；当前包括 wafer-to-resonance feedback demo
 - `figures/`：图件
 - `Makefile`：本地快速构建
 
@@ -38,6 +40,12 @@ make full
 
 ```bash
 make chapter CH=ch03_superconducting_film
+```
+
+只编译 v0.2 的定量闭环章：
+
+```bash
+make chapter CH=ch10_quantitative_loop
 ```
 
 默认单章为 `ch00_overview`。输出放在 `build/`，不会触碰第一册。
@@ -63,6 +71,21 @@ GitHub Actions 的普通章节 push 只编译改动章节；Markdown / 模板修
 - `templates/wafer_metrology_map.csv`：按坐标保存 thickness / Rsq / CD / defect；
 - `templates/resonator_map.csv`：连接设计频率、物理像素和低温 `f0/Qi/Qc`；
 - `templates/first_cooldown_report.md`：把第一次 cooldown 收敛成下一批可执行的 fabrication feedback。
+
+## 可运行的 v0.2 定量例子
+
+当前最小闭环：
+
+```bash
+cd volume2-fabrication
+python3 examples/wafer_to_resonance_demo.py
+```
+
+它使用固定 seed 的 synthetic 8×8 array 演示：
+
+`Rsq/CD wafer map -> frequency-shift surrogate -> measured resonance map -> collision audit -> model-based pre-compensation`
+
+脚本只依赖 Python 标准库，并由 CI 做 smoke test。示例中的 sensitivity、spatial variation 和 collision margin 都是教学参数，不是任何真实加工平台的 specification。详见 `examples/README.md` 和第 10 章。
 
 ## 写作约定
 
