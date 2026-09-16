@@ -60,7 +60,7 @@ anisotropic etch 更强调垂直方向，isotropic etch 会产生更明显的 la
 
 残留可以来自 resist、etch by-product、polymer 或后续清洗不完全。对超导微波器件，残留不能只按“会不会导电短路”判断，因为薄介质残留如果恰好处于高电场区域，也可能增加参与损耗。
 
-\section{为什么 etch 会影响 $f_0$，不仅仅影响 $Q_i$}
+\section{为什么刻蚀会改变谐振频率，而不仅仅影响内部损耗}
 
 如果刻蚀只完美去掉金属、其他所有边界都不变，那么它主要是在实现 GDS 几何。但真实 process 还可能改变：
 
@@ -83,7 +83,7 @@ anisotropic etch 更强调垂直方向，isotropic etch 会产生更明显的 la
 
 已有 Nb LEKID fabrication 工作就把 resonance-spacing nonuniformity 与 silicon surface over-etch 联系起来，并通过限制 substrate etch 改善频率均匀性。这个案例很适合提醒我们：\textbf{pattern transfer 的几何边界包含 substrate，不只有金属。}
 
-\section{为什么 etch damage / residue 会影响 $Q_i$}
+\section{为什么刻蚀损伤和残留会拉低内部品质因数}
 
 超导 resonator 的高电场常集中在 metal edge、gap 和 substrate surface 附近。如果 dry etch 在这些位置造成受损层、粗糙边缘或 polymer residue，就可能增加 TLS-related loss。
 

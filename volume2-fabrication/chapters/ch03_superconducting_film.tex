@@ -1,4 +1,4 @@
-\chapter{超导薄膜：从沉积参数到 $L_k$、$f_0$ 与 $Q_i$}
+\chapter{超导薄膜：从沉积参数到动能电感、谐振频率与内部品质因数}
 
 \begin{chaptergoal}
 把“沉一层 Al”拆成一组可以记录和测量的材料量：厚度 $t$、电阻率 $\rho$、方阻 $R_\square$、临界温度 $T_c$、均匀性、粗糙度、应力和界面历史；理解它们怎样接回第一册的 sheet kinetic inductance、谐振频率和损耗，并知道为什么大阵列必须关心 wafer map，而不能只看中心点。
@@ -22,13 +22,13 @@ $f_0$、frequency scatter、responsivity 与 yield
 
 \section{先认识六个薄膜量}
 
-\subsection{厚度 $t$}
+\subsection{薄膜厚度}
 
 厚度看起来最直观，但“目标 40 nm”只是 deposition 的目标，不是测量结果。至少要区分：设备 thickness monitor 的 readback、witness sample 的实测厚度、以及 across-wafer uniformity。
 
 对一块阵列 wafer，单点厚度不足以回答“整片是否均匀”。如果材料参数随位置平滑变化，resonance frequency 也可能出现空间相关的漂移。
 
-\subsection{电阻率 $\rho$ 与方阻 $R_\square$}
+\subsection{电阻率与方阻}
 
 对于厚度近似均匀、可以用体电阻率描述的薄膜，最基础的关系是
 
@@ -40,7 +40,7 @@ R_\square = \frac{\rho}{t}.
 
 这也说明为什么不能看到 $R_\square$ 变大就立刻说“膜变薄了”：它也可能是 $\rho$ 变了。厚度测量和方阻测量应尽量成对出现。
 
-\subsection{临界温度 $T_c$}
+\subsection{临界温度}
 
 $T_c$ 不只是“材料什么时候超导”的标签。第一册已经讲过，弱耦合 BCS 近似下
 
@@ -69,7 +69,7 @@ $T_c$ 不只是“材料什么时候超导”的标签。第一册已经讲过�
 
 KID 的微波场并不只待在金属体内，还会分布在 metal/substrate、substrate/vacuum 和金属表面附近。因此 film deposition 前后的 surface history 有可能通过界面和介质损耗进入 $Q_i$。这类问题通常不能靠一个单独数值证明，需要 process split、对照片和 power/temperature dependence 等证据共同判断。
 
-\section{从 $R_\square$ 接回 kinetic inductance}
+\section{从方阻接回动能电感}
 
 第一册已经介绍过 sheet kinetic inductance。在常见的低温、低频、dirty-limit BCS 近似下，可以得到一个很有工程直觉的关系：
 
@@ -85,7 +85,7 @@ L_{k,\square} \approx \frac{\hbar R_\square}{\pi\Delta_0}.
 
 这条关系说明了为什么 $R_\square$ 是很有价值的室温/正常态代理量：它不能替代低温测量，却能为 $L_k$ 提供比“名义膜厚”更靠近器件物理的一层证据。
 
-\section{为什么薄膜变化会移动 $f_0$}
+\section{为什么薄膜变化会移动谐振频率}
 
 对一个等效 LC resonator，
 

@@ -22,7 +22,7 @@
 
 只有这五项基本稳定之后，power sweep、temperature sweep、noise PSD、optical response 才更容易解释。
 
-\section{先复习三个 $Q$}
+\section{先复习三个品质因数}
 
 对一个常见 hanger resonator，可以写
 
@@ -97,7 +97,7 @@ Y_{\mathrm{det}}=\frac{N_{\mathrm{matched}}}{N_{\mathrm{design}}}.
 
 不要一看到 frequency 偏差就自动修改 IDC。那可能只是在用设计补偿未知 fabrication bias。
 
-\section{Step 3：看 $Q_c$，验证 coupling geometry}
+\section{Step 3：看外部耦合品质因数，验证 coupling geometry}
 
 如果 $Q_i$ 足够高，$Q_c$ 与设计偏差可以成为很有价值的 coupling-region check。
 
@@ -112,7 +112,7 @@ Y_{\mathrm{det}}=\frac{N_{\mathrm{matched}}}{N_{\mathrm{design}}}.
 
 如果只有个别器件异常，则再查局部 lithography / bridging / defect。
 
-\section{Step 4：看 $Q_i$，但先把它当“症状”}
+\section{Step 4：看内部品质因数，但先把它当“症状”}
 
 $Q_i$ 低可能来自很多不同来源：
 
@@ -145,7 +145,7 @@ $Q_i$ 低可能来自很多不同来源：
 
 反过来，如果 room-temperature film proxy 很正常但低温行为异常，就要扩大到 interface、magnetic environment、package 等其他 hypothesis。
 
-\section{Package / spurious mode 怎样从 $S_{21}$ 看出来}
+\section{Package / spurious mode 怎样从传输曲线看出来}
 
 单个 KID resonance 通常是相对局域、可用 resonator model 拟合的 notch；package / cavity / feedline features 往往更宽、影响更大频段，或者同时扭曲多个 resonator。
 
@@ -214,7 +214,7 @@ $Q_i$ 低且随 package 变化 & bond/package/seam/ground revision & chip 与 pa
 完整 raw $S_{21}$ sweep；resonance inventory；design-to-measured mapping；$f_0,Q_r,Q_i,Q_c$ 表；frequency-error histogram + spatial map；selected power sweep；selected temperature sweep；package/spurious-mode 标记；与 film/CD/defect/package metadata 的统一 sample ID。
 \end{measurebox}
 
-\section{最重要的输出不是“最好 $Q_i$”，而是下一批该改什么}
+\section{最重要的输出不是“最高内部品质因数”，而是下一批该改什么}
 
 一次 fabrication-learning cooldown 的最终报告最好只形成少量明确结论：
 
