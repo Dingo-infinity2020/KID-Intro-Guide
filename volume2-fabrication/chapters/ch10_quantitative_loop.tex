@@ -277,7 +277,7 @@ toy model 可以把“真值”都放在一个脚本里，因为它只是在演�
   \item residual map：$r_i$ 在 wafer coordinate 上的空间结构。
 \end{enumerate}
 
-前三张告诉我们模型解释了什么，第四张告诉我们还漏了什么。下一轮 v0.2 会把 plotting 接到当前已经稳定的 \texttt{joined\_feedback.csv} 上，而不是另外创建一套 notebook-only 数据格式。
+前三张告诉我们模型解释了什么，第四张告诉我们还漏了什么。当前 v0.2 已由 \texttt{examples/plot\_fabrication\_feedback.py} 把这四类诊断接到稳定的 \texttt{joined\_feedback.csv} 上，并额外生成单页 HTML report；下一章给出真实 batch 的操作 runbook。
 
 \begin{measurebox}
 \textbf{一个最小可计算 fabrication-feedback loop：}
