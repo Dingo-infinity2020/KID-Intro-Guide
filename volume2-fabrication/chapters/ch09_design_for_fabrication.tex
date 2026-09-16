@@ -1,18 +1,259 @@
 \chapter{Design for Fabrication：不要只设计一个“仿真里能工作的 KID”}
 
 \begin{chaptergoal}
-把 fabrication tolerance、process bias、test structures 和 array yield 纳入设计；让下一版 GDS 能主动吸收加工平台的真实能力。
+把 fabrication tolerance、systematic process bias、wafer-scale variation、test structures 和 array yield 纳入设计；从“nominal geometry 性能很好”升级到“在真实加工分布里仍然可制造、可测量、可追溯”；形成下一版 GDS 如何吸收上一批 fabrication data 的具体方法。
 \end{chaptergoal}
 
-\section{从 nominal design 走向 process window}
+到这一章，我们已经不再把 fabrication 看成版图之后的一串外部步骤。更合理的设计对象其实有三个版本：
 
-工程设计不只问 nominal geometry 下性能是否最好，还要问在 $\pm\Delta w$、$\pm\Delta g$、$\pm\Delta t$、材料批次变化和封装偏差下，性能是否仍然可接受。对大阵列，frequency collision 往往让这种 tolerance 比单像素峰值性能更重要。
+\begin{center}
+\textbf{as-designed device $\rightarrow$ as-fabricated device $\rightarrow$ as-measured device}
+\end{center}
 
-\processchain{工艺能力分布 $\rightarrow$ geometry/material distribution $\rightarrow$ $f_0,Q_i,Q_c$ distribution $\rightarrow$ collision / yield $\rightarrow$ mask 与版图修正}
+真正成熟的 KID 设计，必须让这三个版本之间存在可解释、可重复的映射。
 
-\section{建议从第一版就放入的 test structures}
+\processchain{工艺能力分布 $\rightarrow$ geometry / material distribution $\rightarrow$ resonator parameter distribution $\rightarrow$ collision / loss / yield $\rightarrow$ 下一版版图与工艺修正}
 
-可以考虑独立的 linewidth/gap monitor、方阻/连续性结构、不同 coupler 强度、不同 meander CD、不同 IDC bias，以及用于测量 etch/膜厚的见证区域。具体结构应服务于“下一次设计要修正什么”，而不是为了填满版图空白。
+\section{Nominal optimum 不等于工程 optimum}
+
+仿真优化经常寻找一个最优点：某个 linewidth、gap、backshort spacing 或 coupling geometry 让吸收率最高、$Q_c$ 最接近目标、谐振频率恰好落在设计值。
+
+但真实 fabrication 不会永远落在单一点上。即使所有步骤都“正常”，最终也会出现厚度、方阻、线宽、gap、etch depth 和 package dimension 的分布。因此工程设计更应该问：
+
+\begin{quote}
+如果所有关键变量都在平台真实的 process window 内波动，器件性能是否仍然落在可接受区域？
+\end{quote}
+
+如果一个结构在 nominal point 上极好，却对 $0.1\,\mu\mathrm{m}$ 线宽变化或几个百分点膜厚变化极其敏感，它可能并不是适合当前平台的最好设计。
+
+\section{先把输入和输出写成向量}
+
+可以把 fabrication / design variables 写成
+
+\[
+\mathbf{x}=
+\begin{bmatrix}
+ t & R_\square & T_c & w & g & C_{\mathrm{IDC}} & C_c & d_{\mathrm{etch}} & d_{\mathrm{pkg}} & \cdots
+\end{bmatrix}^{\!T},
+\]
+
+而关心的器件输出写成
+
+\[
+\mathbf{y}=
+\begin{bmatrix}
+ f_0 & Q_i & Q_c & A_{\mathrm{opt}} & \mathrm{NEP} & \cdots
+\end{bmatrix}^{\!T}.
+\]
+
+在 nominal point 附近，小扰动可以先用一阶 sensitivity matrix 建立工程直觉：
+
+\[
+\delta\mathbf{y}\approx \mathbf{J}\,\delta\mathbf{x},
+\qquad
+J_{ij}=\frac{\partial y_i}{\partial x_j}.
+\]
+
+这并不要求所有 KID physics 都线性。它的价值是帮助我们回答：\textbf{哪几个 fabrication variable 最值得测，哪几个 tolerance 最值得优先收紧？}
+
+如果某个变量对目标性能几乎不敏感，就没必要为了它牺牲大量工艺复杂度；反之，如果一个很难控制的变量恰好是最高敏感方向，就应该重新考虑 geometry 或 system architecture。
+
+\section{Systematic bias 和 random scatter 必须分开}
+
+这是整个 DfM 中最重要的区分之一。
+
+\subsection{Systematic bias}
+
+例如整个 wafer 的 linewidth 都比 GDS 大约宽 $0.2\,\mu$m，或者一批 resonator 的 $f_0$ 都比 design 低约同一比例。只要这种偏差在相同工艺下可重复，它往往可以通过 model update 或 mask pre-compensation 吸收。
+
+\subsection{Random / spatial scatter}
+
+如果 linewidth 的偏差在 wafer 上有随机或空间变化，即使平均值正好等于设计值，也会造成 resonator-to-resonator frequency scatter。
+
+对于频分复用阵列，后者通常更难处理，因为它直接侵蚀相邻 resonator 的安全间隔。
+
+因此，“平均频率很准”并不是 array fabrication 的充分指标。至少还要看 spread、spatial map 和 nearest-neighbor spacing。
+
+\section{从单变量敏感度走向 variance budget}
+
+如果在第一近似中把几个 fabrication variable 看作互不相关的小扰动，则某个输出的方差可以写成
+
+\[
+\sigma_y^2\approx
+\sum_i
+\left(\frac{\partial y}{\partial x_i}\right)^2
+\sigma_{x_i}^2.
+\]
+
+如果变量之间有相关性，还需要加入 covariance 项。早期研究阶段不必立刻建立复杂统计模型，但这个式子已经足以改变工作方式：
+
+\begin{itemize}
+  \item 不再只列“工艺误差有哪些”；
+  \item 而是尝试估计每一种误差对 $f_0$、$Q_c$ 或 absorption spread 的贡献。
+\end{itemize}
+
+例如对 resonance frequency，film thickness / $R_\square$ 影响 kinetic inductance，linewidth/gap 影响 $L$ 与 $C$，substrate / etch 影响 dielectric boundary。哪一项最后占主导，应由 sensitivity 和实测 $\sigma_x$ 一起决定。
+
+\section{Frequency collision：为什么阵列会放大加工误差}
+
+单个 resonator 偏几十 MHz 也许仍然能读；阵列中，相邻 resonator 如果被 fabrication scatter 推到一起，就可能出现 collision、line-shape distortion 或无法稳定分配 tone。
+
+因此阵列设计不能只给每个 resonator 一个 nominal frequency，还要给它一个统计安全间隔。
+
+可以先用一个概念性条件理解：
+
+\[
+|f_i-f_j| > k\,\Delta f_{\mathrm{eff}},
+\]
+
+其中 $\Delta f_{\mathrm{eff}}$ 是与 resonator linewidth、读出算法、拟合稳定性相关的有效安全尺度，$k$ 不是一个全行业通用常数，而应由系统定义。
+
+真正重要的是：设计 spacing 必须同时容纳\textbf{器件线宽 + fabrication frequency scatter + readout margin}。
+
+已有大型 KID / superconducting resonator 阵列工作已经把 wafer-scale material / geometry variation、frequency collision 和 multiplexing yield 放在同一个优化框架中，也发展出 tile-and-trim、post-measurement trimming 等策略。这说明 DfM 并不是制造部门的附加检查，而是阵列架构的一部分。
+
+\section{Monte Carlo：不要只扫一个“最坏值”}
+
+当已经有第一批 fabrication statistics 后，可以把关键变量的经验分布放进 Monte Carlo：
+
+\begin{enumerate}
+  \item 从 measured thickness / $R_\square$ / CD distribution 采样；
+  \item 通过解析 sensitivity、surrogate model 或 EM lookup table 得到每个 resonator 的参数；
+  \item 生成整个 array 的 frequency realization；
+  \item 统计 collision、out-of-band、coupling mismatch 等 yield；
+  \item 比较不同 nominal spacing / ordering / geometry 的鲁棒性。
+\end{enumerate}
+
+这比单纯把所有 tolerance 同时推到“最坏端点”更接近 wafer-scale array 的真实风险。
+
+但要注意：如果 fabrication variation 明显有 spatial correlation，就不应该把每个 pixel 当作独立随机数。中心到边缘的平滑 gradient 需要保留空间结构。
+
+\section{Process capability：什么时候才值得谈 Cp / Cpk}
+
+工业制造常用 process capability 指标，例如在稳定、近似正态的前提下
+
+\[
+C_p=\frac{\mathrm{USL}-\mathrm{LSL}}{6\sigma},
+\]
+
+用 specification width 与 process spread 比较。
+
+这个概念对 KID 也有启发，但早期科研工艺不要机械套公式。若 batch 很少、process 仍在频繁调整、分布有明显空间梯度或多峰结构，那么一个漂亮的 $C_p$ 数字可能没有实际意义。
+
+v0.1 阶段更重要的是先做到：
+
+\begin{itemize}
+  \item specification 是由 design sensitivity 推出来的；
+  \item process spread 是实测的；
+  \item systematic bias 与 random variation 分开；
+  \item 每一次 recipe / tool / operator 的重大变化都有 revision。
+\end{itemize}
+
+\section{第一版就应该放的 test structures}
+
+测试结构不应该等“器件失败了再补”。建议从第一版 GDS 就预留一小块诊断空间。
+
+\subsection{Geometry monitor}
+
+linewidth / gap ladder、dense / isolated pattern、不同 corner / turn，以及 coupler / IDC 的 representative CD。它们负责告诉我们：GDS 到 final geometry 的 transfer function 是什么。
+
+\subsection{Material witness / sheet-resistance structure}
+
+提供适合 thickness、$R_\square$ 或其他材料表征的位置，使材料数据不必依赖完整 pixel。
+
+\subsection{Continuity / open-short structure}
+
+用于快速发现 gross pattern-transfer failure，避免把明显断路带进低温系统。
+
+\subsection{Microwave diagnostic resonator}
+
+如果版图面积允许，可以加入几组 deliberately varied geometry / participation / coupling 的简单 resonator，用来区分 interface loss、coupling error 和 film-related trends。
+
+\section{不要让 test structure 变成“参数动物园”}
+
+一个常见反面例子是：在空白区塞十几种变化，但没有明确 hypothesis，最后也不知道哪一组该测。
+
+每个 test structure 在 tapeout 前都应该能补全一句话：
+
+\begin{quote}
+“如果它的测量结果是 A 而不是 B，我们下一版会因此修改 ______。”
+\end{quote}
+
+填不出来的测试结构，优先级通常不高。
+
+\section{Controlled split：一次 fabrication run 最好只回答少量问题}
+
+如果同一批同时更换 substrate、清洗、Al deposition、resist、etch、package 和 geometry，那么即使最终 $Q_i$ 提高两倍，也很难知道为什么。
+
+更有学习价值的是 controlled split：保持大多数变量不变，只让一个或少数变量形成对照。
+
+最简单是 A/B split。随着经验增加，也可以用 factorial design 探索变量交互，但前提是 sample 数量和 process repeatability 足够。
+
+对我们的第一阶段，宁愿一次回答：
+
+\begin{center}
+“surface preparation A 与 B 对低功率 $Q_i$ 有没有可重复差异？”
+\end{center}
+
+也不要一次问十个无法区分的问题。
+
+\section{把本地平台能力写进 GDS 规则}
+
+最终，DfM 不应该只存在于讲义文字中，而要沉淀成一个 machine-readable / checklist-like design rule set。例如：
+
+\begin{itemize}
+  \item preferred linewidth / gap range；
+  \item 不建议使用的 marginal feature；
+  \item measured systematic CD bias；
+  \item dicing keep-out；
+  \item bond-pad geometry / keep-out；
+  \item alignment / coordinate convention；
+  \item test coupon requirement；
+  \item package optical / microwave critical dimension；
+  \item GDS revision / process revision metadata。
+\end{itemize}
+
+这些规则不应直接从设备宣传分辨率复制，而应该来自我们自己的 metrology 与 yield data。
+
+\section{从测量结果生成下一版 GDS 修正}
+
+可以把反馈分成三类。
+
+\subsection{Model correction}
+
+如果 as-fabricated geometry 和材料都与记录一致，但实测 $f_0$ 长期存在可重复偏差，那么应优先修正 EM / material model，而不是假装 fabrication 错了。
+
+\subsection{Mask compensation}
+
+如果存在稳定的 systematic CD / frequency bias，可以在确认 repeatability 后进行预补偿。这里的关键词是“稳定”：不可重复的 scatter 不能靠固定 offset 消掉。
+
+\subsection{Robust redesign}
+
+如果某个设计对当前平台不可避免的 variation 过于敏感，更好的办法往往不是无限收紧 process，而是换一个 sensitivity 更低的 geometry、增加 frequency margin 或改变 resonator ordering。
+
+这也是 DfM 最成熟的一步：\textbf{不是要求工艺完美，而是让设计适应真实工艺。}
+
+\section{一个建议的 Pre-Fabrication Review}
+
+第一批正式 Al LEKID tapeout 前，可以固定做一次短 review。至少回答：
+
+\begin{enumerate}
+  \item 每个关键尺寸的 nominal value 和 tolerance 来自哪里？
+  \item 哪些参数最影响 $f_0$、$Q_c$ 和 optical absorption？
+  \item 哪些 tolerance 已由本地平台实测，哪些仍是假设？
+  \item wafer / pixel / resonance ID 能否端到端追溯？
+  \item test coupon 能否区分 film / lithography / etch / package 的主要 failure mode？
+  \item dicing、bond、package、backshort 是否已经进入同一机械图？
+  \item 第一轮 cooldown 的成功标准是什么？
+  \item 如果失败，现有数据足不足以知道下一批只改什么？
+\end{enumerate}
+
+如果最后一条答案是否定的，那么这次 tapeout 仍然缺少实验设计。
+
+\begin{measurebox}
+\textbf{DfM 最小交付物：}
+critical-variable list；nominal + tolerance + evidence source；film/CD/process statistics；sensitivity table；frequency-collision simulation 或 margin analysis；test-structure map；dicing/bond/package rules；GDS revision；first-cooldown acceptance criteria；下一版 feedback template。
+\end{measurebox}
 
 \section{第二册最终要形成的闭环}
 
@@ -20,4 +261,19 @@
 \textbf{设计假设 $\rightarrow$ 工艺记录 $\rightarrow$ 室温表征 $\rightarrow$ 低温结果 $\rightarrow$ 参数反演 $\rightarrow$ 下一版设计}
 \end{center}
 
-当这个闭环可以重复运行时，加工就不再是外包给洁净室的黑箱，而成为 KID 设计模型的一部分。
+这个闭环跑起来以后，cleanroom 不再是“把 GDS 变成芯片的黑箱”，而成为 KID model 的实验组成部分。
+
+更进一步，当我们积累几批可追溯数据后，就可以把第一册里的 EM/material simulation 和第二册里的 fabrication statistics 接起来，形成真正的数据驱动 tolerance optimization。这会比单纯追求某一次最好看的 $Q_i$ 更有长期价值。
+
+\begin{checkpointbox}
+面对一个 nominal simulation 很优秀的新 geometry，先不要问“能不能 tapeout”。先问：最敏感的三个 fabrication variable 是什么？平台目前的实际 spread 多大？这些 spread 放进 array 后会造成多少 frequency / coupling / absorption variation？如果回答不了，下一步通常应该是 tolerance study 或 test coupon，而不是马上加工整片 science array。
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item C. M. McKenney et al., wafer-scale frequency variation and tile-and-trim array fabrication, \href{https://www.nist.gov/publications/tile-and-trim-micro-resonator-array-fabrication-optimized-high-multiplexing-factors}{NIST / Rev. Sci. Instrum. 90, 023908}.
+  \item S. Shu et al., measured film/geometry variation and KID frequency deviations, \href{https://arxiv.org/abs/2105.14046}{arXiv:2105.14046}.
+  \item X. Liu et al., post-measurement lithographic frequency trimming for low collision rate, \href{https://www.nist.gov/publications/superconducting-micro-resonator-arrays-ideal-frequency-spacing}{NIST / Opt. Express 25, 2017}.
+  \item J. Li et al., linewidth-driven frequency scatter in superconducting resonator arrays, \href{https://arxiv.org/abs/2203.17244}{arXiv:2203.17244}.
+\end{itemize}
