@@ -5,12 +5,10 @@ This is a teaching example, not a fabrication recipe and not a claim about a
 specific laboratory process. All numbers are deliberately synthetic.
 
 The demo connects:
+  wafer metrology -> frequency-shift surrogate -> collision audit
+  -> model-based pre-compensation for the next design revision.
 
-    wafer metrology -> frequency-shift surrogate -> collision audit
-    -> model-based pre-compensation for the next design revision
-
-The two primary CSV files intentionally use the same column contract as
-``templates/wafer_metrology_map.csv`` and ``templates/resonator_map.csv``.
+The two primary CSV files use the same column contracts as the templates.
 Only Python's standard library is required.
 """
 
@@ -44,7 +42,7 @@ PACKAGE_ID = "PKG_SYNTH_001"
 COOLDOWN_ID = "CD_SYNTH_001"
 
 WAFER_FIELDS = [
-    "project_id",\ "batch_id", "wafer_id", "die_id", "resonator_id",
+    "project_id", "batch_id", "wafer_id", "die_id", "resonator_id",
     "metrology_run_id", "measurement_id", "feature_id", "feature_type",
     "x_mm", "y_mm", "thickness_nm", "Rsq_ohm_sq", "Tc_K",
     "linewidth_design_um", "linewidth_meas_um", "gap_design_um",
@@ -67,19 +65,17 @@ TRUTH_FIELDS = [
 ]
 
 
-def build_records(seed: int = RNG_SEED) -> list[dict[str, float | int | str]]:
-    """Create a deterministic synthetic 8x8 wafer/resonator data set."""
+def build_records(seed=RNG_SEED):
     rng = random.Random(seed)
-    rows: list[dict[str, float | int | str]] = []
-
+    rows = []
     for row in range(NSIDE):
         for col in range(NSIDE):
-            pixel_index = row * NSIDE + col
-            resonator_id = f"R{pixel_index:03d}"
-            x_norm = (col - (NSIDE - 1) / 2) / ((NSIDE - 1) / 2)
-            y_norm = (row - (NSIDE - 1) / 2) / ((NSIDE - 1) / 2)
-            x_mm = col - (NSIDE - 1) / 2
-            y_mm = row - (NSIDE - 1) / 2
+            index = row * NSIDE + col
+            resonator_id = f"R{index:03d}"
+            x_norm = (col - 3.5) / 3.5
+            y_norm = (row - 3.5) / 3.5
+            x_mm = col - 3.5
+            y_mm = row - 3.5
 
             rsq_frac = (
                 0.0040 * x_norm
@@ -91,7 +87,6 @@ def build_records(seed: int = RNG_SEED) -> list[dict[str, float | int | str]]:
                 + 0.008 * x_norm
                 + rng.gauss(0.0, 0.005)
             )
-
             rsq_ohm_sq = R_SQ_NOM_OHM * (1.0 + rsq_frac)
             linewidth_um = LINEWIDTH_NOM_UM + linewidth_delta_um
 
@@ -106,7 +101,7 @@ def build_records(seed: int = RNG_SEED) -> list[dict[str, float | int | str]]:
                 frac_shift_film + frac_shift_cd + frac_shift_unmodeled
             )
 
-            target_hz = F_START_HZ + pixel_index * DESIGN_SPACING_HZ
+            target_hz = F_START_HZ + index * DESIGN_SPACING_HZ
             measured_hz_before = target_hz * (1.0 + frac_shift_total)
             predicted_frac_shift = frac_shift_film + frac_shift_cd
             design_hz_after = target_hz / (1.0 + predicted_frac_shift)
@@ -130,36 +125,27 @@ def build_records(seed: int = RNG_SEED) -> list[dict[str, float | int | str]]:
                 "measured_hz_after": measured_hz_after,
                 "qr": Q_R,
             })
-
     return rows
 
 
 def detect_collisions(rows, frequency_key):
-    """Find adjacent resonances closer than the demo collision margin."""
-    ordered = sorted(rows, key=lambda item: float(item[frequency_key]))
+    ordered = sorted(rows, key=lambda item: item[frequency_key])
     collisions = []
     involved = set()
-
     for left, right in zip(ordered, ordered[1:]):
-        f_left = float(left[frequency_key])
-        f_right = float(right[frequency_key])
-        q_left = float(left["qr"])
-        q_right = float(right["qr"])
+        f_left = left[frequency_key]
+        f_right = right[frequency_key]
         separation_hz = f_right - f_left
-        linewidth_hz = max(f_left / q_left, f_right / q_right)
+        linewidth_hz = max(f_left / left["qr"], f_right / right["qr"])
         threshold_hz = COLLISION_MARGIN_LINEWIDTHS * linewidth_hz
-
         if separation_hz < threshold_hz:
-            left_id = str(left["resonator_id"])
-            right_id = str(right["resonator_id"])
             collisions.append({
-                "left_resonator": left_id,
-                "right_resonator": right_id,
+                "left_resonator": left["resonator_id"],
+                "right_resonator": right["resonator_id"],
                 "separation_hz": separation_hz,
                 "threshold_hz": threshold_hz,
             })
-            involved.update((left_id, right_id))
-
+            involved.update((left["resonator_id"], right["resonator_id"]))
     return collisions, involved
 
 
@@ -178,13 +164,13 @@ def write_wafer_csv(rows, path):
                 "measurement_id": f"M{index:03d}",
                 "feature_id": f"F{index:03d}",
                 "feature_type": "resonator_trace",
-                "x_mm": f"{float(row['x_mm']):.3f}",
-                "y_mm": f"{float(row['y_mm']):.3f}",
+                "x_mm": f"{row['x_mm']:.3f}",
+                "y_mm": f"{row['y_mm']:.3f}",
                 "thickness_nm": "",
-                "Rsq_ohm_sq": f"{float(row['rsq_ohm_sq']):.9g}",
+                "Rsq_ohm_sq": f"{row['rsq_ohm_sq']:.9g}",
                 "Tc_K": "",
                 "linewidth_design_um": f"{LINEWIDTH_NOM_UM:.6g}",
-                "linewidth_meas_um": f"{float(row['linewidth_um']):.9g}",
+                "linewidth_meas_um": f"{row['linewidth_um']:.9g}",
                 "gap_design_um": "",
                 "gap_meas_um": "",
                 "etch_or_recess_nm": "",
@@ -202,10 +188,10 @@ def write_resonator_csv(rows, collision_resonators, path):
         writer = csv.DictWriter(handle, fieldnames=RESONATOR_FIELDS)
         writer.writeheader()
         for row in rows:
-            target_hz = float(row["target_hz"])
-            measured_hz = float(row["measured_hz_before"])
+            target_hz = row["target_hz"]
+            measured_hz = row["measured_hz_before"]
             delta_hz = measured_hz - target_hz
-            resonator_id = str(row["resonator_id"])
+            resonator_id = row["resonator_id"]
             writer.writerow({
                 "project_id": PROJECT_ID,
                 "batch_id": BATCH_ID,
@@ -215,13 +201,13 @@ def write_resonator_csv(rows, collision_resonators, path):
                 "gds_revision": GDS_REVISION,
                 "package_id": PACKAGE_ID,
                 "cooldown_id": COOLDOWN_ID,
-                "x_mm": f"{float(row['x_mm']):.3f}",
-                "y_mm": f"{float(row['y_mm']):.3f}",
+                "x_mm": f"{row['x_mm']:.3f}",
+                "y_mm": f"{row['y_mm']:.3f}",
                 "design_f0_Hz": f"{target_hz:.9f}",
                 "measured_f0_Hz": f"{measured_hz:.9f}",
                 "delta_f_Hz": f"{delta_hz:.9f}",
                 "delta_f_frac": f"{delta_hz / target_hz:.12g}",
-                "Qr": f"{float(row['qr']):.9g}",
+                "Qr": f"{row['qr']:.9g}",
                 "Qi": "",
                 "Qc": "",
                 "fit_status": "PASS",
@@ -237,7 +223,6 @@ def write_resonator_csv(rows, collision_resonators, path):
 
 
 def write_truth_csv(rows, path):
-    """Keep synthetic hidden components separate from the raw-data contract."""
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=TRUTH_FIELDS)
         writer.writeheader()
@@ -246,18 +231,17 @@ def write_truth_csv(rows, path):
                 "resonator_id": row["resonator_id"],
                 "row": row["row"],
                 "col": row["col"],
-                "frac_shift_film": f"{float(row['frac_shift_film']):.12g}",
-                "frac_shift_cd": f"{float(row['frac_shift_cd']):.12g}",
-                "frac_shift_unmodeled": f"{float(row['frac_shift_unmodeled']):.12g}",
-                "predicted_frac_shift": f"{float(row['predicted_frac_shift']):.12g}",
-                "design_f0_after_Hz": f"{float(row['design_hz_after']):.9f}",
-                "measured_f0_after_Hz": f"{float(row['measured_hz_after']):.9f}",
+                "frac_shift_film": f"{row['frac_shift_film']:.12g}",
+                "frac_shift_cd": f"{row['frac_shift_cd']:.12g}",
+                "frac_shift_unmodeled": f"{row['frac_shift_unmodeled']:.12g}",
+                "predicted_frac_shift": f"{row['predicted_frac_shift']:.12g}",
+                "design_f0_after_Hz": f"{row['design_hz_after']:.9f}",
+                "measured_f0_after_Hz": f"{row['measured_hz_after']:.9f}",
             })
 
 
 def ppm_error(row, measured_key):
-    target_hz = float(row["target_hz"])
-    return 1.0e6 * (float(row[measured_key]) - target_hz) / target_hz
+    return 1.0e6 * (row[measured_key] - row["target_hz"]) / row["target_hz"]
 
 
 def build_summary(rows):
@@ -265,7 +249,6 @@ def build_summary(rows):
     after_collisions, _ = detect_collisions(rows, "measured_hz_after")
     before_ppm = [ppm_error(row, "measured_hz_before") for row in rows]
     after_ppm = [ppm_error(row, "measured_hz_after") for row in rows]
-
     summary = {
         "n_resonators": len(rows),
         "before_collision_pairs": len(before_collisions),
@@ -275,18 +258,15 @@ def build_summary(rows):
         "after_mean_error_ppm": statistics.mean(after_ppm),
         "after_std_error_ppm": statistics.pstdev(after_ppm),
         "before_max_abs_error_mhz": max(
-            abs(float(row["measured_hz_before"]) - float(row["target_hz"]))
-            for row in rows
+            abs(row["measured_hz_before"] - row["target_hz"]) for row in rows
         ) / 1.0e6,
         "after_max_abs_error_mhz": max(
-            abs(float(row["measured_hz_after"]) - float(row["target_hz"]))
-            for row in rows
+            abs(row["measured_hz_after"] - row["target_hz"]) for row in rows
         ) / 1.0e6,
     }
-
-    if not summary["after_std_error_ppm"] < summary["before_std_error_ppm"]:
+    if summary["after_std_error_ppm"] >= summary["before_std_error_ppm"]:
         raise RuntimeError("Expected pre-compensation to reduce synthetic scatter.")
-    if not summary["after_collision_pairs"] <= summary["before_collision_pairs"]:
+    if summary["after_collision_pairs"] > summary["before_collision_pairs"]:
         raise RuntimeError("Expected pre-compensation not to increase collisions.")
     return summary, before_collisions, after_collisions
 
@@ -354,7 +334,6 @@ def main():
     rows = build_records()
     summary, before_collisions, after_collisions = build_summary(rows)
     _, before_collision_resonators = detect_collisions(rows, "measured_hz_before")
-
     write_wafer_csv(rows, args.out / "wafer_metrology_map.csv")
     write_resonator_csv(
         rows, before_collision_resonators, args.out / "resonator_map.csv"
