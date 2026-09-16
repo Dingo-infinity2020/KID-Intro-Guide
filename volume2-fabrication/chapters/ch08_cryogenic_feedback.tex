@@ -1,15 +1,241 @@
 \chapter{低温测量如何反推工艺}
 
 \begin{chaptergoal}
-把低温 $S_{21}$ 从“最终成绩”变成工艺诊断工具：先看 resonance map，再看 $Q_i/Q_c$、功率与温度依赖，最后才讨论更深层噪声。
+把低温 $S_{21}$ 从“最终成绩”变成 fabrication diagnosis：第一轮 cooldown 先建立 resonance inventory 和 wafer map，再看 $f_0,Q_r,Q_i,Q_c$、功率与温度依赖，最后才进入噪声与 NEP；学会用多条证据缩小 design / material / fabrication / package / readout 的责任范围，而不是把一个异常 notch 直接归因到某道工艺。
 \end{chaptergoal}
 
-\section{第一轮冷却先回答简单问题}
+第一次把一片新 KID wafer 放进低温系统时，很容易兴奋地直接去找最好的 $Q_i$ 或最低的 NEP。但从 fabrication learning 的角度，更重要的问题其实更朴素：\textbf{我们做出来的东西，整体上和设计有多像？偏差有没有结构？}
 
-第一轮 cooldown 的优先级通常不是立刻做极限 NEP，而是确认：有多少设计 resonance 被找到？频率整体偏向哪里？频率散布是否有空间相关性？$Q_c$ 是否接近设计？$Q_i$ 是否整体受限？是否出现 spurious modes 或异常 baseline？
+\processchain{低温 observables $\rightarrow$ resonance inventory / map $\rightarrow$ 与 film、CD、defect、package 数据对照 $\rightarrow$ 缩小 design / material / fabrication / package / readout 的 hypothesis space}
 
-\processchain{低温 observables $\rightarrow$ 与设计/室温 metrology 对照 $\rightarrow$ 缩小 design / material / fabrication / package / readout 的责任范围}
+\section{第一轮 cooldown 的五个优先级}
 
-\section{几个典型诊断方向}
+建议按下面顺序，而不是一上来就做极限 sensitivity：
 
-如果 $Q_c$ 系统性偏离而 $Q_i$ 尚可，应优先检查 coupler 实际几何和电磁模型；如果整片 $f_0$ 发生相关漂移，应把膜厚/方阻/CD wafer map 纳入对照；如果 $Q_i$ 极低且器件间差异大，则更需要检查局部缺陷、界面、封装与污染证据。这里强调“优先级”，而不是把任何单一症状与某个工艺原因机械一一对应。
+\begin{enumerate}
+  \item 找到多少个 resonance？
+  \item $f_0$ 相对设计整体偏高还是偏低？spread 多大？
+  \item $Q_c$ 是否大致符合 coupling design？
+  \item $Q_i$ 的分布怎样？是否有空间相关性或异常簇？
+  \item baseline / spurious modes / package features 是否干扰正常拟合？
+\end{enumerate}
+
+只有这五项基本稳定之后，power sweep、temperature sweep、noise PSD、optical response 才更容易解释。
+
+\section{先复习三个 $Q$}
+
+对一个常见 hanger resonator，可以写
+
+\[
+\frac{1}{Q_r}=\frac{1}{Q_i}+\frac{1}{Q_c},
+\]
+
+其中 $Q_r$（也常写 loaded $Q$）决定总线宽，$Q_i$ 表示内部损耗，$Q_c$ 表示与 feedline 的外部耦合。
+
+这三个量在 fabrication diagnosis 中承担不同角色：
+
+\begin{itemize}
+  \item $f_0$：对 $L,C$ 以及材料/几何变化敏感；
+  \item $Q_c$：优先反映 coupling geometry 与局部 EM environment；
+  \item $Q_i$：综合承载 film、interface、TLS、quasiparticle、vortex、radiation、package 等内部/寄生损耗。
+\end{itemize}
+
+因此 $Q_i$ 最有价值、也最不能“看到一个数就下结论”。
+
+\section{Step 1：建立 resonance inventory}
+
+第一份低温输出应该不是漂亮的单个 notch，而是一张全 readout band 的 inventory：
+
+\begin{itemize}
+  \item design resonance count；
+  \item detected resonance count；
+  \item unmatched / ambiguous resonance count；
+  \item frequency collision / merged-notch candidate；
+  \item obvious spurious / package-mode candidate；
+  \item unusable frequency regions。
+\end{itemize}
+
+定义一个最朴素的 detection yield：
+
+\[
+Y_{\mathrm{det}}=\frac{N_{\mathrm{matched}}}{N_{\mathrm{design}}}.
+\]
+
+它不等于 science yield，但能让不同 fabrication batch 有一个最基本的比较起点。
+
+\section{Step 2：把 frequency 变成 map，而不是一列数字}
+
+如果能把 measured resonance 对应回 physical resonator，就可以定义
+
+\[
+\Delta f_i=f_{0,i}^{\mathrm{meas}}-f_{0,i}^{\mathrm{design}},
+\qquad
+\epsilon_i=\frac{\Delta f_i}{f_{0,i}^{\mathrm{design}}}.
+\]
+
+然后至少看三种图：
+
+\begin{enumerate}
+  \item measured vs designed frequency；
+  \item fractional error histogram；
+  \item error vs physical position / wafer coordinate。
+\end{enumerate}
+
+第三张图特别重要，因为 fabrication variation 往往具有空间结构。已有大规模 MKID 工作正是通过 physical-pixel-to-frequency mapping 和 wafer-scale statistics 来理解 frequency scatter，并进一步做 trimming 或优化 resonator ordering。
+
+\section{Frequency map 怎样反推 fabrication}
+
+不同图形特征对应不同的优先假设：
+
+\begin{itemize}
+  \item \textbf{全片近似同方向整体偏移：} 先检查材料模型、平均 $R_\square/t/T_c$、systematic CD bias、substrate dielectric / EM model；
+  \item \textbf{中心到边缘平滑梯度：} film thickness / $R_\square$ map、lithography CD map、etch nonuniformity；
+  \item \textbf{局部区域异常：} defect map、颗粒、局部 lithography / etch failure；
+  \item \textbf{相邻设计频率大量碰撞：} scatter 是否已经接近或超过设计 spacing；
+  \item \textbf{随机但很大的 scatter：} 先确认 resonator mapping 和 fitting 是否可靠，再讨论 fabrication randomness。
+\end{itemize}
+
+不要一看到 frequency 偏差就自动修改 IDC。那可能只是在用设计补偿未知 fabrication bias。
+
+\section{Step 3：看 $Q_c$，验证 coupling geometry}
+
+如果 $Q_i$ 足够高，$Q_c$ 与设计偏差可以成为很有价值的 coupling-region check。
+
+当一批器件的 $Q_c$ 系统性偏大或偏小时，应优先对照：
+
+\begin{itemize}
+  \item coupler gap / length final CD；
+  \item feedline geometry；
+  \item substrate / package environment 是否与 simulation 一致；
+  \item resonance fit 是否正确处理 cable delay / asymmetry / background。
+\end{itemize}
+
+如果只有个别器件异常，则再查局部 lithography / bridging / defect。
+
+\section{Step 4：看 $Q_i$，但先把它当“症状”}
+
+$Q_i$ 低可能来自很多不同来源：
+
+\begin{itemize}
+  \item film intrinsic loss / quasiparticles；
+  \item substrate / interface TLS；
+  \item etch damage / residue；
+  \item trapped magnetic vortex；
+  \item radiation / leakage；
+  \item package conductor / seam；
+  \item local defect；
+  \item fitting / calibration error。
+\end{itemize}
+
+所以一个低 $Q_i$ 数值不构成 root cause。真正有用的是它随功率、温度、位置、geometry 或 package revision 怎样变化。
+
+\section{Power sweep：区分“会饱和的损耗”和其他损耗}
+
+很多 amorphous-interface TLS loss 会表现出明显的 microwave-power dependence：低激励时损耗较强，随着 TLS 被逐渐饱和，$Q_i$ 可能上升。
+
+因此 power sweep 是检查 TLS-like behavior 的重要工具之一。但仍要注意：readout power 过高时，KID 自身会出现非线性、加热或 bifurcation 等效应。
+
+所以 power sweep 的目标不是“功率越大 $Q$ 越好”，而是找到线性/低功率区、识别趋势，并与 geometry / surface-process split 比较。
+
+\section{Temperature sweep：把材料模型重新接回来}
+
+随着温度接近 $T_c$ 的一定比例，thermal quasiparticle population 增加，complex conductivity、kinetic inductance 和 dissipation 都会变化，因此 $f_0(T)$ 和 $Q_i(T)$ 可以与 Mattis--Bardeen / quasiparticle model 比较。
+
+如果 measured $T_c$、$R_\square$、film thickness 与低温 $f_0(T)$ / $Q_i(T)$ 能形成一致解释，那么第 3 章的 film batch card 才真正闭环。
+
+反过来，如果 room-temperature film proxy 很正常但低温行为异常，就要扩大到 interface、magnetic environment、package 等其他 hypothesis。
+
+\section{Package / spurious mode 怎样从 $S_{21}$ 看出来}
+
+单个 KID resonance 通常是相对局域、可用 resonator model 拟合的 notch；package / cavity / feedline features 往往更宽、影响更大频段，或者同时扭曲多个 resonator。
+
+可以通过几种便宜的比较提高判断力：
+
+\begin{itemize}
+  \item empty / reference package sweep；
+  \item 同一 die 换 package / lid / bond revision；
+  \item 多个不同 die 是否都在相似频率出现同一 feature；
+  \item EM simulation 中的 package mode 是否与实测 feature 接近。
+\end{itemize}
+
+如果 package feature 没有先处理，强行拟合附近 KID 的 $Q_i/Q_c$ 往往没有太大意义。
+
+\section{建立一个 fabrication diagnosis matrix}
+
+\begin{center}
+\begin{tabularx}{0.98\textwidth}{>{\bfseries}p{3.3cm} X X}
+\toprule
+低温症状 & 优先对照的数据 & 还不能排除 \\
+\midrule
+$f_0$ 全片整体偏移 & $R_\square,t,T_c$、systematic CD、EM model & substrate / calibration / model error \\
+$f_0$ 有空间梯度 & film map、CD map、etch map & thermal / mapping error \\
+大量 collision & frequency scatter statistics、spacing design & fitting/mapping ambiguity \\
+$Q_c$ 系统偏差 & coupler CD、feedline、EM model & background-fit / package \\
+$Q_i$ 低且 power-dependent & surface/interface split、geometry participation & heating / readout nonlinearity \\
+$Q_i$ 低且随 package 变化 & bond/package/seam/ground revision & chip 与 package 共同损耗 \\
+局部 resonator 缺失 & defect map、open/short、local CD & collision / 极端 frequency shift \\
+宽带 baseline / spurious & package / connector / reference sweep & readout chain calibration \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+这张表的意义不是自动诊断，而是防止“一个症状对应一个原因”的思维捷径。
+
+\section{从 resonance index 到 physical pixel：阵列必须做 mapping}
+
+当 resonator 数量增加，仅知道“第 37 个 notch”没有意义。必须尽可能建立
+
+\[
+\text{frequency ID} \leftrightarrow \text{physical pixel ID}.
+\]
+
+大规模 MKID 阵列已经发展出 cryogenic LED mapper 等方法，把 illumination response 与 resonance frequency 对应起来；也有工作在完成 mapping 后再做 lithographic frequency trimming，提高 spacing uniformity 和 collision yield。
+
+对我们的第一批小阵列，不一定需要复杂 LED mapper，但从数据结构一开始就应该预留 physical ID、GDS coordinate、design frequency 与 measured frequency 的映射表。
+
+\section{什么时候才进入 noise / NEP}
+
+如果下面这些问题还没解决：
+
+\begin{itemize}
+  \item resonance mapping 不清楚；
+  \item $Q_c$ 与设计严重不符；
+  \item package baseline 不稳定；
+  \item readout power 已进入明显非线性；
+  \item thermalization / temperature 记录不可靠；
+\end{itemize}
+
+那么直接比较 NEP 往往会把 fabrication、readout 和 calibration 混在一起。
+
+因此第二册的顺序有意把 NEP 放晚：\textbf{先证明器件是谁、在哪、参数怎样，再讨论它有多灵敏。}
+
+\begin{measurebox}
+\textbf{First Cooldown 最小交付物：}
+完整 raw $S_{21}$ sweep；resonance inventory；design-to-measured mapping；$f_0,Q_r,Q_i,Q_c$ 表；frequency-error histogram + spatial map；selected power sweep；selected temperature sweep；package/spurious-mode 标记；与 film/CD/defect/package metadata 的统一 sample ID。
+\end{measurebox}
+
+\section{最重要的输出不是“最好 $Q_i$”，而是下一批该改什么}
+
+一次 fabrication-learning cooldown 的最终报告最好只形成少量明确结论：
+
+\begin{enumerate}
+  \item 哪些 design assumptions 被验证？
+  \item 哪些 fabrication variables 与异常有相关证据？
+  \item 哪些 hypothesis 还没有区分？
+  \item 下一批只改哪一两个变量最有信息量？
+\end{enumerate}
+
+如果一次 cooldown 最后变成“这片不太好，下一版都改改”，那么最珍贵的学习机会基本被浪费了。
+
+\begin{checkpointbox}
+看到一个低 $Q_i$ resonator 时，不要问“是哪道工艺做坏了？”先问：它在 wafer 上哪里？附近器件也低吗？power dependence 怎样？temperature dependence 怎样？package revision 是什么？film/CD/defect map 是否同位置异常？当这些信息齐了，root-cause analysis 才真正开始。
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item C. R. H. McRae et al., resonator loss mechanisms and measurement methodology, \href{https://www.nist.gov/publications/materials-loss-measurements-using-superconducting-microwave-resonators}{NIST / Rev. Sci. Instrum. 91, 091101}.
+  \item J. Gao et al., cryogenic LED pixel-to-frequency mapper for MKID arrays, \href{https://www.nist.gov/publications/cryogenic-led-pixel-frequency-mapper-kinetic-inductance-detector-arrays}{NIST / Appl. Phys. Lett. 111, 2017}.
+  \item X. Liu et al., measured-frequency mapping followed by lithographic trimming, \href{https://www.nist.gov/publications/superconducting-micro-resonator-arrays-ideal-frequency-spacing}{NIST / Opt. Express 25, 2017}.
+  \item C. M. McKenney et al., wafer-scale frequency-spacing statistics and collision-aware array layout, \href{https://www.nist.gov/publications/tile-and-trim-micro-resonator-array-fabrication-optimized-high-multiplexing-factors}{NIST / Rev. Sci. Instrum. 90, 023908}.
+\end{itemize}
