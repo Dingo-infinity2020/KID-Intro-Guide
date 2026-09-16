@@ -8,6 +8,7 @@ on:
       - 'volume2-fabrication/**'
       - '.github/workflows/build-volume2.yml'
   pull_request:
+    types: [opened, reopened, ready_for_review]
     paths:
       - 'volume2-fabrication/**'
       - '.github/workflows/build-volume2.yml'
@@ -31,11 +32,11 @@ jobs:
           run: |
             set -euo pipefail
             cd volume2-fabrication
-            mkdir -p build
+            mkdir -p build/chapters
 
             # Development pushes should not rebuild the whole book unless a
             # structural file changed. For the first commit on a branch, or if
-            # history is unavailable for any reason, fall back to a full build.
+            # history is unavailable for any reason, fall back to one full build.
             structural=0
             if git -C .. rev-parse HEAD^ >/dev/null 2>&1; then
               changed=$(git -C .. diff --name-only HEAD^ HEAD)
