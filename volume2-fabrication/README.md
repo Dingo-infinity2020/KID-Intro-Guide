@@ -11,7 +11,9 @@
 - v0.1 development milestone：**PASS**
 - v0.1 整册：58 页，第 0–9 章第一轮正文完成
 - v0.2：**in progress**，开始进入平台实测约束、定量案例和数据闭环
+- v0.2 整册首个结构检查点：64 页，严格 CI / 全页视觉 QA 已通过
 - v0.2 新增第 10 章：`wafer metrology -> resonance residual -> collision -> next-GDS correction`
+- v0.2 已加入 template-compatible synthetic generator 和 measured-data adapter
 - 第一原则：不写成泛微纳加工教材，所有知识都要回答“它怎样影响 KID 的 `f0`、`Qi`、`Qc`、`Lk`、吸收、噪声、frequency collision 或 yield？”
 - 完整 v0.1 QA：见 `V0.1_MILESTONE_AUDIT.md`
 
@@ -23,7 +25,7 @@
 - `notes/`：知识地图、工艺—器件参数矩阵、设备学习清单与数据约定
 - `references/`：文献与设备/SOP 证据入口
 - `templates/`：process traveler、run manifest、film batch card、wafer metrology map、resonator map、first-cooldown report
-- `examples/`：可运行的定量 toy model；当前包括 wafer-to-resonance feedback demo
+- `examples/`：可运行的 quantitative demo 与 measured-data adapter
 - `figures/`：图件
 - `Makefile`：本地快速构建
 
@@ -50,7 +52,7 @@ make chapter CH=ch10_quantitative_loop
 
 默认单章为 `ch00_overview`。输出放在 `build/`，不会触碰第一册。
 
-GitHub Actions 的普通章节 push 只编译改动章节；Markdown / 模板修改不会启动 TeXLive。full build 额外检查 Overfull、PDF bookmark/PDF-string 数学警告、undefined refs/citations 和 missing characters。
+GitHub Actions 的普通章节 push 只编译改动章节；Markdown-only 修改不会启动 TeXLive。Python example / CSV contract 修改会先做轻量 smoke test。full build 额外检查 Overfull、PDF bookmark/PDF-string 数学警告、undefined refs/citations 和 missing characters。
 
 ## 从 v0.2 开始的数据链
 
@@ -62,30 +64,43 @@ GitHub Actions 的普通章节 push 只编译改动章节；Markdown / 模板修
 
 `gds_revision / process_revision / film_run_id / metrology_run_id / package_id / cooldown_id`
 
-数据字段与单位约定见 `notes/DATA_CONTRACT.md`。
+数据字段、join 规则、单位和 raw-vs-derived 约定见 `notes/DATA_CONTRACT.md`。
 
 建议第一批真实器件就开始使用：
 
 - `templates/run_manifest.yaml`：一批样品的身份、revision 与文件入口；
 - `templates/film_batch_card.md`：薄膜 run、witness 与材料统计；
-- `templates/wafer_metrology_map.csv`：按坐标保存 thickness / Rsq / CD / defect；
+- `templates/wafer_metrology_map.csv`：按坐标保存 thickness / Rsq / CD / defect，并可选连接 `resonator_id`；
 - `templates/resonator_map.csv`：连接设计频率、物理像素和低温 `f0/Qi/Qc`；
 - `templates/first_cooldown_report.md`：把第一次 cooldown 收敛成下一批可执行的 fabrication feedback。
 
-## 可运行的 v0.2 定量例子
+## 可运行的 v0.2 定量闭环
 
-当前最小闭环：
+先生成固定 seed 的 synthetic 8×8 array：
 
 ```bash
 cd volume2-fabrication
 python3 examples/wafer_to_resonance_demo.py
 ```
 
-它使用固定 seed 的 synthetic 8×8 array 演示：
+它演示：
 
 `Rsq/CD wafer map -> frequency-shift surrogate -> measured resonance map -> collision audit -> model-based pre-compensation`
 
-脚本只依赖 Python 标准库，并由 CI 做 smoke test。示例中的 sensitivity、spatial variation 和 collision margin 都是教学参数，不是任何真实加工平台的 specification。详见 `examples/README.md` 和第 10 章。
+生成的两张主 CSV 与正式模板使用同一套列定义，因此可以直接喂给 measured-data adapter：
+
+```bash
+python3 examples/analyze_fabrication_feedback.py \
+  --metrology build/example-wafer-loop/wafer_metrology_map.csv \
+  --resonators build/example-wafer-loop/resonator_map.csv \
+  --out build/example-feedback-analysis \
+  --alpha-k 0.45 \
+  --rsq-reference-ohm-sq 0.45 \
+  --linewidth-sensitivity 0.08 \
+  --collision-margin-linewidths 5
+```
+
+adapter 会生成 `joined_feedback.csv`、`next_design.csv` 与 `analysis_summary.txt`，但不会偷偷从同一批数据拟合 sensitivity。示例中的 sensitivity、spatial variation 和 collision margin 都是教学参数，不是任何真实加工平台的 specification。详见 `examples/README.md` 和第 10 章。
 
 ## 写作约定
 

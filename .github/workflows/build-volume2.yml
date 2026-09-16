@@ -44,7 +44,7 @@ jobs:
           fi
 
           need_examples=false
-          if printf '%s\n' "$changed" | grep -Eq '^volume2-fabrication/examples/.*\.py$|^\.github/workflows/build-volume2\.yml$'; then
+          if printf '%s\n' "$changed" | grep -Eq '^volume2-fabrication/examples/.*\.py$|^volume2-fabrication/templates/.*\.csv$|^\.github/workflows/build-volume2\.yml$'; then
             need_examples=true
           fi
 
@@ -53,17 +53,42 @@ jobs:
           echo "need_tex=$need_tex" >> "$GITHUB_OUTPUT"
           echo "need_examples=$need_examples" >> "$GITHUB_OUTPUT"
 
-      - name: Smoke-test quantitative examples
+      - name: Smoke-test quantitative examples and data contract
         if: steps.detect.outputs.need_examples == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf /tmp/kid-volume2-example
-          python3 volume2-fabrication/examples/wafer_to_resonance_demo.py --out /tmp/kid-volume2-example
-          test -s /tmp/kid-volume2-example/wafer_metrology_map.csv
-          test -s /tmp/kid-volume2-example/resonator_map.csv
-          test -s /tmp/kid-volume2-example/summary.txt
-          grep -Fq 'collision_pairs=0' /tmp/kid-volume2-example/summary.txt
+          rm -rf /tmp/kid-volume2-demo /tmp/kid-volume2-analysis
+
+          python3 volume2-fabrication/examples/wafer_to_resonance_demo.py \
+            --out /tmp/kid-volume2-demo
+
+          test -s /tmp/kid-volume2-demo/wafer_metrology_map.csv
+          test -s /tmp/kid-volume2-demo/resonator_map.csv
+          test -s /tmp/kid-volume2-demo/synthetic_truth.csv
+          test -s /tmp/kid-volume2-demo/summary.txt
+
+          test "$(head -n 1 /tmp/kid-volume2-demo/wafer_metrology_map.csv | tr -d '\r')" = \
+               "$(head -n 1 volume2-fabrication/templates/wafer_metrology_map.csv | tr -d '\r')"
+          test "$(head -n 1 /tmp/kid-volume2-demo/resonator_map.csv | tr -d '\r')" = \
+               "$(head -n 1 volume2-fabrication/templates/resonator_map.csv | tr -d '\r')"
+
+          python3 volume2-fabrication/examples/analyze_fabrication_feedback.py \
+            --metrology /tmp/kid-volume2-demo/wafer_metrology_map.csv \
+            --resonators /tmp/kid-volume2-demo/resonator_map.csv \
+            --out /tmp/kid-volume2-analysis \
+            --alpha-k 0.45 \
+            --rsq-reference-ohm-sq 0.45 \
+            --linewidth-sensitivity 0.08 \
+            --collision-margin-linewidths 5
+
+          test -s /tmp/kid-volume2-analysis/joined_feedback.csv
+          test -s /tmp/kid-volume2-analysis/next_design.csv
+          test -s /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'joined_resonators=64' /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'residual_std_ppm=110.9' /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'current_collision_pairs=2' /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'collision_pairs=0' /tmp/kid-volume2-demo/summary.txt
 
       - name: Build only required Volume 2 PDFs
         if: steps.detect.outputs.need_tex == 'true'
@@ -137,15 +162,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Smoke-test quantitative examples
+      - name: Smoke-test quantitative examples and data contract
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf /tmp/kid-volume2-example
-          python3 volume2-fabrication/examples/wafer_to_resonance_demo.py --out /tmp/kid-volume2-example
-          test -s /tmp/kid-volume2-example/wafer_metrology_map.csv
-          test -s /tmp/kid-volume2-example/resonator_map.csv
-          grep -Fq 'collision_pairs=0' /tmp/kid-volume2-example/summary.txt
+          rm -rf /tmp/kid-volume2-demo /tmp/kid-volume2-analysis
+
+          python3 volume2-fabrication/examples/wafer_to_resonance_demo.py \
+            --out /tmp/kid-volume2-demo
+
+          test "$(head -n 1 /tmp/kid-volume2-demo/wafer_metrology_map.csv | tr -d '\r')" = \
+               "$(head -n 1 volume2-fabrication/templates/wafer_metrology_map.csv | tr -d '\r')"
+          test "$(head -n 1 /tmp/kid-volume2-demo/resonator_map.csv | tr -d '\r')" = \
+               "$(head -n 1 volume2-fabrication/templates/resonator_map.csv | tr -d '\r')"
+
+          python3 volume2-fabrication/examples/analyze_fabrication_feedback.py \
+            --metrology /tmp/kid-volume2-demo/wafer_metrology_map.csv \
+            --resonators /tmp/kid-volume2-demo/resonator_map.csv \
+            --out /tmp/kid-volume2-analysis \
+            --alpha-k 0.45 \
+            --rsq-reference-ohm-sq 0.45 \
+            --linewidth-sensitivity 0.08 \
+            --collision-margin-linewidths 5
+
+          grep -Fq 'joined_resonators=64' /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'residual_std_ppm=110.9' /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'current_collision_pairs=2' /tmp/kid-volume2-analysis/analysis_summary.txt
+          grep -Fq 'collision_pairs=0' /tmp/kid-volume2-demo/summary.txt
 
       - name: Build and audit complete Volume 2
         uses: xu-cheng/texlive-action@v3
