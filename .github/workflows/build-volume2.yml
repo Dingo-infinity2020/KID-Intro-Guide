@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Build only changed chapters on development pushes
         uses: xu-cheng/texlive-action@v3
@@ -32,20 +32,34 @@ jobs:
             set -euo pipefail
             cd volume2-fabrication
             mkdir -p build
-            changed=$(git -C .. diff --name-only HEAD^ HEAD || true)
+
+            # Development pushes should not rebuild the whole book unless a
+            # structural file changed. For the first commit on a branch, or if
+            # history is unavailable for any reason, fall back to a full build.
             structural=0
-            if echo "$changed" | grep -Eq '^volume2-fabrication/(main|preamble|chapter-preview)\.tex$'; then
+            if git -C .. rev-parse HEAD^ >/dev/null 2>&1; then
+              changed=$(git -C .. diff --name-only HEAD^ HEAD)
+            else
+              changed=''
               structural=1
             fi
+
+            if echo "$changed" | grep -Eq '^volume2-fabrication/(main|preamble|chapter-preview)\.tex$|^\.github/workflows/build-volume2\.yml$'; then
+              structural=1
+            fi
+
             if [ "$structural" -eq 1 ]; then
+              echo 'Structural change detected; running one full Volume 2 build.'
               make full
               exit 0
             fi
+
             chapters=$(echo "$changed" | sed -n 's#^volume2-fabrication/chapters/\(.*\)\.tex$#\1#p' | sort -u)
             if [ -z "$chapters" ]; then
               echo 'No TeX chapter changed; skipping PDF build.'
               exit 0
             fi
+
             for ch in $chapters; do
               echo "Building preview for $ch"
               make chapter CH="$ch"
