@@ -1,0 +1,300 @@
+\chapter{把工艺数据变成下一版设计：一个可运行的定量闭环}
+
+\begin{chaptergoal}
+把前面章节里的 film map、CD map、resonance map 和 DfM 连接成一个真正可执行的数据流程：先让每个 resonator 的身份可追溯，再用显式的小信号模型解释 frequency scatter，检查 residual 与 collision，最后只对经过跨批次验证的 systematic component 提出下一版设计补偿。
+\end{chaptergoal}
+
+到 v0.1 为止，我们已经知道应该测什么、记录什么，也知道不能把一个异常 notch 直接归因到某一道工艺。v0.2 再往前走一步：\textbf{把这些记录变成能重复运行的模型。}
+
+这里故意先使用一个很小的 synthetic example，而不是一上来做复杂机器学习。原因很简单：如果一个 64-resonator toy model 都不能把 ID、单位、sensitivity、collision rule 和 correction 写清楚，那么换成几千个像素只会把混乱放大。
+
+\processchain{wafer metrology map $\rightarrow$ per-resonator predictor $\rightarrow$ measured frequency residual $\rightarrow$ collision audit $\rightarrow$ independent-batch check $\rightarrow$ next-GDS correction proposal}
+
+\section{第一步：所有数据先通过 resonator ID 对齐}
+
+对第 $i$ 个 resonator，至少需要把下面几类量放到同一个可连接的数据系统中：
+
+\begin{itemize}
+  \item 设计侧：$f_i^{\mathrm{design}}$、GDS revision、物理坐标；
+  \item 薄膜侧：$R_{\square,i}$、厚度或其他可空间插值的 material proxy；
+  \item 几何侧：linewidth、gap、coupler 等 measured CD；
+  \item 低温侧：$f_{0,i}^{\mathrm{meas}}$、$Q_{r,i}$、$Q_{i,i}$、$Q_{c,i}$；
+  \item 追溯侧：batch / wafer / die / package / cooldown ID。
+\end{itemize}
+
+因此真正的第一步不是“拟合一个模型”，而是先让
+\[
+\text{wafer coordinate}
+\leftrightarrow
+\text{physical pixel}
+\leftrightarrow
+\text{resonator ID}
+\leftrightarrow
+\text{measured notch}
+\]
+能够稳定连接。
+
+本仓库从 v0.2 开始用 \texttt{notes/DATA\_CONTRACT.md} 固定这一层。两个核心输入表是：
+
+\begin{itemize}
+  \item \texttt{wafer\_metrology\_map.csv}：保存物理位置对应的 film / CD / defect 数据，并在可以唯一映射时填写 \texttt{die\_id} 与 \texttt{resonator\_id}；
+  \item \texttt{resonator\_map.csv}：连接 design frequency、physical pixel 与低温 fit 结果。
+\end{itemize}
+
+对于 blanket-film witness 或无法唯一归属于某个 resonator 的 coupon，\texttt{resonator\_id} 可以为空。\textbf{空值比伪造一个映射更安全。}
+
+\begin{warningbox}
+当前分析工具默认只按非空的 \texttt{resonator\_id} 做一对一 join，不会偷偷用“最近的 $(x,y)$”猜配对。坐标自动匹配只有在明确给出坐标变换、容差和匹配置信度以后才应该加入。
+\end{warningbox}
+
+\section{第二步：先定义我们到底在解释什么}
+
+最直接的目标量是 fractional frequency error：
+\[
+\epsilon_i
+=
+\frac{f_{0,i}^{\mathrm{meas}}-f_i^{\mathrm{design}}}
+{f_i^{\mathrm{design}}}.
+\]
+
+如果只看 $\epsilon_i$ 的 histogram，我们只能知道 spread 多大；如果把它与同位置的 film / geometry 数据对齐，就可以尝试建立 predictor。
+
+对薄膜部分，第 3 章已经给出近似关系
+\[
+\frac{\delta f_0}{f_0}
+\approx
+-\frac{\alpha}{2}
+\frac{\delta L_k}{L_k}.
+\]
+
+在一个只用于建立工程直觉的近似里，如果 $T_c$ 变化暂时忽略，并把 sheet kinetic inductance 的变化主要接到 $R_\square$，可以写成
+\[
+\epsilon_{R_\square,i}
+\approx
+-\frac{\alpha}{2}
+\frac{R_{\square,i}-R_{\square,0}}{R_{\square,0}}.
+\]
+
+几何部分则更适合写成 sensitivity：
+\[
+s_w
+=
+\frac{\partial \ln f_0}{\partial \ln w},
+\qquad
+\epsilon_{w,i}
+\approx
+s_w
+\frac{w_i-w_{i}^{\mathrm{design}}}{w_{i}^{\mathrm{design}}}.
+\]
+
+这里的 $s_w$ \textbf{不是材料常数，也不是本讲义可以替实验室规定的数字}。它应该来自 Sonnet/CST/解析 LC sensitivity，或者来自已经在独立批次上验证过的 measured-data model。
+
+于是一个最小 predictor 可以写成
+\[
+\hat{\epsilon}_i
+=
+-\frac{\alpha}{2}
+\frac{R_{\square,i}-R_{\square,0}}{R_{\square,0}}
++
+s_w
+\frac{w_i-w_i^{\mathrm{design}}}{w_i^{\mathrm{design}}}.
+\]
+
+真正值得看的不是 $\hat{\epsilon}_i$ 本身，而是 residual：
+\[
+r_i=\epsilon_i-\hat{\epsilon}_i.
+\]
+
+如果 residual 仍然和 wafer position、gap、package revision 或某个 process split 强相关，就说明模型还漏掉了结构。
+
+\section{第三步：用 synthetic 64-resonator 数据集把整条链跑通}
+
+仓库中的 \texttt{examples/wafer\_to\_resonance\_demo.py} 使用固定随机种子的 $8\times8$ synthetic array。它故意包含：
+
+\begin{itemize}
+  \item 一个带空间梯度的 $R_\square$ map；
+  \item 一个带空间梯度的 linewidth map；
+  \item 一个额外的小随机 residual；
+  \item 64 个 nominally 等间隔的 design frequencies；
+  \item 一个显式的 loaded-$Q$ 和 collision rule。
+\end{itemize}
+
+运行：
+
+\begin{verbatim}
+cd volume2-fabrication
+python3 examples/wafer_to_resonance_demo.py
+\end{verbatim}
+
+脚本会生成：
+
+\begin{itemize}
+  \item \texttt{wafer\_metrology\_map.csv}：列头与正式模板完全一致；
+  \item \texttt{resonator\_map.csv}：列头与正式模板完全一致；
+  \item \texttt{synthetic\_truth.csv}：只保存 toy model 才知道的隐藏分量，不混入原始数据契约；
+  \item \texttt{summary.txt}：固定 seed 的 regression summary。
+\end{itemize}
+
+固定 seed 下，这个 toy model 在补偿前得到大约
+\[
+\sigma_{\epsilon}\approx 860~\mathrm{ppm},
+\]
+模型补偿后剩余大约
+\[
+\sigma_{r}\approx 111~\mathrm{ppm}.
+\]
+
+同一个例子中，在“相邻实测 resonance 间隔小于 5 个 loaded linewidth”这个\textbf{仅用于演示}的判据下，collision pair 从 2 组降到 0 组。
+
+\begin{warningbox}
+这里最重要的不是 ``860 ppm''、``111 ppm'' 或 ``5 linewidths'' 这些数字。它们只是 deterministic regression target，方便 CI 检查示例没有被改坏。真正实验中，sensitivity、process distribution 和 collision margin 都必须重新定义。
+\end{warningbox}
+
+\section{第四步：让同一套 CSV 直接进入 measured-data adapter}
+
+v0.2 同时提供 \texttt{examples/analyze\_fabrication\_feedback.py}。它不需要知道输入来自 synthetic demo 还是真实 wafer；只要求两张表遵守同一个 data contract。
+
+例如对 synthetic 数据可以运行：
+
+\begin{verbatim}
+python3 examples/analyze_fabrication_feedback.py \
+  --metrology build/example-wafer-loop/wafer_metrology_map.csv \
+  --resonators build/example-wafer-loop/resonator_map.csv \
+  --out build/example-feedback-analysis \
+  --alpha-k 0.45 \
+  --rsq-reference-ohm-sq 0.45 \
+  --linewidth-sensitivity 0.08 \
+  --collision-margin-linewidths 5
+\end{verbatim}
+
+它输出三类派生结果：
+
+\begin{itemize}
+  \item \texttt{joined\_feedback.csv}：逐 resonator 保存 measured error、film/CD predictor 与 residual；
+  \item \texttt{next\_design.csv}：按已声明 predictor 计算的下一版 design-frequency correction proposal；
+  \item \texttt{analysis\_summary.txt}：join coverage、scatter、correlation 与当前 collision count。
+\end{itemize}
+
+注意这个脚本\textbf{故意不自动拟合} $\alpha$ 或 $s_w$。这些系数是命令行输入，因为我们希望在代码结构上明确区分两件事：
+
+\begin{center}
+\textbf{应用一个已声明的模型 $\neq$ 用同一批数据训练模型再证明它成功。}
+\end{center}
+
+如果以后需要 regression / Bayesian model，也应该产生独立的 model artifact，记录 training batch、validation batch、参数不确定度和版本，而不是把拟合悄悄塞进这个 join 脚本。
+
+\section{第五步：为什么可以提出 pre-compensation}
+
+如果上一批已经得到一个可重复的 predictor $\hat{\epsilon}_i$，而下一批仍使用足够相似的 process，可以把当前设计频率反推成新的 drawn/design frequency：
+
+\[
+f_i^{\mathrm{draw,new}}
+=
+\frac{f_i^{\mathrm{target}}}{1+\hat{\epsilon}_i}.
+\]
+
+直觉上，这是在版图里提前抵消一个已经被测量证明存在、而且能够重复出现的 systematic shift。
+
+但这一步有一个非常严格的前提：
+
+\begin{center}
+\textbf{只能补偿“可重复的偏差”，不能用固定 correction 去消灭不可重复的随机 scatter。}
+\end{center}
+
+如果某一批的 wafer gradient 下一批就换了方向，那么把它写回 GDS 反而会制造新的系统误差。因此 \texttt{next\_design.csv} 在真实项目里首先是 review proposal，不应该因为脚本生成了它就自动改版图。
+
+\section{第六步：collision audit 要把 linewidth 也放进去}
+
+只比较 nominal frequency spacing 还不够。一个简单的工程判据可以写成
+\[
+|f_i-f_j|
+<
+m\,
+\max\left(
+\frac{f_i}{Q_{r,i}},
+\frac{f_j}{Q_{r,j}}
+\right),
+\]
+满足时先标记为 collision candidate。
+
+这里 $m$ 是 readout / fitting / tone-placement 所需要的 margin，不是物理常数。不同 readout architecture、拟合算法和动态范围会允许不同的安全间隔。
+
+因此一个 array-yield model 至少应该同时知道：
+
+\begin{enumerate}
+  \item design spacing；
+  \item fabrication frequency scatter；
+  \item loaded linewidth；
+  \item readout margin；
+  \item out-of-band / unusable-band 条件。
+\end{enumerate}
+
+这比单纯写“两个 resonance 距离小于 1 MHz 就算 collision”更容易迁移到不同系统。
+
+\section{第七步：真正的验证必须跨 batch}
+
+toy model 可以把“真值”都放在一个脚本里，因为它只是在演示。但真实 fabrication 数据必须避免一个很常见的陷阱：用同一批 wafer 拟合 sensitivity，再用同一批 wafer 宣布模型很好。
+
+最小的验证逻辑应该更接近：
+
+\begin{itemize}
+  \item Batch A：提出或校准 systematic film/CD predictor；
+  \item Batch B：不重新调参数，直接检查预测 residual；
+  \item Batch C 或 controlled split：确认方向、幅度与 spatial structure 的 repeatability；
+  \item 只有稳定 systematic component 才进入下一版 GDS compensation review。
+\end{itemize}
+
+如果 batch 数还很少，就不要急着叫它 ``process model''；更准确的名字是 working hypothesis。
+
+\section{第八步：correlation 不是 root cause}
+
+假设你发现 $R_\square(x,y)$ 和 $\epsilon(x,y)$ 看起来高度相关，也不能立刻得出“频率偏差就是方阻造成的”。
+
+可能存在的 confounder 包括：
+
+\begin{itemize}
+  \item 膜厚和方阻本来就共变；
+  \item deposition uniformity 与 lithography focus 也共享 wafer position；
+  \item resonator mapping 有系统错配；
+  \item temperature / package / readout calibration 具有位置相关偏差；
+  \item 另一个没有记录的 process variable 同时驱动两者。
+\end{itemize}
+
+更强的证据来自 controlled split、独立 batch、as-fabricated EM model 和多种 metrology 同时闭合。
+
+\begin{checkpointbox}
+模型的目标不是给每个异常找一个“最像的原因”，而是把 hypothesis space 越缩越小，并让下一批实验真正区分剩余的几个解释。
+\end{checkpointbox}
+
+\section{v0.2 的四张标准图}
+
+当真实数据开始积累后，每一批至少应该自动生成四类图：
+
+\begin{enumerate}
+  \item wafer map：$R_\square$ / thickness / CD；
+  \item resonance map：$\epsilon_i$、$Q_i$、$Q_c$；
+  \item predictor-vs-measurement：$\hat{\epsilon}_i$ 对 $\epsilon_i$；
+  \item residual map：$r_i$ 在 wafer coordinate 上的空间结构。
+\end{enumerate}
+
+前三张告诉我们模型解释了什么，第四张告诉我们还漏了什么。当前 v0.2 已由 \texttt{examples/plot\_fabrication\_feedback.py} 把这四类诊断接到稳定的 \texttt{joined\_feedback.csv} 上，并额外生成单页 HTML report；下一章给出真实 batch 的操作 runbook。
+
+\begin{measurebox}
+\textbf{一个最小可计算 fabrication-feedback loop：}
+统一 ID 与单位；template-compatible wafer metrology map；resonator map；明确 sensitivity source；显式 predictor；residual；collision rule；跨 batch repeatability；只对稳定 systematic component 提出 next-GDS correction。
+\end{measurebox}
+
+\section{这一章真正的出口}
+
+面对一批新的 KID wafer，不应该再只问“频率偏了多少”。更有用的问题是：
+
+\begin{enumerate}
+  \item 哪部分偏差能被 measured film/CD data 解释？
+  \item 哪部分仍留在 residual 里？
+  \item 这个 predictor 在下一批还能成立吗？
+  \item collision 是 nominal spacing 不够，还是 fabrication scatter 太大？
+  \item 下一版应该补偿 systematic bias，还是重新设计一个更低 sensitivity 的 geometry？
+  \item 当前 correction 的每一个系数，能否说清楚它来自哪一份证据？
+\end{enumerate}
+
+当这些问题能够用同一套表格和脚本回答，并且换一批数据仍不需要手工改代码时，fabrication learning 才真正进入闭环。
