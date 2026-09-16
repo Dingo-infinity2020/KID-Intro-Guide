@@ -1,0 +1,47 @@
+project_id: KID_PROJECT
+batch_id: BATCH_YYYYMMDD_01
+wafer_id: W01
+die_id: null
+
+gds_revision: GDS_REV
+process_revision: PROC_REV
+film_run_id: FILM_RUN_ID
+package_id: null
+cooldown_id: null
+
+substrate:
+  material: null
+  vendor_lot: null
+  thickness_um: null
+  orientation: null
+  surface_finish: null
+
+coordinate_system:
+  origin: null
+  x_positive_direction: null
+  y_positive_direction: null
+  viewing_side: device_side
+  die_rotation_deg: 0
+  notes: null
+
+fabrication:
+  lithography_run_id: null
+  pattern_transfer_run_id: null
+  dicing_run_id: null
+  operator_or_team: null
+  traveler_path: null
+
+metrology:
+  metrology_run_id: null
+  wafer_map_path: templates/wafer_metrology_map.csv
+  film_batch_card_path: templates/film_batch_card.md
+
+cryogenic:
+  resonator_map_path: templates/resonator_map.csv
+  first_cooldown_report_path: templates/first_cooldown_report.md
+
+provenance:
+  created_at: null
+  created_by: null
+  repository_commit: null
+  notes: null

@@ -1,0 +1,1 @@
+project_id,batch_id,wafer_id,metrology_run_id,measurement_id,feature_id,feature_type,x_mm,y_mm,thickness_nm,Rsq_ohm_sq,Tc_K,linewidth_design_um,linewidth_meas_um,gap_design_um,gap_meas_um,etch_or_recess_nm,continuity_status,defect_class,measurement_method,tool_id,status,notes
