@@ -1,15 +1,201 @@
 \chapter{刻蚀与 Lift-off：把胶上的图形变成器件}
 
 \begin{chaptergoal}
-理解 subtractive etch 与 additive lift-off 的基本选择逻辑；知道侧壁、残胶、过刻、欠刻、redeposition 和金属毛刺为什么会成为电磁与可靠性问题。
+理解 subtractive etch 与 additive lift-off 的基本选择逻辑；知道 selectivity、anisotropy、over-etch、sidewall、residue、redeposition、undercut 与 fence 等现象为什么会改变 KID 的真实几何和微波损耗；建立“图形已经出现”之后仍然要继续做的 pattern-transfer 验收。
 \end{chaptergoal}
 
-\section{两条常见路线}
+光刻结束时，我们得到的通常还只是 resist pattern。KID 真正工作的金属边界要等 pattern transfer 完成之后才出现。因此，\textbf{光刻决定“胶上长什么样”，刻蚀或 lift-off 决定“最后金属长什么样”。}
 
-一种路线是先沉整层薄膜，再用光刻胶定义保护区并刻蚀掉不需要的材料；另一种是先形成 resist opening，再沉积材料并 lift-off。二者都能得到图形，但对膜连续性、侧壁、最小间隙、材料兼容性和表面暴露历史的要求不同。
+\processchain{resist pattern $\rightarrow$ etch / deposition + lift-off $\rightarrow$ final metal edge、sidewall、residue 与 substrate exposure $\rightarrow$ $L,C,Q_i$、short/open、frequency scatter 与 yield}
 
-\processchain{图形转移偏差 $\rightarrow$ 实际边缘/侧壁/残留 $\rightarrow$ 电流路径与局部场改变 $\rightarrow$ $L,C,Q_i$, shorts/opens, yield}
+\section{先认识两条主路线}
 
-\section{不要只看“有没有图形”}
+\subsection{路线 A：整层薄膜 + subtractive etch}
 
-低倍显微镜能确认大结构，但不能替代关键 CD、侧壁和 residue 的抽查。尤其是窄 gap、IDC、coupler 与 meander 转角，应提前定义接受标准和抽样位置。
+先在 substrate 上沉积连续 superconducting film，再通过 lithography 保护需要保留的区域，随后去掉其余金属。
+
+这条路线的优点是 superconducting film 在 patterning 前已经连续形成，金属本体不需要跨越 resist sidewall；但 pattern transfer 会直接暴露 film edge 和 substrate，因此 etch chemistry、plasma damage、over-etch、residue 与 sidewall condition 会进入器件问题。
+
+\subsection{路线 B：先开窗口 + deposition + lift-off}
+
+先在 resist 中形成 opening，再沉积金属，最后移除 resist 以及其上的金属，只留下 opening 区域里的图形。
+
+这条路线避免了对目标金属进行 subtractive etch，但要求 resist profile 和 deposition geometry 允许金属在边缘形成可断开的结构。如果 sidewall 被连续包覆，就可能出现 fence、stringer 或 lift-off 不完全。
+
+\begin{center}
+\textbf{没有一种路线在抽象意义上“更高级”；要比较的是最终薄膜、边缘、界面和重复性。}
+\end{center}
+
+\section{为什么 single-layer Al LEKID 常适合从 subtractive route 学起}
+
+已有不少 Al-on-Si LEKID 使用“先沉整层 Al，再光刻/刻蚀”的简洁单层流程。对初学阶段，这种路线的教学价值很高，因为材料沉积与图形定义相对解耦：先把 film batch 做清楚，再研究 lithography / etch 如何把它变成 resonator。
+
+但这不意味着 subtractive etch 天然低损耗。只要 etch 同时改变了 substrate surface、金属边缘或留下 residue，它就可能进入 $Q_i$ 和 $f_0$。因此，“Al 已经刻通”只是必要条件，不是完成条件。
+
+\section{刻蚀时至少要理解五个词}
+
+\subsection{Selectivity}
+
+selectivity 关心目标材料与 mask / substrate 的相对去除速率。对 KID，selectivity 不只是“胶能不能撑住”，还决定为了保证金属清除需要付出多少额外 substrate exposure。
+
+如果 process margin 依赖明显 over-etch 才能保证全 wafer 清除，那么 across-wafer etch nonuniformity 就可能进一步变成 substrate recess 或界面差异。
+
+\subsection{Anisotropy 与 isotropy}
+
+anisotropic etch 更强调垂直方向，isotropic etch 会产生更明显的 lateral component。它们会对应不同 sidewall 与 lateral bias。
+
+对几微米级 KID，重要的是 final linewidth / gap 是否进入设计容差，而不是在名词上追求“完全垂直”。
+
+\subsection{Under-etch 与 over-etch}
+
+欠刻可能留下导电残桥，最终表现为 short、异常 coupling 或整个 resonator 消失；过刻则可能继续攻击 substrate 或改变金属边缘附近的表面。
+
+因此理想的 endpoint 不是“看起来差不多”，而是要与 across-wafer uniformity 和 acceptance coupon 结合。
+
+\subsection{Redeposition / micromasking}
+
+被移除的材料或 process by-product 有时会重新沉积，或者局部颗粒形成微掩膜，留下 fence、grass、pillar 等异常边缘。这些缺陷可能在普通 optical microscope 下并不明显，但在 narrow gap / high-field edge 附近可能影响 loss 或可靠性。
+
+\subsection{Residue}
+
+残留可以来自 resist、etch by-product、polymer 或后续清洗不完全。对超导微波器件，残留不能只按“会不会导电短路”判断，因为薄介质残留如果恰好处于高电场区域，也可能增加参与损耗。
+
+\section{为什么 etch 会影响 $f_0$，不仅仅影响 $Q_i$}
+
+如果刻蚀只完美去掉金属、其他所有边界都不变，那么它主要是在实现 GDS 几何。但真实 process 还可能改变：
+
+\begin{itemize}
+  \item metal linewidth / gap；
+  \item sidewall slope / edge shape；
+  \item substrate recess / over-etch depth；
+  \item exposed-surface dielectric environment；
+  \item coupler / IDC 的局部有效尺寸。
+\end{itemize}
+
+这些都会进入 $L$ 或 $C$，因此仍然可以通过
+
+\[
+\frac{\delta f_0}{f_0}\approx
+-\frac{1}{2}\left(\frac{\delta L}{L}+\frac{\delta C}{C}\right)
+\]
+
+理解方向性影响。
+
+已有 Nb LEKID fabrication 工作就把 resonance-spacing nonuniformity 与 silicon surface over-etch 联系起来，并通过限制 substrate etch 改善频率均匀性。这个案例很适合提醒我们：\textbf{pattern transfer 的几何边界包含 substrate，不只有金属。}
+
+\section{为什么 etch damage / residue 会影响 $Q_i$}
+
+超导 resonator 的高电场常集中在 metal edge、gap 和 substrate surface 附近。如果 dry etch 在这些位置造成受损层、粗糙边缘或 polymer residue，就可能增加 TLS-related loss。
+
+多项 superconducting resonator 工作都观察到 surface treatment、etch method 或 edge damage 与低功率 $Q_i$ 的相关性。这里不能简单推导“dry etch 一定差、wet etch 一定好”，因为具体结果依赖材料、chemistry、mask、清洗和 geometry；真正应该保留的结论是：
+
+\begin{center}
+\textbf{etch 是电磁器件表面工程的一部分，而不是单纯的去材料步骤。}
+\end{center}
+
+\section{Lift-off 的核心不是“把胶泡掉”}
+
+成功的 lift-off 依赖 deposition 后目标图形与 resist-top metal 之间能够干净分离。初学时可以用一个简单截面直觉理解：如果金属沿 resist sidewall 连成连续膜，那么上层金属被移除时就容易拖拽、留下 fence 或撕坏图形。
+
+因此 lift-off process 需要关心：
+
+\begin{itemize}
+  \item resist thickness 相对 metal thickness 是否有足够 margin；
+  \item sidewall profile 是否有利于形成 discontinuity；
+  \item deposition 是否具有很强侧向覆盖；
+  \item 加工后是否存在 metal fence / stringer / flake；
+  \item narrow gap 中是否真的完全清空。
+\end{itemize}
+
+\begin{warningbox}
+这里同样不提供可直接执行的溶剂、超声、温度或时间参数。某些薄膜和微结构很容易被错误的 lift-off 操作损伤。实际步骤必须服从目标实验室 SOP 和具体材料/胶体系。
+\end{warningbox}
+
+\section{Subtractive 与 Lift-off 怎么做工程选择}
+
+可以用下面这张问题表，而不是凭习惯选路线。
+
+\begin{center}
+\begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.24\textwidth}XX}
+\toprule
+问题 & Subtractive etch 更需要确认 & Lift-off 更需要确认 \\
+\midrule
+超导膜质量 & patterning 后 film / edge 是否受损 & deposition 能否在 resist 条件下保持目标 film quality \\
+关键几何 & etch bias、sidewall、substrate recess & opening CD、sidewall coverage、fence \\
+表面损耗 & plasma / residue / exposed substrate & resist residue / deposition contamination \\
+最小 gap & 残桥与 over-etch margin & lift-off 完整性与金属 stringer \\
+均匀性 & etch-rate / endpoint across wafer & resist profile / deposition coverage across wafer \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+真正的选择标准应是：哪条路线在我们的设备和人员条件下，更容易得到\textbf{低损耗、可重复、可测量、可追溯}的 final geometry。
+
+\section{“图形看见了”以后还要检查什么}
+
+pattern transfer 的验收至少应分成四层。
+
+\subsection{Layer 1：Connectivity}
+
+有没有 open / short？feedline 是否连续？IDC gap 有没有桥接？可以结合 optical inspection 与 room-temperature continuity / resistance test structures，而不是等到 dilution refrigerator 才发现整片断路。
+
+\subsection{Layer 2：Critical dimensions}
+
+回到第 4 章的 CD plan，测 final linewidth/gap/coupler。只有 final CD 才是电磁模型应该使用的 geometry。
+
+\subsection{Layer 3：Edge / residue}
+
+对最窄和最高场的典型结构做高倍抽查，重点看残胶、毛刺、fence、孤岛、edge roughness、可疑 discoloration / residue，而不是随便挑“最好看”的位置拍图。
+
+\subsection{Layer 4：Wafer-scale uniformity}
+
+center 与 edge 是否不同？某一方向是否出现 systematic bias？异常是否与 lithography field / etch flow / holder location 有空间相关性？
+
+如果这些问题有记录，那么 fabrication defect 才有可能被映射到低温 resonator map。
+
+\section{给第一批 wafer 加一些便宜的 test coupon}
+
+不要让完整 LEKID pixel 承担所有诊断任务。建议在不影响主器件的区域加入：
+
+\begin{itemize}
+  \item 多组 linewidth / gap ladder；
+  \item dense / isolated feature 对照；
+  \item 简单 continuity / open-short structures；
+  \item film sheet-resistance witness / coupon；
+  \item 可用于 profilometer 或显微测量的较大 pattern；
+  \item 与主 resonator 使用相同 edge/gap 的 microwave test resonator（条件允许时）。
+\end{itemize}
+
+这些结构的意义是把“低温表现不好”分解成更容易回答的问题：图形没转好？材料不均匀？界面损耗？还是设计本身？
+
+\begin{measurebox}
+\textbf{Pattern Transfer Card 最小字段：}
+wafer/batch ID；route（etch 或 lift-off）；tool / process ID；mask/resist ID；关键 endpoint/readback；异常；final CD；center/edge comparison；open/short coupon；edge/residue inspection；是否观察到 substrate recess / fence / bridging；与 film batch、GDS revision 和 cooldown ID 的对应关系。
+\end{measurebox}
+
+\section{低温数据怎样反过来指向这一章}
+
+以后看到下面这些现象时，可以把 pattern transfer 放进故障树，但不要单因果下结论：
+
+\begin{itemize}
+  \item \textbf{resonator 缺失：} open/short、严重 frequency shift、coupling 异常都可能；
+  \item \textbf{$f_0$ 有空间梯度：} film、CD、substrate recess 都值得对图；
+  \item \textbf{$Q_i$ 系统性偏低：} film quality、surface/interface、etch damage/residue、package 等都需排查；
+  \item \textbf{$Q_c$ 与设计偏差大：} coupling-region final geometry 是优先检查项之一；
+  \item \textbf{collision 明显增加：} linewidth/gap/film-thickness statistics 是否比设计 tolerance 大？
+\end{itemize}
+
+这就是 fabrication feedback 的核心：不是看到一种症状就猜一种工艺，而是让每道工艺都有独立可测证据。
+
+\begin{checkpointbox}
+一张显微镜照片里金属图形完整，并不能证明 pattern transfer PASS。真正的 PASS 至少还要回答：关键 CD 对吗？窄 gap 干净吗？有没有系统性 bias？substrate 有没有被额外改变？edge/residue 是否受控？room-temperature coupon 是否正常？这些结果能否和未来的 resonator ID 对齐？
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item \textit{Improvement of Design and Fabrication for Equally Spaced Resonant Frequencies in Niobium LEKIDs}, silicon over-etch and frequency non-uniformity, \href{https://www.jstage.jst.go.jp/article/jcsj/54/1/54_33/_article/-char/en}{J-STAGE, 2019}.
+  \item A. Bruno et al., surface treatment / substrate etching and superconducting-resonator loss, \href{https://arxiv.org/abs/1502.04082}{arXiv:1502.04082}.
+  \item \textit{High-Q trenched aluminum coplanar resonators...}, comparison of etch-induced edge/interface conditions and $Q_i$, \href{https://www.nature.com/articles/s41598-023-42332-6}{Scientific Reports 13, 2023}.
+  \item H. McCarrick et al., representative single-layer Al-on-Si LEKID fabrication, \href{https://arxiv.org/abs/1407.7749}{arXiv:1407.7749}.
+\end{itemize}

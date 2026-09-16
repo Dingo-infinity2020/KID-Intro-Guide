@@ -58,15 +58,58 @@
 
 为什么重要：决定我们真正可能接触到的曝光、沉积、刻蚀、表征、dicing 和 wire-bond 能力。公开设备清单只能定义“可能性”，真正 recipe / material policy / SOP 仍需现场确认。
 
-## 下一轮文献缺口
+## 6. Substrate / interface / TLS loss
 
-v0.2 前还需要系统补齐：
+### McRae et al., 2020 — Materials loss measurements using superconducting microwave resonators
 
-- Al thin-film `Rsq / Tc / thickness / Lk_square` 的实验关联；
-- substrate surface preparation 与 microwave loss；
-- lithography / resist residue / descum / etch damage 与 superconducting resonator `Qi`；
+- NIST: <https://www.nist.gov/publications/materials-loss-measurements-using-superconducting-microwave-resonators>
+- Review of Scientific Instruments 91, 091101 (2020)
+
+为什么重要：建立 participation ratio、TLS、quasiparticle、vortex 等损耗机制的统一实验语言。第二册第 2、7、8 章可以用它避免把低 `Qi` 简化成某一个工艺步骤。
+
+### Bruno et al., 2015 — Reducing intrinsic loss in superconducting resonators by surface treatment and deep etching of silicon substrates
+
+- arXiv: <https://arxiv.org/abs/1502.04082>
+
+为什么重要：直接展示 substrate surface treatment 与改变高场界面 participation 可以改善 resonator loss，是“基底表面不是机械背景”的强证据。
+
+### Earnest et al., 2018 — Substrate surface engineering for high-quality silicon/aluminum superconducting resonators
+
+- arXiv: <https://arxiv.org/abs/1807.08072>
+
+为什么重要：Al-on-Si 体系中对不同 substrate preparation 做对照，并结合截面表征与低温 `Qi`。很适合作为第 2 章 controlled split 的例子。
+
+## 7. Lithography / linewidth 与 resonance frequency
+
+### Li et al., 2022 — Strategies for reducing frequency scatter in large arrays of superconducting resonators
+
+- arXiv: <https://arxiv.org/abs/2203.17244>
+
+为什么重要：用专门设计的 linewidth sweep 证明 inductor linewidth fluctuation 可以系统性地移动 resonance frequency。第 4 章据此把 CD metrology 与 frequency collision 直接连起来。
+
+### Liu et al., 2017 — Superconducting micro-resonator arrays with ideal frequency spacing and extremely low frequency collision rate
+
+- arXiv: <https://arxiv.org/abs/1711.07914>
+
+为什么重要：展示通过 lithographic trimming 修正实际 resonance frequencies、改善 collision-limited yield。可用于第 4、9 章说明“测量 → 版图反馈”是真实可行的工程路线。
+
+## 8. Etch edge / residue 与 microwave loss
+
+### High-Q trenched aluminum coplanar resonators with an ultrasonic edge microcutting for superconducting quantum devices, 2023
+
+- Scientific Reports: <https://www.nature.com/articles/s41598-023-42332-6>
+
+为什么重要：比较不同 substrate / metal etch 条件下的 resonator `Qi`，并讨论受损边缘、聚合物残留和高场界面。它不直接等价于 LEKID 工艺，但很适合提醒第 5 章：etch 的评价指标不能只有“刻通了”。
+
+## 当前文献缺口
+
+v0.2 前继续补齐：
+
+- Al thin-film `Rsq / Tc / thickness / Lk_square` 的更多定量实验关联；
 - packaging / wirebond / slotline / cavity modes；
-- KID fabrication traveler、test coupon、wafer map 的工程案例；
-- 适合第一次 Al LEKID run 的 room-temperature metrology 与 acceptance gate。
+- KID fabrication traveler、test coupon、wafer map 的公开工程案例；
+- 适合第一次 Al LEKID run 的 room-temperature metrology 与 acceptance gate；
+- dicing / backside / package 对毫米波 optical stack 与微波寄生模式的影响；
+- 从 `f0, Qi, Qc` 空间分布做 fabrication root-cause analysis 的实例。
 
 注意：第二册不会从论文中直接复制工艺参数作为本地 recipe；任何可执行工艺条件最终必须由目标加工平台 SOP 和管理员确认。

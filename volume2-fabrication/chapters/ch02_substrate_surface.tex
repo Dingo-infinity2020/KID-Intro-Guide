@@ -1,15 +1,148 @@
 \chapter{基底与表面：器件真正开始的地方}
 
 \begin{chaptergoal}
-知道为什么 substrate 不只是机械支撑；理解介电常数、损耗、表面状态、平整度与清洗历史会进入谐振器和毫米波吸收问题。
+理解 substrate 不是机械支撑，而是同时参与微波电场、毫米波传播、界面损耗和工艺兼容性的器件组成部分；知道为什么“同样一层 Al”放在不同 wafer、经过不同 surface history 后，最终的 $f_0$、$Q_i$ 和阵列均匀性可能不同；建立 substrate / surface 的最小验收与记录框架。
 \end{chaptergoal}
 
-\section{选择基底时要问什么}
+很多初学者第一次画 LEKID 时，注意力几乎都在金属图形上：meander 多长、IDC 多大、coupler 多宽。基底常常只是仿真软件里的一个 dielectric block。但实际器件中，电磁场并不会只待在金属里。GHz 谐振器的电场会穿过 substrate 并集中在金属边缘附近；毫米波结构还可能利用基底厚度、背短路、透镜或波导边界形成完整光学结构。
 
-对微波谐振器，应关心介电常数、介质损耗、厚度及均匀性；对毫米/亚毫米波结构，还要考虑 substrate 中的传播、背短路或透镜几何。对加工，则要关心晶圆尺寸、平整度、表面粗糙度、是否有原生氧化层，以及后续沉积/刻蚀的兼容性。
+因此，本章先建立一个最重要的直觉：
 
-\processchain{substrate / surface $\rightarrow$ 介电边界与界面状态 $\rightarrow$ 有效电容、场分布与损耗 $\rightarrow$ $f_0$、$Q_i$、optical absorption}
+\processchain{substrate / surface $\rightarrow$ 介电边界、界面状态与实际几何 $\rightarrow$ $C$、场参与度、界面损耗与毫米波传播 $\rightarrow$ $f_0$、$Q_i$、optical absorption 与 wafer uniformity}
+
+\section{选择基底时到底在选择什么}
+
+“Si 还是 sapphire”不是材料名称二选一。真正应该列出来的是一组器件参数和工艺条件。
+
+\subsection{介电常数与有效电容}
+
+对 lumped-element resonator，最简单的谐振频率仍然是
+
+\[
+f_0=\frac{1}{2\pi\sqrt{LC}}.
+\]
+
+如果 substrate 的介电环境改变了电容结构的有效电容，那么即使金属版图完全不变，$f_0$ 也会移动。对小扰动，仍可用
+
+\[
+\frac{\delta f_0}{f_0}\approx -\frac{1}{2}\frac{\delta C}{C}
+\]
+
+建立方向性直觉。
+
+这里的 $C$ 不是只由 IDC 金属面积决定。finger/gap 周围的边缘场会进入空气、substrate 以及表面薄层，因此 substrate permittivity、厚度和局部表面状态都属于电磁边界条件的一部分。
+
+\subsection{介质损耗与界面参与度}
+
+对高 $Q$ 超导微波谐振器，更有用的思维方式不是问“这个材料的 loss tangent 是多少”，而是先问：\textbf{电场到底有多少能量参与了这个区域？}
+
+一个常见的损耗记账框架是
+
+\[
+\frac{1}{Q_i}\approx \sum_j p_j\tan\delta_j + \frac{1}{Q_{\mathrm{other}}},
+\]
+
+其中 $p_j$ 是第 $j$ 个介质或界面区域的 electric-field participation，$\tan\delta_j$ 是对应的有效损耗角。真实 KID 还会有 quasiparticle、radiation、vortex、conductor 等其他损耗，所以这个式子不是“总损耗的唯一模型”，而是帮助我们理解为什么\textbf{一层极薄但位于高场区域的表面层也可能重要}。
+
+超导微波谐振器研究长期把 metal--substrate、substrate--vacuum 和 metal--vacuum 附近的界面视为潜在 TLS 损耗来源。对 KID 来说，这提醒我们：低温 $Q_i$ 差不一定等于“Al 膜本体差”，也可能需要回查基底和界面历史。
+
+\subsection{厚度、平整度与毫米波结构}
+
+对 150 GHz 一类 LEKID，substrate thickness 还可能参与毫米波传播和背短路几何。此时同一片 wafer 的厚度公差、局部弯曲、背面处理和安装间隙都可能从“机械尺寸”变成“光学尺寸”。
+
+因此，如果设计依赖特定 optical stack，就不应只记录“high-resistivity Si”，还应把 nominal thickness、实测厚度/公差、wafer bow/flatness（若平台提供）和背面状态写进材料卡。
+
+\section{为什么高阻硅和蓝宝石经常出现}
+
+高阻硅和 sapphire 都常见于超导微波器件，但原因不能简化成“它们绝缘”。设计者真正需要的是：低微波损耗、适合的介电性质、较好的晶圆质量、成熟微纳加工生态，以及与目标薄膜/刻蚀/封装流程的兼容性。
+
+对本册的第一条 single-layer Al LEKID 主线，高阻 Si 是很自然的起点，因为已有大量 LEKID 和 superconducting resonator 工作使用 Al-on-Si。但这不意味着未来所有 KID 都应该固定用 Si。换 substrate 可能同时改变介电常数、表面化学、热学行为、光学传播和 fabrication process window，因此应把它视为一次系统变更，而不是简单替换“支撑板”。
+
+\begin{warningbox}
+不要把文献里的 substrate choice 直接当作本地加工结论。真正下单 wafer 前，应同时确认器件电磁需求和加工平台的 material policy、wafer size/thickness、清洗兼容、背面处理、dicing 与 holder 约束。
+\end{warningbox}
+
+\section{表面不是“理想平面”}
+
+在仿真里，Al/Si 往往是一条数学边界；在真实器件里，它可能包含原生氧化层、吸附物、残胶、颗粒、粗糙度和工艺造成的受损层。
+
+这些层通常很薄，但位置往往恰好在高电场区域。针对 superconducting planar resonator 的研究已经表明，substrate surface preparation、界面氧化层和表面损伤能够明显改变低功率 $Q_i$；也有工作通过改变表面处理或把高场区域从易损界面移开来降低 TLS 相关损耗。
+
+这给 KID fabrication 一个重要的方法论：
+
+\begin{center}
+\textbf{“表面处理有效”必须通过器件数据证明，而不能仅凭表面看起来更干净。}
+\end{center}
 
 \section{“清洗”不是一个按钮}
 
-清洗步骤应根据要去除的污染物和下一步工艺来定义。对于学习阶段，最重要的不是背化学配方，而是每次都明确：我要去掉什么？会不会留下新的表面状态？从清洗结束到沉积开始暴露了多久？这些问题应写进 process traveler。
+加工文档里最危险的模糊词之一就是“clean”。它没有说明要去掉什么，也没有说明清洗之后希望留下什么表面。
+
+第二册建议把任何 surface preparation 拆成三个问题：
+
+\begin{enumerate}
+  \item \textbf{目标污染物是什么？} 颗粒、有机物、原生氧化层、残胶，还是上一道工艺的副产物？
+  \item \textbf{处理后表面变成什么？} 是否可能改变粗糙度、表面终止、氧化状态或引入新的残留？
+  \item \textbf{下一步是什么？} 从处理结束到 deposition 的等待时间、空气暴露、搬运和 storage 是否受控？
+\end{enumerate}
+
+真正有价值的 process traveler 不应该只写“wafer cleaned”，而应该至少记录 surface-prep step ID、时间、工具/站点、sample ID、异常和进入下一步 deposition 的时间。
+
+\begin{warningbox}
+本讲义不会把危险化学品的浓度、温度、时间或设备参数写成可直接执行的 recipe。实际清洗与表面处理必须服从目标实验室的 SOP、材料兼容规则和现场培训。本册只负责解释这些步骤为什么会影响 KID。
+\end{warningbox}
+
+\section{原生氧化层为什么值得单独记}
+
+以 Si 为例，空气暴露后的表面状态并不是永远不变的。对 Al 来说，金属表面也会形成氧化层。对于普通低频电路，这些纳米级变化常常可以忽略；对于高 $Q$ 超导谐振器，界面处又恰好可能具有较高 field participation，因此它们会进入损耗讨论。
+
+这里要避免两个极端：
+
+\begin{itemize}
+  \item 不能看到 native oxide 就断言它一定主导 $Q_i$；
+  \item 也不能因为它很薄就认为一定无关紧要。
+\end{itemize}
+
+正确做法是利用 controlled split、功率/温度依赖、不同几何的 participation 变化以及表面/截面表征建立证据链。
+
+\section{从室温表征到低温反馈}
+
+对第一批 KID wafer，substrate/surface 相关的 room-temperature 数据至少可以分成三层。
+
+\subsection{来料层}
+
+记录 wafer vendor/lot、材料、晶向（若相关）、电阻率等级、直径、目标厚度、polish 状态和正反面标识。不要让一片裸 wafer 在实验室里变成“那片硅”。
+
+\subsection{加工前后表面层}
+
+低倍显微镜负责颗粒和大缺陷；profilometer/AFM/ellipsometry 等工具是否需要使用，要由具体 hypothesis 决定。表征的目标不是“设备能测所以都测”，而是建立能与后续 $Q_i$ 或 geometry 关联的数据。
+
+\subsection{器件层}
+
+最终还是要回到 resonance map：如果某种 surface preparation 真的有价值，应在相同或可比较结构上体现为可重复的 $Q_i$、frequency scatter 或 yield 改善，而不是只在一张 AFM 图上更漂亮。
+
+\begin{measurebox}
+\textbf{Substrate / Surface Card 最小字段：}
+wafer ID 与 lot；material / resistivity grade；diameter / nominal thickness；polish / backside state；surface-prep step ID；关键时间戳；deposition 前等待/暴露记录；颗粒或划痕异常；必要的 thickness/roughness/oxide proxy；对应 film batch；对应 cooldown ID。
+\end{measurebox}
+
+\section{一个很实用的 test structure 思路}
+
+如果我们未来怀疑 substrate surface 在限制 $Q_i$，最有信息量的器件不一定是完整双偏振 LEKID。可以在同一 wafer 上放若干简单 microwave resonator 或具有不同线宽/间隙的 test structures，使 electric-field participation 有系统变化。
+
+如果高场更集中在界面的几何表现出更强的低功率损耗，并且这种趋势随 surface process 改变，就比“完整像素 $Q_i$ 变好了”更容易定位原因。
+
+这也是第二册反复强调 test coupon 的原因：\textbf{正式像素负责实现科学目标，测试结构负责解释为什么。}
+
+\begin{checkpointbox}
+拿到一片“high-resistivity Si”时，你现在应该自动追问：它是哪一批？多厚？哪一面抛光？表面经历了什么？从最后一次 surface preparation 到 Al deposition 等了多久？如果低温 $Q_i$ 变差，我们有没有 test structure 能区分 film loss、interface loss 和 geometry 问题？
+\end{checkpointbox}
+
+\section*{进一步阅读}
+
+\begin{itemize}
+  \item C. R. H. McRae et al., superconducting microwave resonators as probes of materials and interface loss, \href{https://www.nist.gov/publications/materials-loss-measurements-using-superconducting-microwave-resonators}{NIST review / Rev. Sci. Instrum. 91, 091101}.
+  \item A. Bruno et al., substrate surface treatment and deep etching for reducing intrinsic resonator loss, \href{https://arxiv.org/abs/1502.04082}{arXiv:1502.04082}.
+  \item C. T. Earnest et al., silicon/aluminum substrate-surface engineering and resonator $Q_i$, \href{https://arxiv.org/abs/1807.08072}{arXiv:1807.08072}.
+  \item H. McCarrick et al., thin-Al-on-Si 150 GHz LEKID fabrication, \href{https://arxiv.org/abs/1407.7749}{arXiv:1407.7749}.
+\end{itemize}
