@@ -58,7 +58,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf /tmp/kid-volume2-demo /tmp/kid-volume2-analysis
+          rm -rf /tmp/kid-volume2-demo /tmp/kid-volume2-analysis /tmp/kid-volume2-plots /tmp/kid-volume2-batches
 
           python3 volume2-fabrication/examples/wafer_to_resonance_demo.py \
             --out /tmp/kid-volume2-demo
@@ -89,6 +89,25 @@ jobs:
           grep -Fq 'residual_std_ppm=110.9' /tmp/kid-volume2-analysis/analysis_summary.txt
           grep -Fq 'current_collision_pairs=2' /tmp/kid-volume2-analysis/analysis_summary.txt
           grep -Fq 'collision_pairs=0' /tmp/kid-volume2-demo/summary.txt
+
+          python3 volume2-fabrication/examples/plot_fabrication_feedback.py \
+            --joined /tmp/kid-volume2-analysis/joined_feedback.csv \
+            --out /tmp/kid-volume2-plots
+
+          for file in wafer_rsq_map.svg frequency_error_map.svg predictor_vs_measurement.svg residual_map.svg diagnostic_report.html; do
+            test -s "/tmp/kid-volume2-plots/$file"
+          done
+          grep -Fq '<svg' /tmp/kid-volume2-plots/residual_map.svg
+
+          python3 volume2-fabrication/examples/compare_fabrication_batches.py \
+            --joined synthetic_A=/tmp/kid-volume2-analysis/joined_feedback.csv \
+            --joined synthetic_repeat=/tmp/kid-volume2-analysis/joined_feedback.csv \
+            --out /tmp/kid-volume2-batches
+
+          test -s /tmp/kid-volume2-batches/batch_summary.csv
+          test -s /tmp/kid-volume2-batches/repeatability_report.md
+          grep -Fq 'synthetic_A' /tmp/kid-volume2-batches/repeatability_report.md
+          grep -Fq 'synthetic_repeat' /tmp/kid-volume2-batches/repeatability_report.md
 
       - name: Build only required Volume 2 PDFs
         if: steps.detect.outputs.need_tex == 'true'
@@ -166,7 +185,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf /tmp/kid-volume2-demo /tmp/kid-volume2-analysis
+          rm -rf /tmp/kid-volume2-demo /tmp/kid-volume2-analysis /tmp/kid-volume2-plots /tmp/kid-volume2-batches
 
           python3 volume2-fabrication/examples/wafer_to_resonance_demo.py \
             --out /tmp/kid-volume2-demo
@@ -189,6 +208,22 @@ jobs:
           grep -Fq 'residual_std_ppm=110.9' /tmp/kid-volume2-analysis/analysis_summary.txt
           grep -Fq 'current_collision_pairs=2' /tmp/kid-volume2-analysis/analysis_summary.txt
           grep -Fq 'collision_pairs=0' /tmp/kid-volume2-demo/summary.txt
+
+          python3 volume2-fabrication/examples/plot_fabrication_feedback.py \
+            --joined /tmp/kid-volume2-analysis/joined_feedback.csv \
+            --out /tmp/kid-volume2-plots
+          test -s /tmp/kid-volume2-plots/wafer_rsq_map.svg
+          test -s /tmp/kid-volume2-plots/frequency_error_map.svg
+          test -s /tmp/kid-volume2-plots/predictor_vs_measurement.svg
+          test -s /tmp/kid-volume2-plots/residual_map.svg
+          test -s /tmp/kid-volume2-plots/diagnostic_report.html
+
+          python3 volume2-fabrication/examples/compare_fabrication_batches.py \
+            --joined synthetic_A=/tmp/kid-volume2-analysis/joined_feedback.csv \
+            --joined synthetic_repeat=/tmp/kid-volume2-analysis/joined_feedback.csv \
+            --out /tmp/kid-volume2-batches
+          test -s /tmp/kid-volume2-batches/batch_summary.csv
+          test -s /tmp/kid-volume2-batches/repeatability_report.md
 
       - name: Build and audit complete Volume 2
         uses: xu-cheng/texlive-action@v3
